@@ -332,7 +332,7 @@ export default function Register() {
             <div className="input-container">
               <input
                 name="emergencyContact"
-                placeholder="Emergency Contact Name"
+                // placeholder="Emergency Contact Name"
                 value={formData.emergencyContact}
                 onChange={handleChange}
                 className={

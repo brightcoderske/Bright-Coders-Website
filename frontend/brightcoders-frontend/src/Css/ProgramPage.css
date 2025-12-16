@@ -368,6 +368,10 @@
 ========================== */
 
 @media (max-width: 768px) {
+  .programs-header p{
+    text-align: center;
+    font-size: 0.8rem;
+  }
   .modal-overlay {
     align-items: flex-end; /* bottom sheet style */
   }

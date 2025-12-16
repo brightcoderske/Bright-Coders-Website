@@ -163,7 +163,7 @@ const Programs = () => {
       </motion.div>
 
       {/* ******************************************************** */}
-      {/* COURSE DETAIL MODAL */}
+      {/* COURSE DETAILS MODAL */}
       {/* ******************************************************** */}
       <AnimatePresence>
         {selectedCourse && (

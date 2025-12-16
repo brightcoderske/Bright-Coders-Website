@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { HiDesktopComputer } from "react-icons/hi";
 
 import "../Css/Footer.css";
@@ -67,19 +67,44 @@ const Footer = () => {
           <div className="quick-links">
             <ul>
               <li>
-                <Link to="/">Home</Link>
+                <NavLink
+                  to="/"
+                  className={({ isActive }) => (isActive ? "active-link" : "")}
+                >
+                  Home
+                </NavLink>
               </li>
               <li>
-                <Link to="/about">About Us</Link>
+                <NavLink
+                  to="/about"
+                  className={({ isActive }) => (isActive ? "active-link" : "")}
+                >
+                  About Us
+                </NavLink>
               </li>
               <li>
-                <Link to="/programs">Programs</Link>
+                <NavLink
+                  to="/programs"
+                  className={({ isActive }) => (isActive ? "active-link" : "")}
+                >
+                  Programs
+                </NavLink>
               </li>
               <li>
-                <Link to="/testimonials">Testimonials</Link>
+                <NavLink
+                  to="/testimonials"
+                  className={({ isActive }) => (isActive ? "active-link" : "")}
+                >
+                  Testimonials
+                </NavLink>
               </li>
               <li>
-                <Link to="/contact">Contact</Link>
+                <NavLink
+                  to="/contact"
+                  className={({ isActive }) => (isActive ? "active-link" : "")}
+                >
+                  Contact
+                </NavLink>
               </li>
             </ul>
           </div>
@@ -91,7 +116,7 @@ const Footer = () => {
           </p>
           <form action="" className="news-letter-form">
             <input type="email" required placeholder="Your email" />
-            <button>
+            <button type="submit">
               Subscribe <FaArrowRight size={15} color="#fff" />
             </button>
           </form>
