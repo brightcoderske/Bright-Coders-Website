@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import logo from "../assets/logo2.png";
 import { HashLink } from "react-router-hash-link";
@@ -41,10 +41,11 @@ const Navbar = () => {
     setDropDownOpen((prev) => !prev);
   };
 
-  const closeAllMenus = () => {
+  // Wrapping in a useCallback to prevent it from being redefined on every render
+  const closeAllMenus = useCallback(() => {
     setMobileMenuOpen(false);
     setDropDownOpen(false);
-  };
+  }, []); // Empty array because setMobileMenuOpen/setDropDownOpen are stable
 
   // Close menu on outside click (mobile)
   useEffect(() => {
@@ -58,12 +59,12 @@ const Navbar = () => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [closeAllMenus]);
 
   return (
     <div className="navbar-main-section">
       <div className="nav-logo">
-        <img src={logo} alt="Website Logo" width={"125px"} height={"125px"} />
+        <img src={logo} alt="Website Logo" width={"125"} height={"125"} />
       </div>
 
       <div className={`nav-links ${mobileMenuOpen ? "mobile-active" : ""}`}>
@@ -97,12 +98,18 @@ const Navbar = () => {
               dropdownOpen ? "mobile-open active-dropdown" : ""
             }`}
           >
-            <div className="dropdown-link" onClick={toggleDropDown}>
+            <button
+              className="dropdown-link"
+              onClick={toggleDropDown}
+              // Adding ARIA attributes for accessibility
+              aria-expanded={dropdownOpen}
+              aria-controls="submenu-more"
+            >
               <IoMdArrowDropdown className="nav-icon nav-icon-more" />
               <span>More</span>
-            </div>
+            </button>
 
-            <div className="sub-menu">
+            <div className="sub-menu" id="submenu-more">
               <ul>
                 <li>
                   <NavLink to="/founder" onClick={closeAllMenus}>
