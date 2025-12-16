@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "../Css/ProgramPage.css";
 import { FaClock, FaCheckCircle, FaTimes } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import programData from "../Utils/programData";
 import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 
 const Programs = () => {
   const navigate = useNavigate();
@@ -161,89 +162,99 @@ const Programs = () => {
         <button onClick={handleEnrollBtn}> Enroll Now</button>
       </motion.div>
 
+      {/* ******************************************************** */}
       {/* COURSE DETAIL MODAL */}
-
-      {selectedCourse && (
-        <div className="modal-overlay" onClick={closeModal}>
+      {/* ******************************************************** */}
+      <AnimatePresence>
+        {selectedCourse && (
           <motion.div
-            className="modal-box"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.3 }}
-            onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside
+            className="modal-overlay"
+            onClick={closeModal}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <button className="close-modal" onClick={closeModal}>
-              <FaTimes />
-            </button>
+            <motion.div
+              className="modal-box"
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside
+            >
+              <button className="close-modal" onClick={closeModal}>
+                <FaTimes />
+              </button>
 
-            <h1>{selectedCourse.title}</h1>
-            <p className="price">{selectedCourse.price}</p>
+              <h1>{selectedCourse.title}</h1>
+              <p className="price-section">{selectedCourse.price}</p>
 
-            {/* Definition */}
-            {selectedCourse.description?.definition && (
-              <div className="course-section">
-                <h2>What is this course?</h2>
-                <p>{selectedCourse.description.definition}</p>
-              </div>
-            )}
+              {/* Definition */}
 
-            {/* Learning Points */}
-            {selectedCourse.description?.learningPoints && (
-              <div className="course-section">
-                <h2>What you will learn</h2>
-                <ul className="learning-points">
-                  {selectedCourse.description.learningPoints.map(
-                    (point, index) => (
-                      <li key={index}>
-                        <FaCheckCircle className="check-icon" /> {point}
-                      </li>
-                    )
-                  )}
-                </ul>
-              </div>
-            )}
-
-            {/* Outcome */}
-            {selectedCourse.description?.outcome && (
-              <div className="course-section">
-                <h2>Course Outcome</h2>
-                <p>{selectedCourse.description.outcome}</p>
-              </div>
-            )}
-
-            {/* Requirements */}
-            {selectedCourse.requirements && (
-              <div className="course-section">
-                <h2>Requirements</h2>
-                <ul>
-                  {selectedCourse.requirements.map((req, index) => (
-                    <li key={index}>{req}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Focus Areas */}
-            {selectedCourse.focus && (
-              <div className="course-section">
-                <h2>Focus Areas</h2>
-                <div className="tags">
-                  {selectedCourse.focus.map((f, i) => (
-                    <span key={i} className="tag">
-                      {f}
-                    </span>
-                  ))}
+              {selectedCourse.description?.definition && (
+                <div className="course-section">
+                  <h2>What is this course?</h2>
+                  <p>{selectedCourse.description.definition}</p>
                 </div>
-              </div>
-            )}
+              )}
 
-            <button className="enroll-btn" onClick={handleEnroll}>
-              Enroll Now
-            </button>
+              {/* Learning Points */}
+              {selectedCourse.description?.learningPoints && (
+                <div className="course-section">
+                  <h2>What you will learn</h2>
+                  <ul className="learning-points">
+                    {selectedCourse.description.learningPoints.map(
+                      (point, index) => (
+                        <li key={index}>
+                          <FaCheckCircle className="check-icon" /> {point}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </div>
+              )}
+
+              {/* Outcome */}
+              {selectedCourse.description?.outcome && (
+                <div className="course-section">
+                  <h2>Course Outcome</h2>
+                  <p>{selectedCourse.description.outcome}</p>
+                </div>
+              )}
+
+              {/* Requirements */}
+              {selectedCourse.requirements && (
+                <div className="course-section">
+                  <h2>Requirements</h2>
+                  <ul>
+                    {selectedCourse.requirements.map((req, index) => (
+                      <li key={index}>{req}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Focus Areas */}
+              {selectedCourse.focus && (
+                <div className="course-section">
+                  <h2>Focus Areas</h2>
+                  <div className="tags tag-modal">
+                    {selectedCourse.focus.map((f, i) => (
+                      <span key={i} className="tag ">
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <button className="enroll-btn" onClick={handleEnroll}>
+                Enroll Now
+              </button>
+            </motion.div>
           </motion.div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 };
