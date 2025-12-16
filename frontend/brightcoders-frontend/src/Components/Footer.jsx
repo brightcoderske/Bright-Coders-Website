@@ -36,7 +36,9 @@ const Footer = () => {
 
       <section className="main-footer">
         <div className="f-column-1">
-          <img src={logo} alt="Bright Coders' Logo" className="f-logo" />
+          <Link to="/">
+            <img src={logo} alt="Bright Coders' Logo" className="f-logo" />
+          </Link>
           <p className="f-column-1-title">
             {" "}
             Bright Coders is a coding academy helping kids and teens learn

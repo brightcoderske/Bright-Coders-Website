@@ -26,7 +26,7 @@ html,
 body,
 #root {
   width: 100%; /* full width of viewport or set a fixed width */
-  height: 100vh;
+  /* height: 100vh; */
   /* max-width: 1400px; */
   /* background-color: red; */
   /* padding:0 10px; */
@@ -65,4 +65,10 @@ body {
   to {
     opacity: 0;
   }
+}
+
+
+.main-content {
+  min-height: 100vh;
+  position: relative;
 }
