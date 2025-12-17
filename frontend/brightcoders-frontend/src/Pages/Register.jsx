@@ -307,6 +307,7 @@ export default function Register() {
             </select>
             {error.field === "deviceType" && (
               <p className="error-message">{error.message}</p>
+              
             )}
 
             <select

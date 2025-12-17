@@ -106,7 +106,7 @@
   border-color: #0a61a8;
   box-shadow: 0 0 6px rgba(10, 97, 168, 0.3);
 }
-
+/* textarea */
 textarea {
   min-height: 100px;
   resize: vertical;
@@ -160,6 +160,7 @@ textarea {
   margin-bottom: 20px;
 }
 
+/* Check box to check user's consent */
 .checkbox-container {
   display: flex;
   align-items: center;
@@ -393,6 +394,7 @@ textarea {
   .wizard-container {
     margin: 110px 15px;
     padding: 25px;
+    width: 90%;
   }
   .wizard-title {
     font-size: 1.8rem;

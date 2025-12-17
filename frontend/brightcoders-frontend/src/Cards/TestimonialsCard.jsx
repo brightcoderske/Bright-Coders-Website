@@ -56,7 +56,7 @@ const TestimonialsCard = () => {
         },
       },
       {
-        breakpoint: 780, // <=599px
+        breakpoint: 600, // <=
         settings: {
           slidesToShow: 1,
           centerMode: false,
