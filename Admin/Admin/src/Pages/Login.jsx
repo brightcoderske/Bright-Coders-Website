@@ -88,7 +88,7 @@ const Login = ({ onToggle }) => {
           </div>
         </div>
         <div className="alternative">
-          <p>or use your email and password</p>
+          <p style={{fontSize:"1rem"}}>or use your email and password</p>
         </div>
         <label htmlFor="email">Email</label>
         <input

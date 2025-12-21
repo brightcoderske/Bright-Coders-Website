@@ -1,5 +1,13 @@
 import multer from "multer"; 
 //This brings in the Multer library — a Node.js middleware used to handle file uploads (especially multipart/form-data forms).
+import fs from "fs"
+
+// Ensuring the folder exists
+const uploadDir ="uploads/"
+if(!fs.existsSync(uploadDir)){
+  fs.mkdirSync(uploadDir)
+}
+
 
 // configure storage for uploaded files
 const storage = multer.diskStorage({

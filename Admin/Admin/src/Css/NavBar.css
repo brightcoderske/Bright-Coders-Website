@@ -1,0 +1,42 @@
+.navbar {
+  background-color: #ffffff;
+  padding: 20px 0 20px 40px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+
+.navBarMain {
+  display: flex;
+  gap: 8px;
+}
+
+.toggleSideMenu {
+  border: none;
+  background-color: inherit;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.nav-title {
+  /* display: flex; */
+  color: #7c52f4;
+  /* justify-content: center;
+  background-color: red; */
+  width: 100%;
+}
+
+.side-menu-left-section {
+  background-color: white;
+}
+
+.nav-icons {
+  /* border: 1px solid red; */
+  border: none;
+  background-color: inherit;
+}
+
+.side-menu-left-section {
+  color: red;
+}

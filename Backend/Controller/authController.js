@@ -125,7 +125,10 @@ export const imageUpload = async (request, response) => {
       console.error("[Upload Error]:", error);
       return response
         .status(400)
-        .json({ message: "Upload failed: " + error.message });
+        .json({
+          message:
+            "Unable to upload image. Please check the 'uploads' directory.",
+        });
     }
 
     if (!request.file) {

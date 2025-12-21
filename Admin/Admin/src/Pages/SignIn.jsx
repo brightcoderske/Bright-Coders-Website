@@ -106,30 +106,31 @@ const SignIn = ({ onToggle }) => {
         navigate("/home");
       }
     } catch (error) {
-      // Handle Backend Errors
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        const backendMsg = error.response.data.message;
+      // 1. Extract the message regardless of where it came from (Axios or Upload Util)
+      const backendMsg =
+        error.response?.data?.message ||
+        error.message ||
+        "Something went wrong";
+      const lowMsg = backendMsg.toLowerCase();
 
-        // Map backend message to specific fields
-        if (backendMsg.toLowerCase().includes("email")) {
-          setError({ field: "email", message: backendMsg });
-        } else if (backendMsg.toLowerCase().includes("password")) {
-          setError({ field: "password", message: backendMsg });
-        } else {
-          setError({
-            field: "general",
-            message: backendMsg,
-          });
-        }
-      } else {
+      // 2. Now run your mapping logic on that message
+      if (lowMsg.includes("email")) {
+        setError({ field: "email", message: backendMsg });
+      } else if (lowMsg.includes("password")) {
+        setError({ field: "password", message: backendMsg });
+      } else if (
+        lowMsg.includes("upload") ||
+        lowMsg.includes("enoent") ||
+        lowMsg.includes("directory")
+      ) {
+        // This will now catch that "C:\Users\Isaac..." error!
+        console.log("Image/Upload Error Caught: ", backendMsg);
         setError({
-          field: "general",
-          message: "Something went wrong, try again later.",
+          field: "profileImageUrl",
+          message: "Image upload failed. Please try again.",
         });
+      } else {
+        setError({ field: "general", message: backendMsg });
       }
     }
   };
@@ -234,7 +235,11 @@ const SignIn = ({ onToggle }) => {
             onChange={handleChange}
             value={formData.password}
           />
-          {error.message && <div style={{height:"20px"}}><p className="error-paragraph">{error.message}</p></div>}
+          {error.message && (
+            <div style={{ height: "20px" }}>
+              <p className="error-paragraph">{error.message}</p>
+            </div>
+          )}
 
           <button type="submit">Sign Up</button>
 

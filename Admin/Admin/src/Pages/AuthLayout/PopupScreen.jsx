@@ -9,7 +9,7 @@ const PopupScreen = ({ onToggle }) => {
         <img src={logo} alt="" />
       </div>
       <h1>Hello, Friend?</h1>
-      <p>Register with your personal details to use all site features</p>
+      <p>Login with your personal details to use all site features</p>
       <button
         onClick={() => {
           console.log("Button clicked!");
