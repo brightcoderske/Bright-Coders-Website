@@ -288,7 +288,8 @@
    ============================================================ */
 @media (max-width: 440px) {
   .hero-wrapper {
-    padding: 60px 10px; /* Reduce side padding to give more room for text */
+    padding: 10px 0px; /* Reduce side padding to give more room for text */
+    /* background: red; */
   }
 
   .wavy-text h1 {
@@ -336,7 +337,10 @@
   }
 
   .hero-image img {
-    max-width: 95%; /* Ensure image never overflows horizontal scroll */
+    max-width: 100%;
+    margin-left: 10%;
+    transform: scale(1.2);
+    /* width: 1020px; */
   }
   .scroll-indicator {
     display: none;

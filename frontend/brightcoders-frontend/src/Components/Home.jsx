@@ -4,8 +4,10 @@ import { useTypewriter, Cursor } from "react-simple-typewriter";
 // import heroIllustration from "../assets/hero-image.png"; // Save the image I provided here
 import heroIllustration from "../assets/gemini2.png";
 import NumberCounter from "number-counter";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [text] = useTypewriter({
     words: ["Future.", "Dream.", "Product."],
     loop: 0,
@@ -41,8 +43,13 @@ const Home = () => {
           </p>
 
           <div className="hero-action-btns">
-            <button className="btn-get-started">Get Started</button>
-            <button className="btn-view-courses">View Courses</button>
+            <button
+              className="btn-get-started"
+              onClick={() => navigate("/register")}
+            >
+              Get Started
+            </button>
+            <button className="btn-view-courses" onClick={()=>navigate("/programs")}>View Courses</button>
           </div>
 
           <div className="hero-mini-stats">
