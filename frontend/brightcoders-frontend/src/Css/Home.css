@@ -10,7 +10,7 @@
 ========================= */
 .hero-wrapper {
   background: linear-gradient(135deg, #fdfbf7 0%, #e2d9f3 100%);
-min-height: 95vh;
+  min-height: 95vh;
   margin-top: 0;
   display: flex;
   align-items: center;
@@ -27,7 +27,7 @@ min-height: 95vh;
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 60px; 
+  gap: 60px;
   padding: 0 50px;
 }
 
@@ -95,10 +95,9 @@ min-height: 95vh;
   color: var(--accent-purple);
   position: relative;
 }
-.cursor-style{
+.cursor-style {
   font-size: 60%;
 }
-
 
 .text-highlight::after {
   content: "";
@@ -172,7 +171,6 @@ min-height: 95vh;
   align-items: center;
   perspective: 1000px;
   /* background-color: red; */
-
 }
 
 .hero-image img {
@@ -259,6 +257,10 @@ min-height: 95vh;
 }
 
 @media (max-width: 768px) {
+  .hero-container {
+    flex-direction: column;
+    text-align: center;
+  }
   .wavy-text h1 {
     font-size: 2.8rem;
   }
@@ -274,5 +276,7 @@ min-height: 95vh;
   .hero-image img {
     max-width: 500px;
   }
-  .scroll-indicator {display: none;}
+  .scroll-indicator {
+    display: none;
+  }
 }
