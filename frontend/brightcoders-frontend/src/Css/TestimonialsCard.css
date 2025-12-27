@@ -1,9 +1,8 @@
 /* --- Carousel Container --- */
 .carousel-inner {
-  padding: 0px 40px ;
+  padding: 0px 40px;
   position: relative;
   max-width: 1100px;
-  /* margin: 0 auto; */
   justify-self: center;
   /* justify-content: center; */
   /* height: fit-content; */
@@ -16,7 +15,7 @@
 /* --- Individual Card Item --- */
 .corousel-item {
   width: 80% !important;
-  margin: 30px ;
+  margin: 30px;
   padding: 40px 30px;
   border-radius: 20px;
   text-align: center;
@@ -31,16 +30,14 @@
   justify-self: center;
 }
 
-
 /* --- Center Slide Effect --- */
 .slick-center .corousel-item {
   transform: scale(1.1);
   
+
   /* border: 1px solid #eff6ff; */
 }
-.slick-list {
-  margin: 0 -20px; /* Counteracts the margin on the cards for edge alignment */
-}
+
 /* --- Feedback Text --- */
 .testimonial-feedback {
   font-size: 1.1rem;
@@ -108,10 +105,11 @@
 .quotes-mark {
   position: absolute;
   top: -20px;
-  right: -20px;
+  left: -2%;
   opacity: 0.1;
   z-index: 1;
   pointer-events: none;
+  color: #2563eb !important;
 }
 
 /* --- Custom Arrows --- */
@@ -146,7 +144,90 @@
   right: -20px;
 }
 
-/* --- Responsive fixes --- */
+/* --- Responsive Design --- */
+
+/* Laptops & Tablets (Max 1024px) */
+@media (max-width: 1024px) {
+  .carousel-inner {
+    max-width: 90%;
+    padding: 0 20px;
+  }
+
+  .corousel-item {
+    width: 90% !important; /* Slightly wider on tablets */
+    margin: 20px auto;
+    min-height: 380px;
+  }
+
+  .testimonial-feedback {
+    font-size: 1rem;
+    height: auto; /* Allow height to adjust to text */
+    min-height: 120px;
+  }
+}
+
+/* Tablets & Large Phones (Max 768px) */
+@media (max-width: 768px) {
+  .carousel-inner {
+    padding: 0 10px;
+  }
+
+  .corousel-item {
+    width: 100% !important; /* Full width for single-slide view */
+    margin: 15px auto;
+    padding: 30px 20px;
+    min-height: auto;
+  }
+
+  .arrow {
+    display: none !important; /* Hide arrows for touch-swiping */
+  }
+
+  .slick-center .corousel-item {
+    transform: scale(1.02); /* Reduce scale effect on small screens */
+  }
+
+  .testimonial-feedback {
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+  }
+
+  .courousel-name {
+    font-size: 1.1rem;
+  }
+}
+
+/* Small Mobile Phones (Max 480px) */
+@media (max-width: 480px) {
+  .carousel-inner {
+    padding: 0;
+  }
+
+  .corousel-item {
+    padding: 25px 15px;
+    border-radius: 15px;
+    margin: 10px auto;
+  }
+
+  .testimonial-feedback {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .testimonial-image-section {
+    width: 65px;
+    height: 65px;
+  }
+
+  .quotes-mark {
+    transform: scale(0.6); /* Shrink quote icons */
+    top: -30px;
+  }
+
+  .corousel-item span {
+    font-size: 0.75rem;
+  }
+}
 @media (max-width: 768px) {
   .corousel-item {
     padding: 30px 20px;

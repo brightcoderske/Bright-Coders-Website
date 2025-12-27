@@ -13,10 +13,9 @@
 }
 
 .header-paragraph {
-  /* max-width: 600px; */
   margin: 0 auto 40px auto;
   color: #1e3a8a;
-  font-size: 3.1rem;
+  font-size: 3.1rem; /* Note: This is quite large for a paragraph */
 }
 
 .horizontal-line {
@@ -50,9 +49,52 @@
 }
 
 .custom-shape-divider-top-1764543608 .shape-fill {
-  fill: rgba(255, 166, 0, 0.726); /* Matches section above */
+  fill: rgba(255, 166, 0, 0.726);
 }
 
-/* .carousel{
-  background-color: blue;
-} */
+/* --- Added Media Queries for Wrapper --- */
+
+@media (max-width: 1024px) {
+  .header {
+    font-size: 2.2rem;
+  }
+  .header-paragraph {
+    font-size: 2.2rem; /* Scaling down for tablets */
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .testimonials-wrapper {
+    padding: 80px 15px; /* Less padding on smaller screens */
+  }
+
+  .header {
+    font-size: 1.8rem;
+    margin-top: 40px; /* Make space for the absolute-positioned divider */
+  }
+
+  .header-paragraph {
+    font-size: 1.5rem; /* Bringing it down to a readable size */
+    margin-bottom: 30px;
+  }
+
+  .custom-shape-divider-top-1764543608 svg {
+    height: 50px; /* Shorter divider so it doesn't eat into the text */
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    font-size: 1.5rem;
+  }
+
+  .header-paragraph {
+    font-size: 1.2rem;
+    line-height: 1.4;
+  }
+
+  .actual-line {
+    width: 60px; /* Slightly shorter line */
+  }
+}

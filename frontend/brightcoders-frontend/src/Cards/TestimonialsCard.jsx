@@ -99,7 +99,7 @@ const TestimonialsCard = () => {
             </div>
 
             <div className="quotes-mark" aria-hidden="true">
-              <RiDoubleQuotesR size={180} color="silver" />
+              <RiDoubleQuotesR size={150}  />
             </div>
           </div>
         ))}
