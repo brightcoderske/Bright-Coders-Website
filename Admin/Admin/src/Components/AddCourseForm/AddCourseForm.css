@@ -1,7 +1,7 @@
 .form-wrapper {
   background: #ffffff;
   border-radius: 12px;
-  max-width: 850px;
+  max-width: 700px;
   margin: auto;
   max-height: 80vh;
   /* padding-right: 10px; */
@@ -53,6 +53,11 @@
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
 }
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
 
 .form-group,
 .form-section {
@@ -64,7 +69,7 @@
 label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #64748b;
+  color: #5b21b6;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -181,6 +186,45 @@ textarea {
   font-weight: 600;
   cursor: pointer;
 }
+
+.level-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 0.95rem;
+  color: #1e293b;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.level-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.input-error {
+  border: 1px solid #ef4444 !important;
+  background-color: #fef2f2;
+}
+
+.error-msg {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 5px;
+  font-weight: 500;
+  display: block;
+}
+
+.upload-section.error-border {
+  border: 1px dashed #ef4444 !important;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+
 
 @media (max-width: 768px) {
   .form-grid,

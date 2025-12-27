@@ -3,6 +3,7 @@ import {
   Wallet,
   HandCoins,
   LogOut,
+  Newspaper,
   BookOpen, // Icon for Courses
   MessageSquareQuote, // Icon for Testimonials
 } from "lucide-react";
@@ -27,8 +28,14 @@ export const SIDE_MENU_DATA = [
     icon: MessageSquareQuote,
     path: "/testimonials",
   },
-  {
+   {
     id: "04",
+    label: "Blogs",
+    icon: Newspaper,
+    path: "/blogs",
+  },
+  {
+    id: "05",
     label: "Logout",
     icon: LogOut,
     path: "/logout",

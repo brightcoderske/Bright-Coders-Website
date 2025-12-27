@@ -17,6 +17,18 @@ CREATE TABLE IF NOT EXISTS courses (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;
 
+export const runMigrations = async () => {
+  try {
+    // This adds the columns to your EXISTING data safely
+
+    await sql`ALTER TABLE courses ADD COLUMN IF NOT EXISTS last_pushed_at TIMESTAMP WITH TIME ZONE;`;
+    await sql`ALTER TABLE courses ADD COLUMN IF NOT EXISTS last_withdrawn_at TIMESTAMP`;
+    console.log("✅ Database migration complete: Columns added safely.");
+  } catch (err) {
+    console.error("❌ Migration failed:", err);
+  }
+};
+
 // ➤ CREATE: Add new course
 export async function createCourse(data) {
   const result = await sql`
@@ -44,4 +56,30 @@ export const updateCourseById = async (id, data) => {
 export const deleteCourseById = async (id) => {
   const result = await sql`DELETE FROM courses WHERE id=${id} RETURNING id`;
   return result[0];
+};
+
+export const pushCourseToLiveDb = async (id) => {
+  const result = await sql`UPDATE courses 
+    SET is_public = true, 
+        last_pushed_at = CURRENT_TIMESTAMP 
+    WHERE id = ${id}
+    RETURNING *;`;
+  return result[0];
+};
+
+export const withdrawCourseFromLiveWeb = async (id) => {
+  const result = await sql`UPDATE courses 
+  SET is_public = false,
+  last_withdrawn_at =NOW()
+  WHERE id=${id}
+  RETURNING *`;
+  return result[0];
+};
+
+export const getLiveCourses = async () => {
+  return await sql`
+    SELECT * FROM courses 
+    WHERE is_public = true 
+    ORDER BY created_at DESC
+  `;
 };

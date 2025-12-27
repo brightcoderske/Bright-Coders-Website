@@ -1,217 +1,264 @@
 /* -------------------------
-    GLOBAL STYLES
+    GLOBAL & LAYOUT
   -------------------------- */
+:root {
+  --primary: #084b83;
+  --primary-dark: #0b2e4e;
+  --accent: #1cb65d;
+  --accent-light: #ccf5d8;
+  --bg-light: #f8faff;
+  --text-main: #374151;
+  --text-muted: #64748b;
+  --white: #ffffff;
+  --shadow: 0px 6px 14px rgba(0, 0, 0, 0.08);
+}
+
 .programs-page {
   width: 100%;
-  /* padding: 100px 7%; */
-  background: #f8faff;
+  background: var(--bg-light);
   font-family: "Poppins", sans-serif;
+  min-height: 100vh;
+  padding-bottom: 80px;
 }
 
 /* -------------------------
     HEADER SECTION
   -------------------------- */
 .programs-header {
-  /* text-align: center;
-    margin-bottom: 50px; */
   width: 100%;
   min-height: 20vh;
-  background-image: linear-gradient(rgba(8, 0, 58, 0.7), rgba(8, 0, 58, 0.7)),
+  background-image: linear-gradient(rgba(8, 0, 58, 0.75), rgba(8, 0, 58, 0.75)),
     url("https://images.pexels.com/photos/2653362/pexels-photo-2653362.jpeg");
   background-size: cover;
-  background-repeat: no-repeat;
-  color: #fff;
   background-position: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* margin-top: 80px; */
+  text-align: center;
+  color: var(--white);
+  padding: 20px;
 }
 
 .programs-header h1 {
-  font-size: 2.8rem;
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 700;
-  color: white;
   margin-bottom: 10px;
 }
 
 .programs-header p {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.61);
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 600px;
 }
 
 /* -------------------------
-    CATEGORY SECTION
+    LOADING & EMPTY STATES
+  -------------------------- */
+.loading-container,
+.empty-programs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px;
+  color: var(--primary);
+  text-align: center;
+}
+
+.simple-spinner {
+  width: 45px;
+  height: 45px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* -------------------------
+    CATEGORY & GRID
   -------------------------- */
 .program-category {
-  /* margin-bottom: 60px; */
-  padding: 50px 7%;
+  padding: 60px 7% 20px;
 }
 
 .program-category h2 {
   font-size: 1.8rem;
   font-weight: 600;
-  color: #084b83;
-  margin-bottom: 20px;
-  border-left: 5px solid #1cb65d;
-  padding-left: 10px;
+  color: var(--primary);
+  margin-bottom: 30px;
+  border-left: 6px solid var(--accent);
+  padding-left: 15px;
 }
 
-/* -------------------------
-    PROGRAM GRID
-  -------------------------- */
 .program-grid {
-  display: grid;
-  /* grid-template-columns: repeat(3, 1fr); */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  justify-content: center;
-  justify-items: center;
-  gap: 30px;
   /* background-color: red; */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  width: 100%;
 }
 
 /* -------------------------
     PROGRAM CARD
   -------------------------- */
 .program-card {
-  background: #fff;
-  border-radius: 16px;
+  background: var(--white);
+  border-radius: 20px;
   overflow: hidden;
-  padding-bottom: 20px;
   position: relative;
-  box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.08);
-  transition: 0.3s ease-in-out;
-  border-bottom: 3px solid #084b83;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 10px;
+  border-bottom: 3px solid #084b83;
 }
 
 .program-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px);
+  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.12);
 }
 
-/* Program Image */
 .program-card img {
   width: 100%;
-  height: 200px;
+  height: 220px;
   object-fit: cover;
 }
 
-/* Duration Badge */
 .program-duration {
   position: absolute;
   top: 0px;
   right: 0px;
-  background: #1cb65d;
+  background: var(--accent);
   color: white;
-  padding: 3px 12px;
+  padding: 6px 14px;
   border-radius: 0px 14px 0 14px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Title */
 .program-card h3 {
-  font-size: 1.2rem;
-  color: #0b2e4e;
-  font-weight: 600;
-  margin: 15px;
+  font-size: 1.1rem;
+  color: var(--primary-dark);
+  margin: 20px 20px 10px;
 }
 
-/* Focus Tags */
 .focus-area {
-  padding: 0 15px;
+  padding: 0 20px;
 }
-
 .focus-area strong {
-  font-size: 0.9rem;
-  color: #222f43;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .tags {
   margin-top: 8px;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .tag {
-  background: #e7f1ff;
-  color: #084b83;
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  border-radius: 15px;
-}
-
-/* Price */
-.price {
-  margin: 15px;
-  color: #0b2e4e;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-/* Level Badge */
-.level {
-  margin-left: 15px;
+  background: #3b82f6;
+  color: white;
   padding: 4px 12px;
   font-size: 0.75rem;
-  border-radius: 20px;
+  border-radius: 6px;
   font-weight: 500;
 }
 
-.beginner {
+.price {
+  margin: 15px 20px;
+  color: var(--primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.level {
+  /* position: absolute; */
+  /* top: 15px;
+  left: 15px; */
+  margin-left: 20px;
+  padding: 4px 20px;
+  font-size: 0.7rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.level.beginner {
   background: #ccf5d8;
   color: #0f8b2f;
 }
-
-.intermediate {
+.level.intermediate {
   background: #d9ecff;
   color: #0a61a8;
 }
-
-.advanced {
+.level.advanced {
   background: #ffe4cc;
   color: #c25400;
 }
+
 
 /* -------------------------
     BENEFITS / WHAT YOU GET
   -------------------------- */
 .benefits {
   margin-top: 80px;
-  text-align: center;
+  /* text-align: center; */
+  /* background-color: red; */
 }
 
 .benefits h2 {
   color: #0b2e4e;
   font-size: 2rem;
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .benefits ul {
   list-style: none;
-  padding: 0;
-  width: 60%;
+  padding: 20px;
+  width: 40%;
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: rgba(192, 192, 192, 0.747);
+  
+  border-radius: 20px;
 }
 
 .benefits ul li {
   font-size: 1rem;
   padding: 10px 0;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   gap: 10px;
-  justify-content: center;
+  justify-content: center;  
   color: #333;
 }
 
 .benefits ul li svg {
   color: #1cb65d;
   font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 /* -------------------------
@@ -225,7 +272,7 @@
 .program-cta button {
   background: #0a61a8;
   color: white;
-  padding: 14px 30px;
+  padding: 14px 50px;
   border: none;
   font-size: 1rem;
   font-weight: 600;
@@ -239,7 +286,11 @@
   transform: translateY(-3px);
 }
 
-/* Overlay */
+/* -------------------------
+    MODAL STYLES
+  -------------------------- */
+
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -247,26 +298,35 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.733) !important;
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 10000; /* High z-index to stay on top */
 }
 
-/* Modal Box */
 .modal-box {
   background: #fff;
   width: 90%;
-  min-width: 700px;
-  padding: 25px 30px;
+  max-width: 800px; /* Increased for better readability */
+  min-width: 520px; /* Better for mobile */
+  padding: 30px 40px;
   border-radius: 12px;
   position: relative;
   overflow-y: auto;
   max-height: 90vh;
   box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  text-align: left; /* Aligns content to the left like Modal 2 */
 }
 
-/* Close Button */
+.modal-box h1 {
+  color: darkslateblue;
+  margin-top: 10px;
+  font-size: 1.8rem;
+}
+
 .close-modal {
   position: absolute;
   top: 15px;
@@ -275,30 +335,23 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+  color: #64748b;
+  transition: color 0.2s;
 }
 
-/* Section styling */
+.close-modal:hover {
+  color: #000;
+}
+
+/* Section styling matching Modal 2 */
 .course-section {
-  margin-top: 20px;
-}
-
-.price-section {
-  background-color: green;
-  color: white;
-  width: fit-content;
-  justify-self: center;
-  padding: 10px 15px;
-  border-radius: 14px;
-  margin: 30px 0;
-}
-
-.modal-box h1 {
-  color: darkslateblue;
+  margin-top: 25px;
+  width: 100%;
 }
 
 .course-section h2 {
   color: darkcyan;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-size: 1.2rem;
   border-bottom: 2px solid #3b82f6;
   display: inline-block;
@@ -308,67 +361,99 @@
 .course-section p {
   line-height: 1.6;
   color: #374151;
+  margin: 0;
 }
 
-/* Learning points */
+.price-section {
+  background-color: #10b981; /* Green like Modal 2 */
+  color: white;
+  width: fit-content;
+  padding: 8px 18px;
+  border-radius: 50px;
+  font-weight: 700;
+  margin: 15px 0;
+  font-size: 1rem;
+}
+
+/* Learning Points matching Modal 2 */
 .learning-points {
   list-style: none;
   padding-left: 0;
+  margin: 0;
 }
 
 .learning-points li {
   display: flex;
-  align-items: center;
-  margin-bottom: 8px;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
   color: #374151;
 }
 
 .check-icon {
-  color: #10b981;
-  margin-right: 8px;
+  color: #10b981; /* Green check icons */
+  margin-top: 4px;
+  flex-shrink: 0;
 }
 
-/* Tags */
-.tags {
+/* Requirements Item Styling */
+.requirement-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc; /* Light slate background */
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  color: #475569;
+  border-left: 3px solid #3b82f6;
+}
+
+.section-icon {
+  color: #3b82f6; /* Blue icon */
+  flex-shrink: 0;
+}
+
+/* Tags matching Modal 2 */
+.tags.tag-modal {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.tags.tag-modal {
-  justify-content: center;
-}
 .tag {
   background-color: #3b82f6;
   color: #fff;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-/* Enroll button */
+/* Enroll Button matching Modal 2 */
 .enroll-btn {
-  margin-top: 25px;
+  margin-top: 35px;
   background-color: #10b981;
   color: #fff;
   border: none;
-  padding: 12px 25px;
+  padding: 14px 25px;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 100%; /* Better for mobile UX */
 }
 
 .enroll-btn:hover {
   background-color: #059669;
+  transform: translateY(-2px);
 }
-
-/* ==========================
-   MOBILE FULLSCREEN MODAL
-========================== */
-
+/* -------------------------
+    RESPONSIVE
+  -------------------------- */
 @media (max-width: 768px) {
-  .programs-header p{
+   .programs-header p{
     text-align: center;
     font-size: 0.8rem;
   }
@@ -395,17 +480,24 @@
     font-size: 1.4rem;
     text-align: center;
   }
-
-  .price-section {
-    margin: 1rem auto 1.5rem;
-  }
-
-  .enroll-btn {
-    width: 100%;
-    font-size: 1.1rem;
+  .benefits ul {
+    grid-template-columns: 1fr;
   }
 }
 
+@media (max-width: 630px) {
+ .benefits {
+justify-self: center;
+  width: 80%;
+    
+  }
+  .benefits h2{
+    font-size: 1.7rem;
+  }
+  .benefits ul {
+    
+    width: 100%;  } 
+}
 @keyframes slideUp {
   from {
     transform: translateY(100%);

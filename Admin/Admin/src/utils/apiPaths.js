@@ -1,6 +1,5 @@
 export const BASE_URL = "http://localhost:8000";
 
-// utils/apiPaths.js
 export const API_PATHS = {
   AUTH: {
     LOGIN: "/api/auth/login",
@@ -15,19 +14,27 @@ export const API_PATHS = {
     CREATE: "/api/courses",
     UPDATE: (id) => `/api/courses/${id}`,
     DELETE: (id) => `/api/courses/${id}`,
+    PUSH: (id) => `/api/courses/${id}/push`,
+    WITHDRAW: (id) => `/api/courses/${id}/withdraw`,
   },
-//   INCOME: {
-//     ADD_INCOME: "/api/income/add",
-//     GET_ALL_INCOME: "/api/income/get",
-//     DELETE_INCOME: (incomeId) => `/api/income/${incomeId}`,
-//     DOWNLOAD_INCOME: "/api/income/downloadexcel",
-//   },
-//   EXPENSE: {
-//     ADD_EXPENSE: "/api/expense/add",
-//     GET_ALL_EXPENSE: "/api/expense/get",
-//     DELETE_EXPENSE: (expenseId) => `/api/expense/${expenseId}`,
-//     DOWNLOAD_EXPENSE: "/api/expense/downloadexcel",
-//   },
+  BLOGS: {
+    GET_ALL: "/api/blogs",
+    GET_LIVE: "/api/blogs/live",
+    CREATE: "/api/blogs",
+    UPDATE: (id) => `/api/blogs/${id}`,
+    DELETE: (id) => `/api/blogs/${id}`,
+    PUSH: (id) => `/api/blogs/${id}/push`,
+    WITHDRAW: (id) => `/api/blogs/${id}/withdraw`,
+  },
+  // 🔹 Testimonial Routes
+  TESTIMONIALS: {
+    GET_LIVE: "/api/testimonials/live", // Public landing page
+    SUBMIT: "/api/testimonials/submit", // Public form submission
+    GET_ALL: "/api/testimonials", // Admin dashboard view
+    DELETE: (id) => `/api/testimonials/${id}`,
+    APPROVE: (id) => `/api/testimonials/${id}/approve`,
+    HIDE: (id) => `/api/testimonials/${id}/hide`,
+  },
   IMAGE: {
     UPLOAD_IMAGE: "/api/auth/upload-image",
   },

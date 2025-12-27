@@ -1,31 +1,29 @@
+import { response } from "express";
 import * as Queries from "../Database/Config/courseQueries.js";
+import { courseSchema } from "../Middleware/Validators/courseValidator.js";
 // ========================================
 // 🔹 Create Course
 // ========================================
 export const handleAddCourse = async (request, response) => {
   try {
-    const course = await Queries.createCourse(request.body);
+    // validate() returns an object with an 'error' property if it fails
+    const { error, value } = courseSchema.validate(request.body, { abortEarly: false });
 
-    // if (req.body.syncWithBrightCoders) {
-    //   try {
-    //     console.log("🚀 Syncing to BrightCoders Public Page...");
+    if (error) {
+      // Map the errors into a clean array of messages
+      const errorMessages = error.details.map((detail) => detail.message);
+      return response.status(400).json({ 
+        message: "Validation Failed", 
+        errors: errorMessages 
+      });
+    }
 
-    //     // This is the external API of your public-facing landing page
-    //     await axios.post("https://brightcoders.co.ke/api/v1/update-catalog", {
-    //       apiKey: process.env.PUBLIC_SITE_SECRET, // Security key
-    //       courseData: course, // Send the data we just saved
-    //     });
-
-    //     console.log("✅ Public page updated!");
-    //   } catch (syncError) {
-    //     // If the public site fails, we log it but don't crash the admin panel
-    //     console.error("❌ Sync to public page failed:", syncError.message);
-    //   }
-    // }
-
+    // 'value' is the cleaned, validated data (it even converts types!)
+    const course = await Queries.createCourse(value);
     return response.status(201).json(course);
+    
   } catch (err) {
-    response.status(500).json({ error: "Failed to add course" });
+    response.status(500).json({ error: "Server Error" });
   }
 };
 
@@ -68,5 +66,45 @@ export const handleDeleteCourse = async (request, response) => {
       .json({ message: "Course deleted successfully" });
   } catch (err) {
     response.status(500).json({ error: "Delete Failed" });
+  }
+};
+
+// ========================================
+// 🔹 Pushing Course Live
+// ========================================
+export const handlePushToLive = async (request, response) => {
+  try {
+    const { id } = request.params;
+    // Call the database function to handle the push
+    const updatedCourse = await Queries.pushCourseToLiveDb(id);
+    if (!updatedCourse) {
+      return response.status(404).json({ message: "Course not found!" });
+    }
+
+    return response
+      .status(200)
+      .json({ message: "Sync Successful! Course is now live.", updatedCourse });
+  } catch (error) {
+    response.status(500).json({ error: "Push to live failed" });
+  }
+};
+
+// ========================================
+// 🔹 Withdraw Course from Live
+// ========================================
+export const withdrawCourse = async (request, response) => {
+  const { id } = request.params;
+  try {
+    const updatedCourse = await Queries.withdrawCourseFromLiveWeb(id);
+    if (!updatedCourse) {
+      return response.status(404).json({ message: "Course not found!" });
+    }
+    return response.status(200).json({
+      message: "Course withdrawn from live site",
+      updatedCourse,
+    });
+  } catch (error) {
+    console.error("Withdraw Error:", error);
+    response.status(500).json({ message: "Server error during withdrawal" });
   }
 };

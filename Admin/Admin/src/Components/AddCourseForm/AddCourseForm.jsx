@@ -3,12 +3,21 @@ import React, { useState, useRef, useEffect } from "react";
 import "./AddCourseForm.css";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
+import {
+  validateCourseForm,
+  cleanCourseData,
+} from "../../helpers/courseValidation";
 
-const AddCourseForm = ({ onClose, refreshCourses, initialData }) => {
+const AddCourseForm = ({
+  onClose,
+  refreshCourses,
+  initialData,
+  triggerToast,
+}) => {
   const [loading, setLoading] = useState(false);
   const formEndRef = useRef(null);
+  const [errors, setErrors] = useState({});
 
-  // Initialize state: Handling both snake_case (DB) and camelCase (JS)
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
     category: initialData?.category || "",
@@ -118,20 +127,38 @@ const AddCourseForm = ({ onClose, refreshCourses, initialData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { isValid, errors: validationErrors } = validateCourseForm(formData);
+
+    if (!isValid) {
+      setErrors(validationErrors);
+      // Scroll to the first error
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     try {
       setLoading(true);
+      setErrors({}); // Clear previous errors
+      // Clean the data (remove empty array items)
+      const dataToSend = cleanCourseData(formData);
       if (initialData) {
         await axiosInstance.put(
           API_PATHS.COURSES.UPDATE(initialData.id),
-          formData
+          dataToSend
         );
       } else {
-        await axiosInstance.post(API_PATHS.COURSES.CREATE, formData);
+        await axiosInstance.post(API_PATHS.COURSES.CREATE, dataToSend);
       }
       refreshCourses();
       onClose();
     } catch (error) {
-      alert("Failed to save course");
+      const serverMessage = error.response?.data?.error;
+
+      const simpleStatement =
+        typeof serverMessage === "string"
+          ? serverMessage
+          : "Please check the form for errors and try again.";
+
+      triggerToast(simpleStatement, "error");
     } finally {
       setLoading(false);
     }
@@ -146,42 +173,55 @@ const AddCourseForm = ({ onClose, refreshCourses, initialData }) => {
             <input
               type="text"
               name="title"
+              className={errors.title ? "input-error" : ""}
               value={formData.title}
               onChange={handleChange}
-              required
               placeholder="e.g. Scratch Coding"
             />
+            {errors.title && <span className="error-msg">{errors.title}</span>}
           </div>
+
           <div className="form-group">
             <label>Category</label>
             <input
               type="text"
               name="category"
+              className={errors.category ? "input-error" : ""}
               value={formData.category}
               onChange={handleChange}
-              required
               placeholder="e.g. Young Coders"
             />
+            {errors.category && (
+              <span className="error-msg">{errors.category}</span>
+            )}
           </div>
+
           <div className="form-group">
             <label>Price</label>
             <input
-              type="text"
+              type="number"
               name="price"
+              className={errors.price ? "input-error" : ""}
               value={formData.price}
               onChange={handleChange}
               placeholder="KSh 3,000"
             />
+            {errors.price && <span className="error-msg">{errors.price}</span>}
           </div>
+
           <div className="form-group">
             <label>Duration</label>
             <input
               type="text"
               name="duration"
+              className={errors.duration ? "input-error" : ""}
               value={formData.duration}
               onChange={handleChange}
               placeholder="3 weeks"
             />
+            {errors.duration && (
+              <span className="error-msg">{errors.duration}</span>
+            )}
           </div>
         </div>
 
@@ -189,14 +229,19 @@ const AddCourseForm = ({ onClose, refreshCourses, initialData }) => {
           <label>Course Definition</label>
           <textarea
             name="definition"
+            className={errors.definition ? "input-error" : ""}
             rows="3"
             value={formData.description.definition}
             onChange={handleDescriptionChange}
             placeholder="Describe the program..."
           />
+          {errors.definition && (
+            <span className="error-msg">{errors.definition}</span>
+          )}
         </div>
 
         <div className="form-grid-2">
+          {/* Learning Points */}
           <div className="form-section">
             <label>Learning Points</label>
             {formData.description.learningPoints.map((item, index) => (
@@ -231,8 +276,12 @@ const AddCourseForm = ({ onClose, refreshCourses, initialData }) => {
             >
               <Plus size={16} /> Add Point
             </button>
+            {errors.learningPoints && (
+              <span className="error-msg">{errors.learningPoints}</span>
+            )}
           </div>
 
+          {/* Requirements */}
           <div className="form-section">
             <label>Requirements</label>
             {formData.requirements.map((item, index) => (
@@ -260,6 +309,9 @@ const AddCourseForm = ({ onClose, refreshCourses, initialData }) => {
             >
               <Plus size={16} /> Add Requirement
             </button>
+            {errors.requirements && (
+              <span className="error-msg">{errors.requirements}</span>
+            )}
           </div>
         </div>
 
@@ -268,43 +320,69 @@ const AddCourseForm = ({ onClose, refreshCourses, initialData }) => {
           <input
             type="text"
             name="outcome"
+            className={errors.outcome ? "input-error" : ""}
             value={formData.description.outcome}
             onChange={handleDescriptionChange}
             placeholder="What will they achieve?"
           />
+          {errors.outcome && (
+            <span className="error-msg">{errors.outcome}</span>
+          )}
         </div>
 
-        <div className="form-group">
-          <label>Focus Modules</label>
-          <div className="focus-grid">
-            {formData.focus.map((item, index) => (
-              <div key={index} className="array-item">
-                <input
-                  value={item}
-                  onChange={(e) =>
-                    handleArrayChange(index, e.target.value, "focus")
-                  }
-                />
-                <button
-                  type="button"
-                  className="remove-btn"
-                  onClick={() => removeArrayField(index, "focus")}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
+        <div className="form-grid-3">
+          <div className="form-section">
+            <label>Focus Modules</label>
+            <div className="focus-grid">
+              {formData.focus.map((item, index) => (
+                <div key={index} className="array-item">
+                  <input
+                    value={item}
+                    placeholder="Enter module focus topic..."
+                    onChange={(e) =>
+                      handleArrayChange(index, e.target.value, "focus")
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="remove-btn"
+                    onClick={() => removeArrayField(index, "focus")}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="add-btn"
+              onClick={() => addArrayField("focus")}
+            >
+              <Plus size={16} /> Add Focus
+            </button>
+            {errors.focus && <span className="error-msg">{errors.focus}</span>}
           </div>
-          <button
-            type="button"
-            className="add-btn"
-            onClick={() => addArrayField("focus")}
-          >
-            <Plus size={16} /> Add Focus
-          </button>
+
+          <div className="form-section">
+            <label>Difficulty Level</label>
+            <select
+              name="level"
+              value={formData.level}
+              onChange={handleChange}
+              className={`level-select ${errors.level ? "input-error" : ""}`}
+            >
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+            {errors.level && <span className="error-msg">{errors.level}</span>}
+          </div>
         </div>
 
-        <div className="upload-section">
+        {/* Image Upload Section */}
+        <div
+          className={`upload-section ${errors.imageUrl ? "error-border" : ""}`}
+        >
           <label className="file-label">
             <ImageIcon size={20} />
             <span>{formData.imageUrl ? "Change Image" : "Upload Image"}</span>
@@ -314,6 +392,9 @@ const AddCourseForm = ({ onClose, refreshCourses, initialData }) => {
             <div className="upload-status">
               <CheckCircle size={16} /> Uploaded
             </div>
+          )}
+          {errors.imageUrl && (
+            <span className="error-msg">{errors.imageUrl}</span>
           )}
         </div>
 

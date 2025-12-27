@@ -6,6 +6,8 @@ dotenv.config();
 import { initDb } from "./Database/Config/config.db.js";
 import authRouter from "./Router/authRouter.js";
 import courseRouter from "./Router/courseRouter.js";
+import blogRouter from "./Router/blogRouter.js";
+import testimonialRouter from "./Router/testimonialRouter.js";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -40,6 +42,9 @@ app.use(express.json());
 // routes
 app.use("/api/auth", authRouter);
 app.use("/api/courses", courseRouter);
+app.use("/api/blogs", blogRouter);
+app.use("/api/blogs", blogRouter);
+app.use("/api/testimonials", testimonialRouter);
 
 // serve uploads folder statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

@@ -1,0 +1,98 @@
+/* --- User Profile Cell (Avatar + Name/Role) --- */
+.user-profile-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-sm {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* Makes it a circle */
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+  background-color: #f1f5f9;
+}
+
+.font-bold {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9rem;
+}
+
+.text-muted.small {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* --- Message Cell (Truncation) --- */
+.message-cell {
+  max-width: 300px; /* Prevents long messages from stretching the table */
+}
+
+.truncate-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limits to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.85rem;
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* --- Star Ratings --- */
+.rating-stars {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+/* --- Moderation Specific Badges --- */
+.badge.public {
+  background: #dcfce7; /* Light green */
+  color: #15803d; /* Dark green */
+  border: 1px solid #bbf7d0;
+}
+
+.badge.draft {
+  background: #fef3c7; /* Light Amber */
+  color: #b45309; /* Dark Amber */
+  border: 1px solid #fde68a;
+}
+
+/* --- Stats Grid Active States --- */
+.active-filter {
+  border: 2px solid #2563eb !important;
+  background-color: #eff6ff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.stat-icon.live {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.stat-icon.draft {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* --- Animation for Approval Toggle --- */
+.push-row-btn:hover {
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .message-cell {
+    display: none; /* Hide messages on small mobile screens to save space */
+  }
+
+  .admin-table th:nth-child(2),
+  .admin-table td:nth-child(2) {
+    display: none;
+  }
+}

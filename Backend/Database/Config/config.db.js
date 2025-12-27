@@ -2,7 +2,9 @@ import dotenv from "dotenv";
 dotenv.config();
 import { neon } from "@neondatabase/serverless";
 import bcrypt from "bcryptjs";
-import { courseTableSchema } from "./courseQueries.js";
+import { courseTableSchema, runMigrations } from "./courseQueries.js";
+import { blogTableSchema } from "./blogQueries.js";
+import { testimonialTableSchema } from "./testimonialsQueries.js";
 const { PGUSER, PGPASSWORD, PGHOST, PGDATABASE } = process.env;
 
 export const sql = neon(
@@ -32,7 +34,15 @@ export async function initDb() {
 `;
 
     await sql(Object.assign([courseTableSchema], { raw: [courseTableSchema] }));
+    await runMigrations();
+
+    await sql(Object.assign([blogTableSchema], { raw: [blogTableSchema] }));
+    await sql(
+      Object.assign([testimonialTableSchema], { raw: [testimonialTableSchema] })
+    );
     console.log("Course Table Initialized");
+    console.log("Blog Table Initialized");
+    console.log("testimonial Table Initialized");
   } catch (error) {
     console.error("Error in initializing the Database: ", error);
   }

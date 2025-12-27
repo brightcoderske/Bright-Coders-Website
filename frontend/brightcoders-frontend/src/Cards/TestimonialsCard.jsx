@@ -1,8 +1,9 @@
-import testimonialsData from "../Utils/TestimonialsCardData";
+import React, { useEffect, useState } from "react";
 import "../Css/TestimonialsCard.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
+import axios from "axios"; // or your axiosInstance
 import {
   FaChevronLeft,
   FaChevronRight,
@@ -13,66 +14,70 @@ import {
 import { RiDoubleQuotesR } from "react-icons/ri";
 
 const TestimonialsCard = () => {
-  const NextArrow = ({ style, onClick }) => (
-    <div className={`arrow next`} onClick={onClick} aria-hidden="true">
+  const [liveTestimonials, setLiveTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // --- Fetch Live Data ---
+  useEffect(() => {
+    const fetchLiveReviews = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/testimonials/live"
+        );
+        setLiveTestimonials(response.data);
+      } catch (error) {
+        console.error("Error loading testimonials:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLiveReviews();
+  }, []);
+
+  const NextArrow = ({ onClick }) => (
+    <div className="arrow next" onClick={onClick} aria-hidden="true">
       <FaChevronRight />
     </div>
   );
 
-  const PrevArrow = ({ style, onClick }) => (
-    <div className={`arrow prev`} onClick={onClick} aria-hidden="true">
+  const PrevArrow = ({ onClick }) => (
+    <div className="arrow prev" onClick={onClick} aria-hidden="true">
       <FaChevronLeft />
     </div>
   );
 
   const settings = {
-    infinite: true,
+    infinite: liveTestimonials.length > 3, // Only loop if we have enough cards
     speed: 500,
-    slidesToShow: 3, // default for large screens
+    slidesToShow: 3,
     slidesToScroll: 1,
     centerMode: true,
     centerPadding: "0px",
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
-    autoplaySpeed: 3000,
     autoplay: true,
-    pauseOnHover: true,
-    swipeToSlide: true,
-
-    /* responsive breakpoints - important order doesn't matter but values do */
+    autoplaySpeed: 3000,
     responsive: [
-      {
-        breakpoint: 1600, // <=1599px
-        settings: {
-          slidesToShow: 3,
-          centerMode: true,
-        },
-      },
-      {
-        breakpoint: 1024, // <=1023px
-        settings: {
-          slidesToShow: 2,
-          centerMode: false,
-        },
-      },
-      {
-        breakpoint: 600, // <=
-        settings: {
-          slidesToShow: 1,
-          centerMode: false,
-        },
-      },
+      { breakpoint: 1024, settings: { slidesToShow: 2, centerMode: false } },
+      { breakpoint: 600, settings: { slidesToShow: 1, centerMode: false } },
     ],
   };
+
+  if (loading) return <div className="loading">Loading stories...</div>;
+  if (liveTestimonials.length === 0) return null; // Hide section if no reviews approved
 
   return (
     <div className="carousel-inner">
       <Slider {...settings}>
-        {testimonialsData.map((item, idx) => (
-          <div className="corousel-item" key={idx}>
-            <p className="testimonial-feedback">"{item.feedback}"</p>
-            <h4 className="courousel-name">{item.name}</h4>
-            <span>{item.role}</span>
+        {liveTestimonials.map((item) => (
+          <div className="corousel-item" key={item.id}>
+            {/* Database uses 'message', Joi uses 'message' */}
+            <p className="testimonial-feedback">"{item.message}"</p>
+
+            {/* Database uses 'user_name' */}
+            <h4 className="courousel-name">{item.user_name}</h4>
+            <span>{item.user_role}</span>
+
             <div className="testimonial-stars">
               {[...Array(5)].map((_, index) =>
                 index < item.rating ? (
@@ -84,8 +89,8 @@ const TestimonialsCard = () => {
             </div>
 
             <div className="testimonial-image-section">
-              {item.image ? (
-                <img src={item.image} alt={item.name} />
+              {item.image_url ? (
+                <img src={item.image_url} alt={item.user_name} />
               ) : (
                 <div className="placeholder-icon">
                   <FaUserAlt />

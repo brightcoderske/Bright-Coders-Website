@@ -59,7 +59,7 @@
 .profile-pic-name {
   font-weight: 700;
   font-size: 20px;
-  font-family: inherit; /* Use your global font */
+  font-family: inherit;
   margin-top: 5px;
   color: white;
 }
@@ -78,8 +78,7 @@
   margin-top: 20px;
   border-radius: 10px;
   display: flex;
-  width: 100%;
-  /* border: 2px solid white; */
+  width: 90%;
   justify-content: flex-start;
   color: #013a59;
   cursor: pointer;
@@ -87,7 +86,5 @@
   align-items: center;
   gap: 10px;
 }
-/* .logout-btn:hover{
-    transform: translateY(-3px);
-} */
+
 

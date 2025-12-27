@@ -1,0 +1,203 @@
+/* --- OVERLAY STYLES --- */
+.modal-custom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4); /* Dimmed background */
+  backdrop-filter: blur(4px); /* Modern blur effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* High z-index to stay above everything */
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* --- ALERT BOX (CONFIRMATION MODAL) --- */
+.alert-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+}
+
+.alert-icon-header h3 {
+  margin-top: 1rem;
+  font-size: 1.25rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.alert-icon-header p {
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.alert-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.alert-actions button {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.cancel-btn {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.cancel-btn:hover {
+  background: #e5e7eb;
+}
+
+/* Red Delete/Danger Button */
+.delete-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+/* Blue Confirm/Info Button */
+.add-course-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.add-course-btn:hover {
+  background: #2563eb;
+}
+
+/* --- TOAST NOTIFICATIONS --- */
+/* --- TOAST NOTIFICATIONS --- */
+.toast-notification {
+  position: fixed;
+  bottom: 30px; /* Changed from 10% to be more consistent on different screens */
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  color: white;
+  min-width: 280px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  overflow: hidden; /* CRITICAL: Clips the bar so it stays inside the rounded corners */
+  z-index: 1100;
+  animation: slideInRight 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+/* NEW: The Base Progress Bar Style */
+.toast-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  transform-origin: left; /* Ensures it shrinks toward the left */
+  animation: toastProgress 4s linear forwards; /* Match your 4000ms timeout */
+}
+
+.toast-notification.success { background: #10b981; }
+.toast-notification.error { background: #ef4444; }
+
+/* Progress bar colors */
+.toast-notification.success .toast-progress-bar { background: whitesmoke; }
+.toast-notification.error .toast-progress-bar { background: rgba(255, 255, 255, 0.4); }
+
+/* --- ANIMATIONS --- */
+@keyframes toastProgress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.toast-notification.success {
+  background: #10b981; /* Green */
+}
+
+.toast-notification.error {
+  background: #ef4444; /* Red */
+}
+
+
+.toast-notification span {
+  flex-grow: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.toast-notification button {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  opacity: 0.8;
+  padding: 4px;
+}
+
+.toast-notification button:hover {
+  opacity: 1;
+}
+
+/* --- ANIMATIONS --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

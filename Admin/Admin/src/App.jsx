@@ -13,6 +13,8 @@ import AuthLayout from "./Pages/AuthLayout/AuthLayout";
 import ProgramManagement from "./Components/ProgramManagement";
 import AdminDashBoard from "./Components/AdminDashBoard";
 import DashBoardLayout from "./Layouts/DashBoardLayout";
+import AdminBlogManager from "./Components/AdminBlogManager/AdminBlogManager";
+import AdminTestimonialManager from "./Components/AdminTestimonialManager/AdminTestimonialManager";
 
 function AppRoutes() {
   return (
@@ -20,6 +22,7 @@ function AppRoutes() {
       <Route path="/" element={<Root />} />
       <Route path="/authentication" element={<AuthLayout />} />
       <Route path="/login" element={<Login />} />
+
       <Route path="/signIn" element={<SignIn />} />
 
       {/* DASHBOARD GROUP */}
@@ -29,9 +32,9 @@ function AppRoutes() {
 
         {/* When path is /programs, it replaces the content with ProgramManagement */}
         <Route path="/programs" element={<ProgramManagement />} />
-
+        <Route path="/blogs" element={<AdminBlogManager />} />
         {/* You can add more here later */}
-        <Route path="/testimonials" element={<div>Testimonials Page</div>} />
+        <Route path="/testimonials" element={<AdminTestimonialManager />} />
       </Route>
     </Routes>
   );
