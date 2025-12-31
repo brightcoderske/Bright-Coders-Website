@@ -125,7 +125,7 @@
 
 .card-quotes {
   font-size: 2.5rem;
-  color: #e2e8f0;
+  color: rgba(0, 139, 139, 0.699);
   margin-bottom: 20px;
 }
 
@@ -188,6 +188,7 @@
 }
 
 .form-container {
+  border:  1px solid darkcyan; 
   max-width: 800px;
   margin: 0 auto;
   background: white;

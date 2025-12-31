@@ -357,6 +357,199 @@ textarea {
   color: #4e4dbf;
 }
 
+/* ==========================================
+   PAYMENT MODAL STYLES
+   ========================================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Dim background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px); /* Modern blur effect */
+}
+
+.payment-modal {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  max-width: 420px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.payment-modal h2 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-size: 1.6rem;
+}
+
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #95a5a6;
+}
+
+/* Instruction Card */
+.instruction-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.instruction-card p {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+/* Copy Box for Phone Number */
+.copy-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border: 2px dashed #2ecc71; /* M-Pesa Green */
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.copy-box span {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: #2ecc71;
+}
+
+.copy-box button {
+  background: #2ecc71;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  transition: opacity 0.2s;
+}
+
+.copy-box button:hover {
+  opacity: 0.8;
+}
+
+/* M-Pesa Input Field */
+.mpesa-code-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 2px;
+  transition: border-color 0.2s;
+}
+
+.mpesa-code-input:focus {
+  outline: none;
+  border-color: #2ecc71;
+  background: #f0fff4;
+}
+
+/* Divider */
+.modal-divider {
+  margin: 20px 0;
+  position: relative;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-divider span {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  padding: 0 10px;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+/* Pay Later Toggle */
+.pay-later-btn {
+  width: 100%;
+  background: #f1f5f9;
+  border: 2px solid transparent;
+  padding: 12px;
+  border-radius: 8px;
+  color: #475569;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 20px;
+  transition: all 0.2s;
+}
+
+.pay-later-btn.active {
+  border-color: #3498db;
+  color: #3498db;
+  background: #ebf8ff;
+}
+
+/* Final Confirm Button */
+.confirm-btn {
+  width: 100%;
+  padding: 15px;
+  background: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+.confirm-btn:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Success Card */
+.success-card {
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: #2ecc71;
+  margin-bottom: 20px;
+}
+
 /* ==========================
    MEDIA QUERIES
 ========================== */

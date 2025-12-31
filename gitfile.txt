@@ -1,0 +1,5 @@
+
+PS C:\Users\Isaac\Desktop\Bright Coders Website> rm .git/refs/heads/main
+PS C:\Users\Isaac\Desktop\Bright Coders Website> git log -1 --oneline
+a463cae (HEAD -> main, origin/main, origin/HEAD) still working
+PS C:\Users\Isaac\Desktop\Bright Coders Website> 

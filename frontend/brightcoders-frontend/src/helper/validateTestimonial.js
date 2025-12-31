@@ -43,7 +43,7 @@ export const validateTestimonial = (formData, image) => {
 };
 
 export const validateImage = (file) => {
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
   const maxSize = 2 * 1024 * 1024; // 2MB
 
   if (!allowedTypes.includes(file.type)) {

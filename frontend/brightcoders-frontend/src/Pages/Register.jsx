@@ -1,7 +1,8 @@
 // Multi-Step Registration Form (React + External CSS)
 // This file uses a 4-step progressive wizard form.
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import {
@@ -11,15 +12,21 @@ import {
   FaUser,
   FaChild,
   FaClipboardList,
+  FaCopy,
 } from "react-icons/fa";
-import programData from "../Utils/programData";
+// import programData from "../Utils/programData";
 import "../Css/Register.css";
 import { validateStep } from "../helper/validateStep";
+import axios from "axios";
 
 export default function Register() {
+  const location = useLocation();
   const [step, setStep] = useState(1);
   const [openCourseDropdown, setOpenCourseDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [dbCourses, setDbCourses] = useState([]);
+  const [mpesaCode, setMpesaCode] = useState("");
+  const [coursePrice, setCoursePrice] = useState("5,000");
   const [error, setError] = useState({
     field: "",
     message: "",
@@ -43,6 +50,40 @@ export default function Register() {
     heardFrom: "",
     consent: false,
   });
+  // FETCH ALL COURSES FOR THE DROPDOWN ON MOUNT
+  useEffect(() => {
+    const fetchAllCourses = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/courses");
+        setDbCourses(response.data);
+      } catch (error) {
+        console.error("Error while fetching data from the Database");
+      }
+    };
+    fetchAllCourses();
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.selectedCourse) {
+      setFormData((prev) => ({
+        ...prev,
+        course: location.state.selectedCourse,
+      }));
+      setCoursePrice(location.state.price);
+    }
+  }, [location.state]);
+
+ useEffect(() => {
+  if (formData.course && dbCourses.length > 0) {
+    // Look inside each category's items array for the title
+    const allCourses = dbCourses.flatMap(cat => cat.items || []);
+    const selected = allCourses.find((c) => c.title === formData.course);
+    
+    if (selected) {
+      setCoursePrice(selected.price);
+    }
+  }
+}, [formData.course, dbCourses]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -67,8 +108,14 @@ export default function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.consent) return alert("You must agree to the terms.");
-    console.log(formData.data);
+    console.log(formData); // Fixed to access formData directly
     setShowModal(true);
+  };
+
+  // Helper for copying number
+  const handleCopy = () => {
+    navigator.clipboard.writeText("0712345678");
+    alert("Number copied!");
   };
 
   return (
@@ -250,19 +297,27 @@ export default function Register() {
 
               {openCourseDropdown && (
                 <div className="options-list">
-                  {programData.flatMap((cat) =>
-                    cat.items.map((item) => (
-                      <div
-                        key={item.title}
-                        className="option"
-                        onClick={() => {
-                          setFormData({ ...formData, course: item.title });
-                          setOpenCourseDropdown(false);
-                        }}
-                      >
-                        {item.title} ({cat.category})
-                      </div>
-                    ))
+                  {/* Check if data exists first to avoid errors */}
+                  {dbCourses.length > 0 ? (
+                    dbCourses.flatMap((cat) =>
+                      // Ensure cat.items exists before mapping
+                      (cat.items || []).map((item) => (
+                        <div
+                          key={item.title}
+                          className="option"
+                          onClick={() => {
+                            setFormData({ ...formData, course: item.title });
+                            // Set the price immediately from the item object
+                            setCoursePrice(item.price);
+                            setOpenCourseDropdown(false);
+                          }}
+                        >
+                          {item.title} ({cat.category})
+                        </div>
+                      ))
+                    )
+                  ) : (
+                    <div className="option disabled">Loading programs...</div>
                   )}
                 </div>
               )}
@@ -307,7 +362,6 @@ export default function Register() {
             </select>
             {error.field === "deviceType" && (
               <p className="error-message">{error.message}</p>
-              
             )}
 
             <select
@@ -333,7 +387,6 @@ export default function Register() {
             <div className="input-container">
               <input
                 name="emergencyContact"
-                // placeholder="Emergency Contact Name"
                 value={formData.emergencyContact}
                 onChange={handleChange}
                 className={
@@ -454,15 +507,51 @@ export default function Register() {
         </div>
       </form>
 
-      {/* PAYMENT MODAL */}
+      {/* PAYMENT MODAL - STYLED FOR MPESA */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-box">
-            <h2>Select Payment Method</h2>
             <button className="close-modal" onClick={() => setShowModal(false)}>
               ✕
             </button>
-            <button className="payment-option">Mpesa</button>
+            <h2>Complete Payment</h2>
+
+            <div className="instruction-card">
+              <p>
+                1. Send <b>KES {coursePrice}</b> to:
+              </p>
+              <div className="copy-box">
+                <span>0712345678</span>
+                <button type="button" onClick={handleCopy}>
+                  <FaCopy /> Copy
+                </button>
+              </div>
+              <p>2. Enter Transaction Code below:</p>
+            </div>
+
+            <input
+              type="text"
+              className="mpesa-code-input"
+              placeholder="TRANS CODE (e.g. SFD5...)"
+              value={mpesaCode}
+              onChange={(e) => setMpesaCode(e.target.value.toUpperCase())}
+            />
+
+            <div className="modal-divider">
+              <span>OR</span>
+            </div>
+
+            <button className="pay-later-btn">Request to Pay Later</button>
+
+            <button
+              className="payment-option"
+              style={{ width: "100%", marginTop: "10px" }}
+              onClick={() =>
+                console.log("Final Data:", { ...formData, mpesaCode })
+              }
+            >
+              Confirm Registration
+            </button>
           </div>
         </div>
       )}
