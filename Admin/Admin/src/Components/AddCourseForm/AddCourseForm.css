@@ -224,6 +224,45 @@ textarea {
   border-radius: 8px;
 }
 
+.status-toggles {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.toggle-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: white;
+  color: #666;
+}
+
+.toggle-control:hover {
+  border-color: #007bff;
+  background: #f0f7ff;
+}
+
+.toggle-control.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Specific color for featured star when active */
+.toggle-control.active:has(svg.lucide-star) {
+  background: #f59e0b; /* Amber/Gold color */
+  border-color: #f59e0b;
+}
+
 
 
 @media (max-width: 768px) {

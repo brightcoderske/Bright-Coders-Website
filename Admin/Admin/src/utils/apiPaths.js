@@ -16,6 +16,7 @@ export const API_PATHS = {
     DELETE: (id) => `/api/courses/${id}`,
     PUSH: (id) => `/api/courses/${id}/push`,
     WITHDRAW: (id) => `/api/courses/${id}/withdraw`,
+    FEATURED: (id) => `/api/courses/${id}/featured`,
   },
   BLOGS: {
     GET_ALL: "/api/blogs",

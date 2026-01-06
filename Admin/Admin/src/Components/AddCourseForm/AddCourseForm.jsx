@@ -1,4 +1,11 @@
-import { Plus, Trash2, Image as ImageIcon, CheckCircle, X } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Image as ImageIcon,
+  CheckCircle,
+  X,
+  Star,
+} from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import "./AddCourseForm.css";
 import axiosInstance from "../../utils/axiosInstance";
@@ -27,6 +34,7 @@ const AddCourseForm = ({
     imageUrl: initialData?.imageUrl || initialData?.image_url || "",
     isPublic: initialData?.isPublic ?? initialData?.is_public ?? false,
     focus: initialData?.focus || [""],
+    isFeatured: initialData?.isFeatured ?? initialData?.is_featured ?? false,
     requirements: initialData?.requirements || [""],
     description: {
       definition: initialData?.description?.definition || "",
@@ -167,6 +175,48 @@ const AddCourseForm = ({
   return (
     <div className="form-wrapper">
       <form onSubmit={handleSubmit} className="premium-form">
+        {/* Header Toggles - Strategic improvement for quick status management */}
+        <div className="status-toggles">
+          <label
+            className={`toggle-control ${
+              formData.isFeatured ? "active-featured" : ""
+            }`}
+          >
+            <input
+              type="checkbox"
+              name="isFeatured"
+              checked={formData.isFeatured}
+              onChange={handleChange}
+              hidden
+            />
+            <Star
+              size={18}
+              fill={formData.isFeatured ? "currentColor" : "none"}
+            />
+            <span>
+              {formData.isFeatured ? "Featured Program" : "Set as Featured"}
+            </span>
+          </label>
+
+          <label
+            className={`toggle-control ${
+              formData.isPublic ? "active-public" : ""
+            }`}
+          >
+            <input
+              type="checkbox"
+              name="isPublic"
+              checked={formData.isPublic}
+              onChange={handleChange}
+              hidden
+            />
+            {formData.isPublic ? <CheckCircle size={18} /> : <X size={18} />}
+            <span>
+              {formData.isPublic ? "Visible to Public" : "Draft Mode"}
+            </span>
+          </label>
+        </div>
+
         <div className="form-grid">
           <div className="form-group">
             <label>Course Title</label>
@@ -197,14 +247,14 @@ const AddCourseForm = ({
           </div>
 
           <div className="form-group">
-            <label>Price</label>
+            <label>Price (KSh)</label>
             <input
               type="number"
               name="price"
               className={errors.price ? "input-error" : ""}
               value={formData.price}
               onChange={handleChange}
-              placeholder="KSh 3,000"
+              placeholder="3000"
             />
             {errors.price && <span className="error-msg">{errors.price}</span>}
           </div>
@@ -226,14 +276,14 @@ const AddCourseForm = ({
         </div>
 
         <div className="form-group">
-          <label>Course Definition</label>
+          <label>Course Definition (Short Summary)</label>
           <textarea
             name="definition"
             className={errors.definition ? "input-error" : ""}
             rows="3"
             value={formData.description.definition}
             onChange={handleDescriptionChange}
-            placeholder="Describe the program..."
+            placeholder="A brief overview of what this program is about..."
           />
           {errors.definition && (
             <span className="error-msg">{errors.definition}</span>
@@ -241,34 +291,36 @@ const AddCourseForm = ({
         </div>
 
         <div className="form-grid-2">
-          {/* Learning Points */}
+          {/* Learning Points Section */}
           <div className="form-section">
             <label>Learning Points</label>
-            {formData.description.learningPoints.map((item, index) => (
-              <div key={index} className="array-item">
-                <input
-                  value={item}
-                  placeholder="Skill learned..."
-                  onChange={(e) =>
-                    handleArrayChange(
-                      index,
-                      e.target.value,
-                      null,
-                      "learningPoints"
-                    )
-                  }
-                />
-                <button
-                  type="button"
-                  className="remove-btn"
-                  onClick={() =>
-                    removeArrayField(index, null, "learningPoints")
-                  }
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
+            <div className="array-list">
+              {formData.description.learningPoints.map((item, index) => (
+                <div key={index} className="array-item">
+                  <input
+                    value={item}
+                    placeholder="e.g. Master Logic Gates"
+                    onChange={(e) =>
+                      handleArrayChange(
+                        index,
+                        e.target.value,
+                        null,
+                        "learningPoints"
+                      )
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="remove-btn"
+                    onClick={() =>
+                      removeArrayField(index, null, "learningPoints")
+                    }
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
             <button
               type="button"
               className="add-btn"
@@ -276,32 +328,31 @@ const AddCourseForm = ({
             >
               <Plus size={16} /> Add Point
             </button>
-            {errors.learningPoints && (
-              <span className="error-msg">{errors.learningPoints}</span>
-            )}
           </div>
 
-          {/* Requirements */}
+          {/* Requirements Section */}
           <div className="form-section">
             <label>Requirements</label>
-            {formData.requirements.map((item, index) => (
-              <div key={index} className="array-item">
-                <input
-                  value={item}
-                  placeholder="e.g. Laptop"
-                  onChange={(e) =>
-                    handleArrayChange(index, e.target.value, "requirements")
-                  }
-                />
-                <button
-                  type="button"
-                  className="remove-btn"
-                  onClick={() => removeArrayField(index, "requirements")}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
+            <div className="array-list">
+              {formData.requirements.map((item, index) => (
+                <div key={index} className="array-item">
+                  <input
+                    value={item}
+                    placeholder="e.g. Windows Laptop"
+                    onChange={(e) =>
+                      handleArrayChange(index, e.target.value, "requirements")
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="remove-btn"
+                    onClick={() => removeArrayField(index, "requirements")}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
             <button
               type="button"
               className="add-btn"
@@ -309,9 +360,6 @@ const AddCourseForm = ({
             >
               <Plus size={16} /> Add Requirement
             </button>
-            {errors.requirements && (
-              <span className="error-msg">{errors.requirements}</span>
-            )}
           </div>
         </div>
 
@@ -323,22 +371,23 @@ const AddCourseForm = ({
             className={errors.outcome ? "input-error" : ""}
             value={formData.description.outcome}
             onChange={handleDescriptionChange}
-            placeholder="What will they achieve?"
+            placeholder="e.g. Students will build a fully functional 2D game."
           />
           {errors.outcome && (
             <span className="error-msg">{errors.outcome}</span>
           )}
         </div>
 
-        <div className="form-grid-3">
+        <div className="form-grid-2">
+          {/* Focus Modules */}
           <div className="form-section">
             <label>Focus Modules</label>
-            <div className="focus-grid">
+            <div className="array-list">
               {formData.focus.map((item, index) => (
                 <div key={index} className="array-item">
                   <input
                     value={item}
-                    placeholder="Enter module focus topic..."
+                    placeholder="Module topic..."
                     onChange={(e) =>
                       handleArrayChange(index, e.target.value, "focus")
                     }
@@ -360,7 +409,6 @@ const AddCourseForm = ({
             >
               <Plus size={16} /> Add Focus
             </button>
-            {errors.focus && <span className="error-msg">{errors.focus}</span>}
           </div>
 
           <div className="form-section">
@@ -375,30 +423,28 @@ const AddCourseForm = ({
               <option value="Intermediate">Intermediate</option>
               <option value="Advanced">Advanced</option>
             </select>
-            {errors.level && <span className="error-msg">{errors.level}</span>}
           </div>
         </div>
 
-        {/* Image Upload Section */}
+        {/* Media Section */}
         <div
           className={`upload-section ${errors.imageUrl ? "error-border" : ""}`}
         >
           <label className="file-label">
             <ImageIcon size={20} />
-            <span>{formData.imageUrl ? "Change Image" : "Upload Image"}</span>
+            <span>
+              {formData.imageUrl ? "Change Cover Image" : "Upload Cover Image"}
+            </span>
             <input type="file" hidden onChange={handleFileUpload} />
           </label>
           {formData.imageUrl && (
             <div className="upload-status">
-              <CheckCircle size={16} /> Uploaded
+              <CheckCircle size={16} /> Image Linked
             </div>
-          )}
-          {errors.imageUrl && (
-            <span className="error-msg">{errors.imageUrl}</span>
           )}
         </div>
 
-        <div ref={formEndRef} style={{ height: "1px" }} />
+        <div ref={formEndRef} style={{ height: "20px" }} />
 
         <div className="form-actions sticky-footer">
           <button type="button" className="btn-secondary" onClick={onClose}>

@@ -51,7 +51,7 @@ app.use("/api/registration", registrationRouter);
 
 
 // serve uploads folder statically
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 // uploads: name of the subfolder in the backend you want to reach
 
 const PORT = process.env.PORT;

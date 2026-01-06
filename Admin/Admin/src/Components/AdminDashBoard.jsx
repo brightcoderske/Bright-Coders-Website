@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Users,
   BookOpen,
@@ -15,6 +15,7 @@ import {
   Newspaper,
   CheckCircle,
   ExternalLink,
+  Send,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import "../Css/AdminDashBoard.css";
@@ -23,9 +24,23 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashBoardBlog from "./DashBoardComponents/DashBoardBlog";
 import DashBoardTestimonial from "./DashBoardComponents/DashBoardTestimonial";
+import NotificationCenter from "./DashBoardComponents/NotificationCenter";
+import {
+  getAllBlogs,
+  getAllCourses,
+  getAllRegistrations,
+  getAllTestimonials,
+} from "../services/generalServices";
+import { set } from "date-fns";
+import NumberCounter from "number-counter";
 
 const AdminDashBoard = () => {
   const navigate = useNavigate();
+  const [recentEnrolments, setRecentEnrolments] = useState([]);
+  const [pendingTestimonials, setPendingTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [blogs, setBlogs] = useState([]);
 
   // Animation Variants
   const containerVars = {
@@ -41,15 +56,15 @@ const AdminDashBoard = () => {
     {
       id: 1,
       label: "Total Students",
-      value: "1,240",
+      value: recentEnrolments.length.toLocaleString(),
       icon: Users,
       color: "#3b82f6",
-      trend: "+12%",
+      trend: `+${recentEnrolments.length >= 100 ? "New" : "0"}`,
     },
     {
       id: 2,
       label: "Active Programs",
-      value: "14",
+      value: courses.length.toLocaleString(),
       icon: Layout,
       color: "#10b981",
       trend: "Live",
@@ -57,20 +72,46 @@ const AdminDashBoard = () => {
     {
       id: 3,
       label: "Blog Posts",
-      value: "48",
+      value: blogs.length.toLocaleString(),
       icon: Newspaper,
       color: "#f59e0b",
-      trend: "+3 new",
+      trend: "Active",
     },
     {
       id: 4,
       label: "Testimonials",
-      value: "156",
+      value: pendingTestimonials.filter((t) => !t.is_approved).length,
       icon: MessageSquare,
       color: "#8b5cf6",
-      trend: "98% Positive",
+      trend: "Approval Req.",
     },
   ];
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      // Fetch both in parallel for better performance
+      const [enrolmentData, testimonialData, courseData, blogData] =
+        await Promise.all([
+          getAllRegistrations(),
+          getAllTestimonials(),
+          getAllCourses(),
+          getAllBlogs(),
+        ]);
+      setRecentEnrolments(enrolmentData);
+      setPendingTestimonials(testimonialData);
+      setCourses(courseData);
+      setBlogs(blogData);
+    } catch (err) {
+      console.error("Error fetching dashboard data", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   return (
     <motion.div
@@ -94,13 +135,18 @@ const AdminDashBoard = () => {
             <Search size={40} className="search-shortcut" />
           </div>
           <div className="header-actions">
-            <motion.button
+            {/* <motion.button
               whileHover={{ scale: 1.1 }}
               className="action-icon-btn"
+              title="View System Alerts."
             >
               <Bell size={20} />
               <span className="notification-dot"></span>
-            </motion.button>
+            </motion.button> */}
+            <NotificationCenter
+              enrolments={recentEnrolments}
+              testimonials={pendingTestimonials}
+            />
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -134,7 +180,20 @@ const AdminDashBoard = () => {
               </div>
               <div className="stat-info">
                 <p className="stat-label">{stat.label}</p>
-                <h3 className="stat-value">{stat.value}</h3>
+                {/* <h3 className="stat-value">{loading ? "..." : stat.value}</h3> */}
+                <h3 className="stat-value">
+                  {loading ? (
+                    "..."
+                  ) : // Check if the value is actually a number before using the counter
+                  isNaN(parseInt(stat.value)) ? (
+                    stat.value
+                  ) : (
+                    <NumberCounter
+                      start={0}
+                      end={parseInt(stat.value.toString().replace(/,/g, ""))}
+                    />
+                  )}
+                </h3>{" "}
                 <span className="stat-trend positive">
                   <ArrowUpRight size={14} /> {stat.trend}
                 </span>
@@ -160,7 +219,10 @@ const AdminDashBoard = () => {
                 View All Students <ExternalLink size={18} />
               </button>
             </div>
-            <EnrolmentTable />
+            <EnrolmentTable
+              students={recentEnrolments.slice(0, 2)}
+              loading={loading}
+            />
           </motion.div>
 
           {/* New Section: Recent Blog Drafts */}
@@ -203,9 +265,14 @@ const AdminDashBoard = () => {
                 <Plus size={16} /> New Program
               </button>
               <button className="glass-action">
-                <MessageSquare size={16} /> Add Testimonial
+                <Send size={16} /> Send Announcement
               </button>
-              <button className="glass-action">
+              <button
+                className="glass-action"
+                onClick={() =>
+                  navigate("/blogs", { state: { openAddModal: true } })
+                }
+              >
                 <Newspaper size={16} /> Create Blog Post
               </button>
             </div>
@@ -217,7 +284,12 @@ const AdminDashBoard = () => {
             className="content-card testimonial-card"
           >
             <h3>Pending Approval</h3>
-            <DashBoardTestimonial />
+
+            <DashBoardTestimonial
+              testimonials={pendingTestimonials}
+              loading={loading}
+              refreshData={fetchDashboardData} // Important for approval logic
+            />
           </motion.div>
 
           {/* System Health */}

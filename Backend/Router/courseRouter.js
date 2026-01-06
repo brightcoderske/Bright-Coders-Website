@@ -1,33 +1,43 @@
-  import express from "express";
-  import { protect } from "../Middleware/authMiddleware.js";
-  import {
-    handleAddCourse,
-    handleDeleteCourse,
-    handleGetCourses,
-    handlePushToLive,
-    handleUpdateCourse,
-    withdrawCourse,
-  } from "../Controller/courseController.js";
-  import { getLiveCourses } from "../Database/Config/courseQueries.js";
-  import { validate } from "../Middleware/validate.js";
-  import { courseSchema } from "../Middleware/Validators/courseValidator.js";
+import express from "express";
+import { protect } from "../Middleware/authMiddleware.js";
+import {
+  handleAddCourse,
+  handleDeleteCourse,
+  handleGetCourses,
+  handlePushToLive,
+  handleUpdateCourse,
+  withdrawCourse,
+  handleToggleFeatured, // Import the new toggle handler
+  handleGetLiveCourses, // Import the improved live handler
+} from "../Controller/courseController.js";
+import { validate } from "../Middleware/validate.js";
+import {
+  courseSchema,
+  toggleFeaturedSchema, // Import the smaller schema for toggling
+} from "../Middleware/Validators/courseValidator.js";
 
-  const router = express.Router();
-  // Apply 'protect' to ensure only logged-in admins can do these tasks
-  router.get("/", handleGetCourses);
-  router.post("/", protect, validate(courseSchema), handleAddCourse);
-  router.put("/:id", protect, handleUpdateCourse);
-  router.delete("/:id", protect, handleDeleteCourse);
-  router.post("/:id/push", handlePushToLive);
-  router.get("/live", async (req, res) => {
-    try {
-      const courses = await getLiveCourses();
-      res.status(200).json(courses);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching website content" });
-    }
-  });
+const router = express.Router();
 
-  router.post("/:id/withdraw", withdrawCourse);
+// --- ADMIN ROUTES (Management) ---
+router.get("/", protect, handleGetCourses); // Usually admin only
+router.post("/", protect, validate(courseSchema), handleAddCourse);
+router.put("/:id", protect, validate(courseSchema), handleUpdateCourse); // Added validation here
+router.delete("/:id", protect, handleDeleteCourse);
 
-  export default router;
+//  One-click Featured Toggle
+router.patch(
+  "/:id/featured",
+  protect,
+  validate(toggleFeaturedSchema),
+  handleToggleFeatured
+);
+
+// Sync Actions
+router.post("/:id/push", protect, handlePushToLive);
+router.post("/:id/withdraw", protect, withdrawCourse);
+
+// --- PUBLIC ROUTES (Website) ---
+// This route is used by the student-facing homepage
+router.get("/live", handleGetLiveCourses);
+
+export default router;

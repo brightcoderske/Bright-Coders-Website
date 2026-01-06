@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 const TestimonialPage = () => {
   const API_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
+
   // --- States ---
   const [formData, setFormData] = useState({
     user_name: "",
@@ -45,7 +46,6 @@ const TestimonialPage = () => {
         setErrors({ ...errors, image: "" });
       }
     } else {
-      // If invalid, clear the input
       e.target.value = "";
     }
   };
@@ -53,11 +53,13 @@ const TestimonialPage = () => {
   const fetchLiveReviews = async () => {
     try {
       const response = await axios.get(
-        `${API_URL.replace(/\/$/, "")}/api/testimonials/live`
+        `${API_URL.replace(/\/$/, "")}/testimonials/live`
       );
-      setLiveTestimonials(response.data);
+      // Safety check: Ensure data is an array
+      setLiveTestimonials(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error loading testimonials:", error);
+      setLiveTestimonials([]);
     } finally {
       setLoading(false);
     }
@@ -88,10 +90,7 @@ const TestimonialPage = () => {
     if (image) data.append("image", image);
 
     try {
-      const submitPath = `${API_URL.replace(
-        /\/$/,
-        ""
-      )}/api/testimonials/submit`;
+      const submitPath = `${API_URL.replace(/\/$/, "")}/testimonials/submit`;
       await axios.post(submitPath, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -119,7 +118,7 @@ const TestimonialPage = () => {
 
   return (
     <div className="testimonial-wrapper">
-      {/* 1. HERO HEADER WITH IMAGE BACKGROUND */}
+      {/* 1. HERO HEADER */}
       <header className="testimonial-hero">
         <div className="hero-overlay"></div>
         <div className="hero-content">
@@ -162,28 +161,31 @@ const TestimonialPage = () => {
                 <div className="card-footer">
                   <div className="user-info">
                     <div className="user-img-wrapper">
+                      {/* IMPROVED IMAGE LOGIC: Swaps to Icon on Error */}
                       {item.image_url ? (
-                        <>
-                          {" "}
-                          <img
-                            src={
-                              item.image_url.startsWith("http")
-                                ? item.image_url
-                                : `${API_URL.replace(
-                                    /\/$/,
-                                    ""
-                                  )}/${item.image_url.replace(/^\//, "")}`
-                            }
-                            alt={item.user_name}
-                            onError={(e) => {
-                              e.target.src =
-                                "https://via.placeholder.com/150?text=User"; // Fallback image
-                            }}
-                          />
-                        </>
-                      ) : (
-                        <FaUserAlt />
-                      )}
+                        <img
+                          src={
+                            item.image_url.startsWith("http")
+                              ? item.image_url
+                              : `${API_URL.replace(
+                                  /\/$/,
+                                  ""
+                                )}/${item.image_url.replace(/^\//, "")}`
+                          }
+                          alt={item.user_name}
+                          onError={(e) => {
+                            // Hide the broken image tag and show the sibling icon
+                            e.target.style.display = "none";
+                            e.target.nextSibling.style.display = "block";
+                          }}
+                        />
+                      ) : null}
+
+                      {/* This icon acts as the default if image_url is missing OR if loading fails */}
+                      <FaUserAlt
+                        className="user-fallback-icon"
+                        style={{ display: item.image_url ? "none" : "block" }}
+                      />
                     </div>
                     <div>
                       <h4>{item.user_name}</h4>
@@ -275,9 +277,7 @@ const TestimonialPage = () => {
                   ))}
                 </select>
               </div>
-              {/* still working */}
 
-              {/* DASHED UPLOAD AREA */}
               <div className="upload-container">
                 <label>PROFILE MEDIA</label>
                 <p className="help-text">Max size: 2MB (JPG, PNG, WebP)</p>

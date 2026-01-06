@@ -1,36 +1,22 @@
 import { CheckCircle, ExternalLink, Loader2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
-import { getAllTestimonials } from "../../services/generalServices";
+
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
+import { useState } from "react";
 
-const DashBoardTestimonial = () => {
+const DashBoardTestimonial = ({ testimonials, loading, refreshData }) => {
   const navigate = useNavigate();
-  const [testimonials, setTestimonials] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [testimonials, setTestimonials] = useState([]);
+  // const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  useEffect(() => {
-    fetchTestimonials();
-  }, []);
-
-  const fetchTestimonials = async () => {
-    try {
-      const data = await getAllTestimonials();
-      setTestimonials(data);
-    } catch (error) {
-      console.error("Error in fetching blogs");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleApprove = async (id) => {
     try {
       setIsProcessing(true);
       await axiosInstance.post(API_PATHS.TESTIMONIALS.APPROVE(id));
-      await fetchTestimonials();
+      await refreshData();
     } catch (err) {
       console.error("Approval failed!");
     } finally {

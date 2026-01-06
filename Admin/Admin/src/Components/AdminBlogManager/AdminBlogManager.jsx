@@ -18,8 +18,10 @@ import axiosInstance from "../../utils/axiosInstance.js";
 import { API_PATHS } from "../../utils/apiPaths.js";
 import AddBlogForm from "./AddBlogForm/AddBlogForm.jsx";
 import "../AdminBlogManager/AdminBlogManager.css";
+import { useLocation } from "react-router-dom";
 
 const AdminBlogManager = () => {
+  const location = useLocation();
   const [blogs, setBlogs] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -57,6 +59,14 @@ const AdminBlogManager = () => {
   useEffect(() => {
     fetchBlogs();
   }, []);
+
+  useEffect(() => {
+  if (location.state?.openAddModal) {
+    handleAddNew();
+    // Clear the state so it doesn't reopen on every refresh
+    window.history.replaceState({}, document.title);
+  }
+}, [location]);
 
   const fetchBlogs = async () => {
     try {

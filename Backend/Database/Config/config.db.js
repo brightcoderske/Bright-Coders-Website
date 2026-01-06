@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { neon } from "@neondatabase/serverless";
 import bcrypt from "bcryptjs";
-import { courseTableSchema, runMigrations } from "./courseQueries.js";
+import { courseTableSchema } from "./courseQueries.js";
 import { blogTableSchema } from "./blogQueries.js";
 import { testimonialTableSchema } from "./testimonialsQueries.js";
 import { registrationTableSchema } from "./registrationQueries.js";
@@ -35,8 +35,7 @@ export async function initDb() {
 `;
 
     await sql(Object.assign([courseTableSchema], { raw: [courseTableSchema] }));
-    await runMigrations();
-
+    
     await sql(Object.assign([blogTableSchema], { raw: [blogTableSchema] }));
     await sql(
       Object.assign([registrationTableSchema], {

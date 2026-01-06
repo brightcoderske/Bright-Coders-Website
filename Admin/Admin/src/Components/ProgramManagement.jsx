@@ -12,6 +12,7 @@ import {
   ArrowUp,
   Search,
   LayoutGrid,
+  Star,
 } from "lucide-react";
 import "../Css/ProgramManagement.css";
 import axiosInstance from "../utils/axiosInstance.js";
@@ -56,13 +57,13 @@ const ProgramManagement = () => {
   };
   const location = useLocation(); // Import useLocation from react-router-dom
 
-useEffect(() => {
-  if (location.state?.openAddModal) {
-    handleAddNew();
-    // Clear the state so it doesn't reopen on every refresh
-    window.history.replaceState({}, document.title);
-  }
-}, [location]);
+  useEffect(() => {
+    if (location.state?.openAddModal) {
+      handleAddNew();
+      // Clear the state so it doesn't reopen on every refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   useEffect(() => {
     fetchCourses();
@@ -80,11 +81,37 @@ useEffect(() => {
     }
   };
 
+  const handleToggleFeatured = async (course) => {
+    try {
+      const newStatus = !course.is_featured;
+
+      await axiosInstance.patch(API_PATHS.COURSES.FEATURED(course.id), {
+        isFeatured: newStatus,
+      });
+
+      // Update local state immediately for a snappy UI
+      setCourses((prev) =>
+        prev.map((c) =>
+          c.id === course.id ? { ...c, is_featured: newStatus } : c
+        )
+      );
+
+      triggerToast(
+        newStatus ? "Course Featured!" : "Removed from Featured",
+        "success"
+      );
+    } catch (err) {
+      triggerToast("Failed to update featured status", "error");
+    }
+  };
+
   // --- STATS CALCULATION ---
   const stats = useMemo(() => {
     const live = courses.filter((c) => c.is_public).length;
+    const featured = courses.filter((c) => c.is_featured).length;
     return {
       live,
+      featured,
       draft: courses.length - live,
       total: courses.length,
     };
@@ -234,6 +261,15 @@ useEffect(() => {
               <span className="stat-value">{stats.live}</span>
             </div>
           </div>
+          <div className="stat-card featured-stat">
+            <div className="stat-icon featured">
+              <Star size={20} fill="#f59e0b" color="#f59e0b" />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">Featured</span>
+              <span className="stat-value">{stats.featured}</span>
+            </div>
+          </div>
           <div
             className={`stat-card ${
               filterMode === "draft" ? "active-filter" : ""
@@ -352,6 +388,10 @@ useEffect(() => {
                       <th className="course-title-head">Course Title</th>
                       <th>Price</th>
                       <th className="status-head">Status</th>
+                      <th className="featured-head">
+                        {/* <Star size={20} fill="#f59e0b" color="#f59e0b" /> */}
+                        Featured
+                      </th>
                       <th>Last Pushed</th>
                       <th>Actions</th>
                     </tr>
@@ -387,6 +427,26 @@ useEffect(() => {
                             {course.is_public ? "Live" : "Draft"}
                           </span>
                         </td>
+                        <td className="featured-cell">
+                          <button
+                            className={`star-toggle ${
+                              course.is_featured ? "active" : ""
+                            }`}
+                            onClick={() => handleToggleFeatured(course)}
+                            title={
+                              course.is_featured
+                                ? "Remove from Featured"
+                                : "Mark as Featured"
+                            }
+                            style={{ border: "none", background: "transparent" }}
+                          >
+                            <Star
+                              size={20}
+                              fill={course.is_featured ? "#f59e0b" : "grey"}
+                              color={course.isFeatured ? "#f59e0b" : ""}
+                            />
+                          </button>
+                        </td>
                         <td>
                           <span className="sync-time">
                             {course.last_pushed_at
@@ -396,6 +456,7 @@ useEffect(() => {
                               : "Never"}
                           </span>
                         </td>
+
                         <td>
                           <div className="action-btns">
                             {course.is_public ? (

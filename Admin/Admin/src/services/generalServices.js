@@ -15,3 +15,9 @@ export const getAllTestimonials = async () => {
   const res = await axiosInstance.get(API_PATHS.TESTIMONIALS.GET_ALL);
   return res.data;
 };
+
+
+export const getAllCourses = async () => {
+  const res = await axiosInstance.get(API_PATHS.COURSES.GET_ALL);
+  return res.data;
+};
