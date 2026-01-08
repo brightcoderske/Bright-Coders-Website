@@ -274,7 +274,33 @@ textarea {
   border: none;
   cursor: pointer;
 }
+.payment-type-toggle {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  gap: 4px;
+  border: 1px solid #e2e8f0;
+}
 
+.payment-type-toggle button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  background: transparent;
+  color: #64748b;
+  transition: 0.2s ease;
+}
+
+.payment-type-toggle button.active {
+  background: white;
+  color: #2563eb; /* Change to your primary theme color */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 .payment-option {
   padding: 12px 20px;
   background: #041e43;

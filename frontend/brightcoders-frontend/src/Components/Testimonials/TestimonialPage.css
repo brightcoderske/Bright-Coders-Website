@@ -188,7 +188,7 @@
 }
 
 .form-container {
-  border:  1px solid darkcyan; 
+  border: 1px solid darkcyan;
   max-width: 800px;
   margin: 0 auto;
   background: white;
@@ -357,6 +357,65 @@
 .box-err {
   border-color: #ef4444;
   background: #fef2f2;
+}
+
+/* --- Load More Styling --- */
+.load-more-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+  gap: 15px;
+}
+
+.btn-load-more {
+  background: white;
+  color: darkcyan;
+  padding: 12px 40px;
+  border-radius: 50px;
+  border: 2px solid darkcyan;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-load-more:hover {
+  background: darkcyan;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 139, 139, 0.2);
+}
+
+.load-stats {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* --- Smooth Entrance Animation --- */
+.testimonial-card {
+  opacity: 0;
+  animation: slideUpFade 0.5s ease forwards;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Mobile Fix for Button --- */
+@media (max-width: 600px) {
+  .btn-load-more {
+    width: 100%;
+    max-width: 300px;
+  }
 }
 
 /* --- Responsive --- */

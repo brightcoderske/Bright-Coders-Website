@@ -19,7 +19,7 @@
 
 .swiper-slide {
   width: 280px !important;
-  height: 430px;
+  height: 400px;
   transition: 300ms;
 }
 
@@ -78,11 +78,11 @@
   /* background-color: red; */
   line-height: 1.6;
   font-style: italic;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   position: relative;
   z-index: 2;
   /* Fixed height to keep cards uniform */
-  /* height: 50%; */
+  height: 40%;
   overflow: hidden;
 }
 

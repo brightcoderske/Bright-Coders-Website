@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaCloudUploadAlt, FaRegStar, FaStar, FaUserAlt } from "react-icons/fa";
 import { RiDoubleQuotesR } from "react-icons/ri";
 import {
+  getWordCount,
   validateImage,
   validateTestimonial,
 } from "../../helper/validateTestimonial";
@@ -27,8 +28,27 @@ const TestimonialPage = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // --- Load More Logic ---
+  const getInitialCount = () => {
+    if (window.innerWidth < 600) return 3; // Mobile: 3 cards
+    if (window.innerWidth < 1024) return 4; // Tablet: 4 cards
+    return 6; // Desktop: 6 cards (2 rows of 3)
+  };
+  const [visibleCount, setVisibleCount] = useState(getInitialCount());
+
+  const handleLoadMore = () => {
+    const width = window.innerWidth;
+    const itemsPerRow = width < 600 ? 1 : width < 1024 ? 2 : 3;
+    setVisibleCount((prev) => prev + itemsPerRow * 2); // Load 2 more rows
+  };
+
   // --- Handlers ---
   const handleChange = (e) => {
+    if (e.target.name === "message") {
+      const wordCount = getWordCount(e.target.value);
+      if (wordCount > 20) return;
+    }
+
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (errors[e.target.name]) {
       setErrors({ ...errors, [e.target.name]: "" });
@@ -55,7 +75,6 @@ const TestimonialPage = () => {
       const response = await axios.get(
         `${API_URL.replace(/\/$/, "")}/testimonials/live`
       );
-      // Safety check: Ensure data is an array
       setLiveTestimonials(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error loading testimonials:", error);
@@ -149,8 +168,9 @@ const TestimonialPage = () => {
       <section className="testimonials-display-section" id="success-stories">
         <div className="container">
           <h2 className="section-title">Success Stories</h2>
+
           <div className="testimonial-grid">
-            {liveTestimonials.map((item) => (
+            {liveTestimonials.slice(0, visibleCount).map((item) => (
               <div className="testimonial-card" key={item.id}>
                 <div className="card-quotes">
                   <RiDoubleQuotesR />
@@ -161,27 +181,28 @@ const TestimonialPage = () => {
                 <div className="card-footer">
                   <div className="user-info">
                     <div className="user-img-wrapper">
-                      {/* IMPROVED IMAGE LOGIC: Swaps to Icon on Error */}
                       {item.image_url ? (
                         <img
                           src={
                             item.image_url.startsWith("http")
                               ? item.image_url
-                              : `${API_URL.replace(
+                              : `${API_URL.replace(/\/api$/, "").replace(
                                   /\/$/,
                                   ""
-                                )}/${item.image_url.replace(/^\//, "")}`
+                                )}/${item.image_url.replace(/^\/+/, "")}`
                           }
                           alt={item.user_name}
                           onError={(e) => {
-                            // Hide the broken image tag and show the sibling icon
                             e.target.style.display = "none";
-                            e.target.nextSibling.style.display = "block";
+                            const fallback =
+                              e.target.parentElement.querySelector(
+                                ".user-fallback-icon"
+                              );
+                            if (fallback) fallback.style.display = "block";
                           }}
                         />
                       ) : null}
 
-                      {/* This icon acts as the default if image_url is missing OR if loading fails */}
                       <FaUserAlt
                         className="user-fallback-icon"
                         style={{ display: item.image_url ? "none" : "block" }}
@@ -206,6 +227,18 @@ const TestimonialPage = () => {
               </div>
             ))}
           </div>
+
+          {/* LOAD MORE BUTTON */}
+          {visibleCount < liveTestimonials.length && (
+            <div className="load-more-container">
+              <button className="btn-load-more" onClick={handleLoadMore}>
+                Load More Stories
+              </button>
+              <p className="load-stats">
+                Showing {visibleCount} of {liveTestimonials.length} stories
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -249,7 +282,20 @@ const TestimonialPage = () => {
             </div>
 
             <div className="field-group">
-              <label>YOUR EXPERIENCE</label>
+              <label>YOUR EXPERIENCE</label>{" "}
+              <span
+                style={{
+                  fontSize: "0.7rem",
+                  color:
+                    getWordCount(formData.message) < 5 ||
+                    getWordCount(formData.message) >= 20
+                      ? "#ef4444" //Red if too short OR too long
+                      : "#10b981", // Green if in the "Sweet Spot" (5-19 words)
+                  fontWeight: "bold",
+                }}
+              >
+                {getWordCount(formData.message)} / 20 Words
+              </span>
               <textarea
                 name="message"
                 value={formData.message}

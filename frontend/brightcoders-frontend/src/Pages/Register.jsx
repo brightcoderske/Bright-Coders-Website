@@ -30,6 +30,9 @@ export default function Register() {
   const [mpesaCode, setMpesaCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [coursePrice, setCoursePrice] = useState("5,000");
+  // Payment Selection States
+  const [paymentMode, setPaymentMode] = useState("full"); // "full" or "deposit"
+  const DEPOSIT_AMOUNT = "Any amount"; // Define your fixed deposit amount here
   const [error, setError] = useState({
     field: "",
     message: "",
@@ -120,18 +123,28 @@ export default function Register() {
     setShowModal(true);
   };
 
-  const handleRegistrationSubmit = async (paymentType) => {
+  const handleRegistrationSubmit = async (method) => {
     setIsLoading(true);
-    setShowModal(false);
+    let finalCode = mpesaCode;
+    let amountPaid = 0;
+    let paymentStatus = "";
 
-    // This line handles the "OR" logic:
-    // If paymentType is "Pay Later", we use that string.
-    // Otherwise, we use the mpesaCode the user typed in the input.
-    const finalCode = paymentType === "Pay Later" ? "PAY_LATER" : mpesaCode;
+    if (method === "Pay Later") {
+      finalCode = "PAY_LATER";
+      amountPaid = 0;
+      paymentStatus = "pending";
+    } else {
+      // If "full", they pay coursePrice. If "deposit", they pay DEPOSIT_AMOUNT.
+      amountPaid = paymentMode === "full" ? coursePrice : DEPOSIT_AMOUNT;
+      paymentStatus = paymentMode === "full" ? "completed" : "partial";
+    }
 
     const submissionData = {
       ...formData,
       mpesaCode: finalCode,
+      amountPaid,
+      paymentStatus,
+      totalCoursePrice: coursePrice,
     };
 
     try {
@@ -597,9 +610,36 @@ export default function Register() {
             </button>
             <h2>Complete Payment</h2>
 
+            {/* --- LIPA MDOGO MDOGO TOGGLE START --- */}
+            <div className="payment-type-toggle">
+              <button
+                type="button"
+                className={paymentMode === "full" ? "active" : ""}
+                onClick={() => setPaymentMode("full")}
+              >
+                Full Payment
+              </button>
+              <button
+                type="button"
+                className={paymentMode === "deposit" ? "active" : ""}
+                onClick={() => setPaymentMode("deposit")}
+              >
+                Lipa Mdogo Mdogo
+              </button>
+            </div>
+            {/* --- LIPA MDOGO MDOGO TOGGLE END --- */}
+
             <div className="instruction-card">
+              {/* The amount below changes dynamically based on the toggle selection */}
               <p>
-                1. Send <b>KES {coursePrice}</b> to:
+                Send{" "}
+                <b>
+                  KES{" "}
+                  {paymentMode === "full"
+                    ? coursePrice.toLocaleString()
+                    : DEPOSIT_AMOUNT.toLocaleString()}
+                </b>{" "}
+                to:
               </p>
               <div className="copy-box">
                 <span>0712345678</span>
@@ -607,16 +647,27 @@ export default function Register() {
                   <FaCopy /> Copy
                 </button>
               </div>
-              <p>2. Enter Transaction Code below:</p>
+              <p>Enter M-Pesa Transaction Code:</p>
             </div>
 
             <input
               type="text"
               className="mpesa-code-input"
-              placeholder="TRANS CODE (e.g. SFD5...)"
+              placeholder="E.g. QX23..."
               value={mpesaCode}
               onChange={(e) => setMpesaCode(e.target.value.toUpperCase())}
             />
+
+            <button
+              className="confirm-btn"
+              onClick={() => {
+                if (!/^[A-Z0-9]{10}$/.test(mpesaCode))
+                  return alert("Invalid M-Pesa Code");
+                handleRegistrationSubmit("M-Pesa");
+              }}
+            >
+              Confirm Registration
+            </button>
 
             <div className="modal-divider">
               <span>OR</span>
@@ -627,24 +678,6 @@ export default function Register() {
               onClick={() => handleRegistrationSubmit("Pay Later")}
             >
               Request to Pay Later
-            </button>
-
-            <button
-              className="payment-option"
-              style={{ width: "100%", marginTop: "10px" }}
-              onClick={() => {
-                console.log("Final Data:", { ...formData, mpesaCode });
-                // After successful backend response:
-                const mpesaRegex = /^[A-Z0-9]{10}$/;
-
-                if (!mpesaRegex.test(mpesaCode)) {
-                  alert("Please enter a valid M-Pesa transaction code.");
-                  return;
-                }
-                handleRegistrationSubmit("M-Pesa");
-              }}
-            >
-              {isLoading ? "Processing..." : "Confirm Registration"}
             </button>
           </div>
         </div>

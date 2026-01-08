@@ -1,8 +1,12 @@
 // validationUtils.js
 
+export const getWordCount = (text) => {
+  const trimmed = text.trim();
+  return trimmed === "" ? 0 : trimmed.split(/\s+/).length;
+};
+
 export const validateTestimonial = (formData, image) => {
   const errors = {};
-  const WORD_LIMIT = 50;
 
   // Name Validation
   if (!formData.user_name.trim()) {
@@ -17,17 +21,19 @@ export const validateTestimonial = (formData, image) => {
   }
 
   // Message / Word Count Validation
+  const words = getWordCount(formData.message);
   const message = formData.message.trim();
-  const words = message === "" ? 0 : message.split(/\s+/).length;
+  const MAX_WORDS_LIMIT = 20;
+  const MIN_WORDS_LIMIT = 5;
 
   if (!message) {
     errors.message = "The testimonial message cannot be empty.";
-  } else if (words > WORD_LIMIT) {
-    errors.message = `Story is too long! Please keep it under ${WORD_LIMIT} words (Current: ${words}).`;
-  } else if (message.length < 10) {
-    errors.message = "Please write a bit more (at least 10 characters).";
+  } else if (words < MIN_WORDS_LIMIT) {
+    // Check the user's word count
+    errors.message = `Please share a little more detail (at least ${MIN_WORDS_LIMIT} words).`;
+  } else if (words > MAX_WORDS_LIMIT) {
+    errors.message = `Please keep your story under ${MAX_WORDS_LIMIT} words.`;
   }
-
   // Image Validation (Optional but recommended)
   if (image) {
     const fileSize = image.size / 1024 / 1024; // in MB

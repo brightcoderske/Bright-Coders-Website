@@ -21,7 +21,12 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "img-src": ["'self'", "data:", "http://localhost:8000"], // Allow images from your backend
+        "img-src": [
+          "'self'",
+          "data:",
+          "http://localhost:8000",
+          "https://images.unsplash.com",
+        ], // Allow images from your backend
       },
     },
   })
@@ -48,10 +53,8 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/testimonials", testimonialRouter);
 app.use("/api/registration", registrationRouter);
 
-
-
 // serve uploads folder statically
-app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // uploads: name of the subfolder in the backend you want to reach
 
 const PORT = process.env.PORT;

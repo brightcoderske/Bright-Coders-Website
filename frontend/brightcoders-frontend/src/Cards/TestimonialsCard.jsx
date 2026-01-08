@@ -37,11 +37,8 @@ const TestimonialsCard = () => {
         const response = await axios.get(
           `${API_URL.replace(/\/$/, "")}/testimonials/live`
         );
-        console.log(
-          "This is my testimonial data fgrom the db...",
-          response.data
-        );
-        setLiveTestimonials(response.data);
+
+        setLiveTestimonials(response.data.slice(0, 15));
       } catch (error) {
         console.error("Error loading testimonials:", error);
       } finally {
@@ -77,7 +74,11 @@ const TestimonialsCard = () => {
           nextEl: ".button-next-custom",
           prevEl: ".button-prev-custom",
         }}
-        pagination={{ clickable: true }}
+        pagination={{
+          clickable: true,
+          dynamicBullets: true, // This limits the visible dots
+          dynamicMainBullets: 3, // This keeps the focus on just 3 dots
+        }}
         // navigation={true}
         modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
         className="mySwiper"
@@ -109,7 +110,7 @@ const TestimonialsCard = () => {
                         ? item.image_url
                         : // Ensure we don't end up with // in the URL
                           `${API_URL.replace(
-                            /\/$/,
+                            /\/api$/,
                             ""
                           )}/${item.image_url.replace(/^\/+/, "")}`
                     }

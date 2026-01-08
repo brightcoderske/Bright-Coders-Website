@@ -252,7 +252,6 @@ const AdminTestimonialManager = () => {
                             className="avatar-sm"
                             alt={t.user_name}
                           />
-                      
                         </div>
                         <div>
                           <div className="font-bold">{t.user_name}</div>
@@ -284,7 +283,7 @@ const AdminTestimonialManager = () => {
                         {t.is_approved ? "Approved" : "Pending"}
                       </span>
                     </td>
-                    <td onClick={(e)=>e.stopPropagation()}>
+                    <td onClick={(e) => e.stopPropagation()}>
                       <div className="action-btns">
                         <button
                           className={
