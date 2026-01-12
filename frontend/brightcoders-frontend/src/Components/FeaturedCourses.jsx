@@ -68,7 +68,7 @@ const FeaturedCourses = () => {
             <div className="features-card" key={course.id}>
               <FeaturedCourseCard
                 image={course.image_url} // Matching your DB column
-                header={course.category}
+                level={course.level}
                 title={course.title}
                 focus={course.focus}
                 duration={course.duration}

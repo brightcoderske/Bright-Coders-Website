@@ -9,7 +9,7 @@ const FeaturedCourseCard = ({
   duration,
   fee,
   image,
-  header,
+  level,
   DurationIcon,
 }) => {
   const navigate = useNavigate();
@@ -72,7 +72,7 @@ const FeaturedCourseCard = ({
             <p className="fee-p">
               <strong> {fee} </strong>
             </p>
-            <h4 className="card-header">{header}</h4>
+            <h4 className="card-header">{level}</h4>
           </div>
         </div>
       </div>
