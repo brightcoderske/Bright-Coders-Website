@@ -267,29 +267,6 @@
   font-weight: 800;
 }
 
-/* 6. Blog & Testimonial Styling */
-/* .blog-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 15px;
-  background: #f1f5f9;
-  border-radius: 16px;
-  transition: var(--transition-smooth);
-}
-
-.blog-item:hover {
-  background: #e2e8f0;
-  transform: scale(1.01);
-}
-
-.blog-img-stub {
-  width: 45px;
-  height: 45px;
-  background: #cbd5e1;
-  border-radius: 10px;
-} */
-
 /* --- Blog Management Section --- */
 .truncate-text {
   display: -webkit-box;
@@ -612,14 +589,301 @@
 }
 
 /* 9. Responsive adjustments */
+
+/* Tablets / Medium Screens */
+/* --- 1. Large Tablets / Medium Screens (≤1024px) --- */
 @media (max-width: 1024px) {
   .dashboard-content {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Stack main + side content */
+    gap: 24px;
+  }
+
+  .search-wrapper {
+    width: 220px;
+  }
+
+  .search-wrapper:focus-within {
+    width: 260px;
+  }
+
+  .stats-grid-wrapper {
+    flex-wrap: wrap; /* 2 per row max */
+    gap: 16px;
+  }
+
+  .stat-card {
+    flex: 1 1 calc(50% - 16px);
+    padding: 14px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+}
+
+/* --- 2. Tablets & Large Phones (≤768px) --- */
+@media (max-width: 768px) {
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-wrapper {
+    width: 100%;
+  }
+
+  .stats-grid-wrapper {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .stat-card {
+    flex: 1 1 100%; /* Full width per card */
+    flex-direction: row;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .stat-icon-box {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+  }
+
+  .stat-trend {
+    font-size: 0.65rem;
+  }
+
+  .left-content-stack,
+  .side-cards {
+    gap: 20px;
+  }
+
+
+
+
+   /* Wrap table in horizontal scroll */
+  .table-section {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modern-table {
+    min-width: 100%; /* Forces scroll instead of squishing */
+  }
+
+  /* Reduce padding + font */
+  .modern-table th {
+    font-size: 0.65rem;
+    padding: 10px 12px;
+  }
+
+  .modern-table td {
+    font-size: 0.75rem;
+    padding: 12px;
+  }
+
+  .user-cell {
+    gap: 8px;
+    font-size: 0.75rem;
+  }
+
+  .u-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 9px;
+  }
+
+  /* Mini chart smaller */
+  .mini-chart {
+    width: 40px;
+    height: 4px;
+  }
+
+  /* Prevent name wrapping badly */
+  .user-cell {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 740px) {
+  .stats-grid {
+    /* display: grid; */
+    grid-template-columns: repeat(2, 1fr) !important; /* ALWAYS 2 columns */
+    gap: 12px;
+  }
+  .stat-icon-box {
+    transform: scale(0.8);
+  }
+
+
+}
+
+@media (max-width: 580px) {
+  .header-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+
+  .header-actions{
+    justify-self: center !important;
   }
   .search-wrapper {
-    width: 200px;
+    padding: 10px 12px 10px 5px;
+    width: 360px;
+    
   }
+
   .search-wrapper:focus-within {
-    width: 250px;
+    width: 410px;
+  }
+
+  .content-card {
+    padding: 20px;}
+
+
+   .dashboard-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+    /* =========================
+   Table / Activity Overflow Fix
+========================= */
+
+}
+
+/* --- 3. Small Phones (≤480px) --- */
+@media (max-width: 480px) {
+  .admin-container {
+    padding: 20px 12px;
+  }
+
+  .admin-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .admin-header p {
+    font-size: 0.8rem;
+  }
+
+  .stats-grid-wrapper {
+    flex-direction: column; /* Stack all stats */
+    overflow-x: auto; /* Optional: horizontal scroll if needed */
+  }
+
+  .stat-card {
+    flex: 1 1 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+    gap: 8px;
+    min-width: 0; /* Prevent overflow */
+  }
+
+  .stat-icon-box {
+    width: 36px;
+    height: 36px;
+  }
+  .stat-label {
+    font-size: 0.8rem !important;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+  }
+
+  .stat-trend {
+    font-size: 0.6rem;
+  }
+
+ 
+
+  .left-content-stack,
+  .side-cards {
+    gap: 16px;
+  }
+
+  .content-card {
+    padding: 16px;
+  }
+
+    .search-wrapper {
+    padding: 10px 12px 10px 5px;
+     width: 100%;
+  }
+
+  .search-wrapper:focus-within {
+    width: 100%;
+  }
+
+  @media (max-width: 480px) {
+  .modern-table {
+    min-width: 520px;
+  }
+
+  .modern-table td {
+    padding: 10px;
+  }
+
+  .u-avatar {
+    width: 24px;
+    height: 24px;
+    font-size: 8px;
+  }
+
+  .mini-chart {
+    width: 30px;
+  }
+}
+
+
+
+}
+
+/* --- 4. Very Small Phones (≤360px) --- */
+@media (max-width: 360px) {
+  .stat-value {
+    font-size: 1rem;
+  }
+
+  .stat-label {
+    font-size: 0.5rem;
+  }
+
+  .stat-trend {
+    font-size: 0.55rem;
+  }
+
+  .admin-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .admin-header p {
+    font-size: 0.7rem;
+  }
+
+  .content-card {
+    padding: 12px;
   }
 }

@@ -1,12 +1,10 @@
 /* --- Global & Layout --- */
 .login_page {
   display: grid;
-  grid-template-columns: 55% 45%; 
-  height: 100%; 
+  grid-template-columns: 55% 45%;
+  height: 100%;
   width: 100%;
   background-color: #fff;
-  transform: scale(1.1);
-
 }
 
 /* --- Form Container --- */
@@ -15,7 +13,7 @@
   flex-direction: column;
   width: 100%;
   max-width: 400px; /* Adjusted to prevent crowding */
-  margin: auto; 
+  margin: auto;
   padding: 1.5rem;
 }
 
@@ -59,10 +57,18 @@
 }
 
 /* Brand Colors on Hover */
-.social-icon:nth-child(1):hover svg { color: #4285f4; }
-.social-icon:nth-child(2):hover svg { color: #1877f2; }
-.social-icon:nth-child(3):hover svg { color: #181717; }
-.social-icon:nth-child(4):hover svg { color: #0a66c2; }
+.social-icon:nth-child(1):hover svg {
+  color: #4285f4;
+}
+.social-icon:nth-child(2):hover svg {
+  color: #1877f2;
+}
+.social-icon:nth-child(3):hover svg {
+  color: #181717;
+}
+.social-icon:nth-child(4):hover svg {
+  color: #0a66c2;
+}
 
 /* --- Alternative Text --- */
 .alternative {
@@ -137,12 +143,89 @@
   transform: translateY(-2px);
 }
 
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 /* --- Responsiveness --- */
+/* --- Tablets & Large Phones (Max 992px) --- */
+@media (max-width: 992px) {
+  .login_page {
+    /* Reduce scale to prevent content from going off-screen */
+    transform: scale(1);
+
+    grid-template-columns: 50% 50%;
+  }
+}
+
+/* --- Mobile Landscape & Tablets (Max 768px) --- */
 @media (max-width: 768px) {
   .login_page {
-    grid-template-columns: 1fr;
+    display: flex; /* KILL grid */
+    flex-direction: column; /* vertical stack */
+    height: auto;
+    min-height: 100vh;
+    width: 100%;
   }
-  .PopupScreen {
-    display: none;
+
+  /* Popup must come first */
+  .popup-section {
+    order: -1; /* move popup to the top */
+    width: 100%;
+    min-height: 320px;
+    padding: 40px 20px;
+
+    /* remove desktop curves */
+    border-radius: 0 !important;
+
+    /* give mobile curved bottom */
+    border-bottom-left-radius: 80px !important;
+    border-bottom-right-radius: 80px !important;
+  }
+
+  .login_page form {
+    order: 1;
+    max-width: 100%;
+    padding: 1.5rem;
+  }
+}
+
+/* --- Small Phones (Max 480px) --- */
+@media (max-width: 480px) {
+  .login_page form {
+    max-width: 100%;
+  }
+
+  .login_social_icons {
+    gap: 0.5rem;
+  }
+
+  .social-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .login_page form input {
+    padding: 12px; /* Slightly larger tap target for fingers */
   }
 }

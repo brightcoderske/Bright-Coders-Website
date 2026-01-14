@@ -5,25 +5,47 @@
   height: 100%;
   width: 100%;
   background-color: #fff;
-  overflow: hidden;
-  transform: scale(1.1);
+  overflow: visible;
+  /* height: 100vh; */
+  /* transform: scale(1.1); */
+}
+
+.form-row {
+  display: flex;
+  gap: 15px; /* Space between the two inputs */
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.form-group {
+  flex: 1; /* Makes both inputs take up equal width */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure the inputs inside the row behave correctly */
+.form-group .inputs {
+  width: 100% !important;
 }
 
 /* --- Form Container --- */
-.sign-up-page .form-container-right {
+.sign-up-page .form-container-left {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center !important;
   height: 100%;
+
 }
 
 .sign-up-page form {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 0.5rem 2rem;
+
 }
 
 .sign-up-page h3 {
@@ -36,7 +58,7 @@
 .sign-up-page .signIn-p {
   color: #666;
   text-align: center;
-  margin-bottom: 0.5rem;
+  /* margin-bottom: 0.5rem; */
   font-size: 1.1rem;
 }
 
@@ -45,7 +67,7 @@
   display: flex;
   /* flex-direction: column; */
   align-items: center;
-  margin-bottom: 1rem;
+  margin-top: 1rem;
   justify-content: center;
   position: relative;
 }
@@ -95,8 +117,8 @@
   font-size: 0.8rem;
   font-weight: 600;
   color: #1a2e40;
-  margin-bottom: 0.3rem;
-  margin-top: 0.8rem;
+  /* margin-bottom: 0.3rem; */
+  /* margin-top: 0.8rem; */
 }
 
 .sign-up-page input:not(.profile-pic-input) {
@@ -128,7 +150,7 @@
   border-radius: 10px;
   cursor: pointer;
   text-transform: uppercase;
-  margin-top: 1.5rem;
+  margin-top: 0.5rem;
   transition: all 0.3s ease;
 }
 
@@ -154,24 +176,72 @@
 .sign-up-page form .toggle-link:hover {
   text-decoration: underline;
 }
+/* --- RESPONSIVENESS (The "Good" Media Queries) --- */
 
-/* --- Responsiveness --- */
+/* 1. Large Laptops: Remove the scale before it clips */
+@media (max-width: 1200px) {
+  .sign-up-page {
+    grid-template-columns: 40% 60%;
+  }
+}
+
+@media (max-width: 900px) {
+  .signin-face {
+    transform: none !important;
+  }
+}
+/* 2. Tablets & Mobile: Vertical Stack */
 @media (max-width: 768px) {
   .sign-up-page {
     grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
-  .PopupScreen2 {
-    display: none;
+
+  /* Make Popup section the header on mobile */
+  .popupScreen2,
+  .popup-section {
+    order: 1; /* Move to top */
+    width: 100%;
+    min-height: 300px;
+    border-radius: 0 0 40px 40px;
+    padding: 40px 20px;
+  }
+
+  .sign-up-page .form-container-left {
+    order: 2;
+    padding: 30px 10px;
+  }
+
+  .sign-up-page form {
+    max-width: 90%;
+  }
+
+  .sign-up-page h3 {
+    font-size: 1.6rem;
   }
 }
 
-.error-paragraph {
-  color: red;
-  font-size: 13px;
-  /* margin-bottom: -5%; */
-  /* background-color: blue; */
-  
-}
-.error-border {
-  border-color: red !important;
+/* 3. Small Phones: Maximize space */
+@media (max-width: 480px) {
+  .sign-up-page form {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .sign-up-page .label {
+    margin-top: 0.8rem;
+  }
+
+  .sign-up-page input:not(.profile-pic-input) {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .placeholder-circle {
+    width: 80px;
+    height: 80px;
+  }
 }

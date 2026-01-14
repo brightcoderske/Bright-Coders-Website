@@ -16,21 +16,7 @@ const EnrolmentTable = ({ students, loading }) => {
     return names[0][0].toUpperCase();
   };
 
-  // useEffect(() => {
-  //   fetchRegistrations();
-  // }, []);
 
-  // const fetchRegistrations = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const data = await getAllRegistrations();
-  //     setStudents(data.slice(0,2));
-  //   } catch (err) {
-  //     console.error("Error from Enroll Table");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   if (loading) {
     return <p style={{ padding: "1rem" }}>Loading students...</p>;

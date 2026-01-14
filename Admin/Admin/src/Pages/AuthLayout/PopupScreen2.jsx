@@ -1,9 +1,9 @@
 import React from "react";
-import "../../Css/PopupScreen.css";
+import "../../Css/PopupScreen2.css";
 import logo from "../../assets/logo2.png";
 const PopupScreen2 = ({ onToggle }) => {
   return (
-    <div className="popup-section" style={{ borderRadius: "0 100px 100px 0" }}>
+    <div className="popup-section">
       <div className="logo-section">
         <img src={logo} alt="" />
       </div>

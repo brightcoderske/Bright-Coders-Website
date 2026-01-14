@@ -26,20 +26,29 @@ axiosInstance.interceptors.request.use(
 
 // Response interceptors
 
+// Response interceptors
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // handle common errors globally
     if (error.response) {
       const { status } = error.response;
-      if (status === 401) {
-        // redirect to homepage
+      
+      // Get the current URL path
+      const currentPath = window.location.pathname;
+
+      // Only redirect if it's a 401 AND we are NOT already on the auth page
+      if (status === 401 && currentPath !== "/authentication") {
+        console.warn("Unauthorized! Redirecting to login...");
+        localStorage.removeItem("token"); // Optional: clear stale token
         window.location.href = "/authentication";
-      } else if (status === 500)
+      } else if (status === 500) {
         console.error("Server error. Please try again later");
+      }
     } else if (error.code === "ECONNABORTED") {
       console.error("Request timeout. Please try again.");
     }
+    
+    // This allows your Login.js catch block to actually receive the error
     return Promise.reject(error);
   }
 );

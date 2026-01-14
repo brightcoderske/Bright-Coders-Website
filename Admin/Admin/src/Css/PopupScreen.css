@@ -1,55 +1,79 @@
+/* --- 1. Global Reset (Kills Top White Space) --- */
+
+/* --- 2. Main Page Containers --- */
+.login_page {
+  display: grid;
+  height: 100%;
+  width: 100%;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+/* Login: Popup on the Right */
+.login_page {
+  grid-template-columns: 55% 45%;
+}
+
+/* Sign Up: Popup on the Left */
+.sign-up-page {
+  grid-template-columns: 45% 55%;
+}
+
+/* --- 3. Popup Section (Teal Area) --- */
 .popup-section {
-  /* Layout */
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   text-align: center;
-/* min-height: ; */
-  
-  /* Dimensions & Spacing */
-  height: 100%; 
+  height: 100%;
   padding: 0 10%;
-  gap: 20px; /* 
-  
-  /* Styling */
+  gap: 20px;
   color: white;
   background-color: darkcyan;
-  border-top-left-radius: 150px;
-  border-bottom-left-radius: 150px;
-  
-  /* Animation Safety */
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
 }
 
-.logo-section{
+/* Desktop Border Radius Logic */
+.login_page .popup-section {
+  border-top-left-radius: 150px;
+  border-bottom-left-radius: 150px;
+}
+
+.sign-up-page .popup-section {
+  border-top-right-radius: 150px;
+  border-bottom-right-radius: 150px;
+}
+
+/* --- 4. Logo & Content --- */
+.logo-section {
   width: 150px;
   height: 150px;
   border-radius: 50%;
   background-color: white;
-  margin-bottom: -1rem;
-  margin-top: -30%
-  
-  
+  margin-top: -15%; /* Adjusted to prevent clipping */
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.logo-section img{
-  width: 100%;
-  height: 100%;
+
+.logo-section img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
 }
+
 .popup-section h1 {
   font-size: 2.5rem;
-  margin-bottom: 10px;
-
 }
-
 .popup-section p {
   font-size: 1rem;
-  letter-spacing: 0.1rem;
   line-height: 1.5;
-  margin-bottom: 20px;
 }
 
+/* --- 5. Button & Hover Animation --- */
 .popup-section button {
   position: relative;
   width: 100%;
@@ -70,8 +94,6 @@
 .popup-section button:hover {
   color: darkcyan;
 }
-
-/* The Animation Layer */
 .popup-section button:after {
   content: "";
   background: white;
@@ -81,14 +103,98 @@
   left: 0;
   width: 100%;
   height: 100%;
-  
-  /* Animation starts hidden */
   transform: skewX(-45deg) scale(0, 1);
   transform-origin: center;
   transition: transform 0.5s ease;
 }
-
 .popup-section button:hover:after {
-  /* Animation fills the button */
-  transform: skewX(-45deg) scale(1.6, 1); 
+  transform: skewX(-45deg) scale(1.6, 1);
+}
+
+/* --- 6. Form Styling (Login & Sign-Up) --- */
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.inputs {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background-color: #f0f2f5;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.error-border {
+  border: 1px solid red !important;
+}
+
+/* --- 7. MOBILE RESPONSIVENESS (The Fix) --- */
+@media (max-width: 768px) {
+  /* Make parent flex column so order works */
+  .login_page,
+  .sign-up-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* Popup goes to top */
+  .login_page .popup-section,
+  .sign-up-page .popup-section {
+    order: -1; /* move popup to top */
+    width: 100%;
+    min-height: 340px;
+    padding: 40px 20px;
+
+    /* reset desktop curves */
+    border-radius: 0;
+
+    /* bottom curve only */
+    border-bottom-left-radius: 80px;
+    border-bottom-right-radius: 80px;
+
+    background-color: darkcyan; /* normal color */
+  }
+
+  /* Form below popup */
+  .login_page form,
+  .sign-up-page form {
+    order: 1;
+    max-width: 100%;
+    padding: 2rem 1.5rem;
+  }
+
+  /* Adjust logo for mobile */
+  .popup-section .logo-section {
+    width: 110px;
+    height: 110px;
+    margin-top: 0; /* remove desktop negative offset */
+    margin-bottom: 20px;
+  }
+
+  /* Text adjustments */
+  .popup-section h1 {
+    font-size: 1.8rem;
+  }
+
+  .popup-section p {
+    font-size: 0.95rem;
+    padding: 0 5%;
+  }
+}
+
+/* --- 8. Small Phones --- */
+@media (max-width: 480px) {
+  .popup-section {
+    min-height: 300px;
+    border-top-left-radius: 60px !important;
+    border-top-right-radius: 60px !important;
+  }
 }

@@ -5,11 +5,13 @@ import "../Css/Login.css";
 import UserContext from "../Components/Context/UserContext";
 import PopupScreen from "./AuthLayout/PopupScreen";
 import axiosInstance from "../utils/axiosInstance";
+
 import { API_PATHS } from "../utils/apiPaths";
 const Login = ({ onToggle }) => {
   // added the states for  form data and errors
   const navigate = useNavigate();
   const { updateUser } = useContext(UserContext);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState({
     field: "",
     message: "",
@@ -21,12 +23,14 @@ const Login = ({ onToggle }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+      e.stopPropagation()
     setError({ field: "", message: "" }); // Reset error message
     const { email, password } = formData;
     // ========================================
     // 🔹 login api call
     // ========================================
     try {
+      setLoading(true);
       const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
         email,
         password,
@@ -42,22 +46,19 @@ const Login = ({ onToggle }) => {
         navigate("/home");
       }
     } catch (err) {
-      // Get the message from the backend
       const backendMsg = err.response?.data?.message || "Something went wrong.";
 
-      // If it's a login failure (wrong email or password)
       if (
         err.response?.status === 401 ||
         backendMsg.toLowerCase().includes("password") ||
         backendMsg.toLowerCase().includes("invalid")
       ) {
-        setError({
-          field: "both", // We use a keyword to trigger both borders
-          message: backendMsg,
-        });
+        setError({ field: "both", message: backendMsg });
       } else {
         setError({ field: "general", message: backendMsg });
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,7 +89,7 @@ const Login = ({ onToggle }) => {
           </div>
         </div>
         <div className="alternative">
-          <p style={{fontSize:"1rem"}}>or use your email and password</p>
+          <p style={{ fontSize: "1rem" }}>or use your email and password</p>
         </div>
         <label htmlFor="email">Email</label>
         <input
@@ -128,7 +129,9 @@ const Login = ({ onToggle }) => {
           </p>
         )}
         <Link to="#">Forget Your Password?</Link>
-        <button type="submit">Login In</button>
+        <button type="submit" disabled={loading}>
+          {loading ? <span className="spinner"></span> : "Login In"}
+        </button>
       </form>
       <PopupScreen onToggle={onToggle} />
     </div>

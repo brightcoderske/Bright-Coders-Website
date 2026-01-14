@@ -135,14 +135,7 @@ const AdminDashBoard = () => {
             <Search size={40} className="search-shortcut" />
           </div>
           <div className="header-actions">
-            {/* <motion.button
-              whileHover={{ scale: 1.1 }}
-              className="action-icon-btn"
-              title="View System Alerts."
-            >
-              <Bell size={20} />
-              <span className="notification-dot"></span>
-            </motion.button> */}
+           
             <NotificationCenter
               enrolments={recentEnrolments}
               testimonials={pendingTestimonials}

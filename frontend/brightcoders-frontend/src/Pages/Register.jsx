@@ -825,7 +825,7 @@ export default function Register() {
                     <button
                       className="confirm-btn"
                       disabled={
-                        !mpesaCode ||
+                        mpesaCode.length !== 10 ||
                         (paymentMode === "deposit" &&
                           (Number(depositPaid) <= 0 || !depositPaid))
                       }

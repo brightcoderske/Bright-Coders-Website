@@ -5,7 +5,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import HomePage from "./Pages/HomePage";
+
 import Login from "./Pages/Login";
 import SignIn from "./Pages/SignIn";
 import UserProvider from "./Components/Context/UserProvider";
@@ -16,30 +16,29 @@ import DashBoardLayout from "./Layouts/DashBoardLayout";
 import AdminBlogManager from "./Components/AdminBlogManager/AdminBlogManager";
 import AdminTestimonialManager from "./Components/AdminTestimonialManager/AdminTestimonialManager";
 import AdminRegistrationManager from "./Components/AdminRegistrationManager/AdminRegistrationManager";
+import ProtectedRoute from "./Pages/ProtectedRoute";
 
 function AppRoutes() {
   return (
     <Routes>
+      {/* ================= PUBLIC ROUTES ================= */}
       <Route path="/" element={<Root />} />
       <Route path="/authentication" element={<AuthLayout />} />
       <Route path="/login" element={<Login />} />
-
       <Route path="/signIn" element={<SignIn />} />
 
-      {/* DASHBOARD GROUP */}
-      <Route element={<DashBoardLayout />}>
-        {/* When path is /home, it renders AdminDashBoard inside the Layout */}
-        <Route path="/home" element={<AdminDashBoard />} />
-
-        {/* When path is /programs, it replaces the content with ProgramManagement */}
-        <Route path="/programs" element={<ProgramManagement />} />
-        <Route path="/blogs" element={<AdminBlogManager />} />
-        {/* You can add more here later */}
-        <Route path="/testimonials" element={<AdminTestimonialManager />} />
-        <Route
-          path="/studentRegistration"
-          element={<AdminRegistrationManager />}
-        />
+      {/* ================= PROTECTED ROUTES ================= */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashBoardLayout />}>
+          <Route path="/home" element={<AdminDashBoard />} />
+          <Route path="/programs" element={<ProgramManagement />} />
+          <Route path="/blogs" element={<AdminBlogManager />} />
+          <Route path="/testimonials" element={<AdminTestimonialManager />} />
+          <Route
+            path="/studentRegistration"
+            element={<AdminRegistrationManager />}
+          />
+        </Route>
       </Route>
     </Routes>
   );
@@ -55,16 +54,10 @@ function App() {
   );
 }
 
+/* Root redirect */
 const Root = () => {
-  // Check if token exists in local storage
-  const isAuthenticated = !!localStorage.getItem("token");
-  // Redirect  to dashboard if authenticated, otherwise to login
-
-  return isAuthenticated ? (
-    <Navigate to={"/home"} />
-  ) : (
-    <Navigate to={"/authentication"} />
-  );
+  const token = localStorage.getItem("token");
+  return token ? <Navigate to="/home" /> : <Navigate to="/authentication" />;
 };
 
 export default App;

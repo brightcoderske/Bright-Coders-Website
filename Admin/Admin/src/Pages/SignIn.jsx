@@ -154,7 +154,6 @@ const SignIn = ({ onToggle }) => {
           <p className="signIn-p">
             Join us today by entering your details below.
           </p>
-
           <div className="profile-pic-section">
             <label htmlFor="profile-pic-upload" className="placeholder-circle">
               {profilePicPreview ? (
@@ -187,39 +186,42 @@ const SignIn = ({ onToggle }) => {
               onChange={handleProfilePicChange}
             />
           </div>
+       
+          <div className="form-row">
+            <div className="form-group">
+              <label className="label" htmlFor="fullName">
+                Full Name
+              </label>
+              <input
+                id="fullName"
+                type="text"
+                name="fullName"
+                placeholder="e.g John Doe"
+                className={`inputs ${
+                  error.field === "fullName" ? "error-border" : ""
+                }`}
+                value={formData.fullName}
+                onChange={handleChange}
+              />
+            </div>
 
-          <label className="label" htmlFor="fullName">
-            Full Name
-          </label>
-          <input
-            id="fullName"
-            type="text"
-            name="fullName"
-            placeholder="e.g John Doe"
-            //required
-            className={`inputs ${
-              error.field === "fullName" ? "error-border" : ""
-            }`}
-            value={formData.fullName}
-            onChange={handleChange}
-          />
-
-          <label className="label" htmlFor="signInEmail">
-            Email Address
-          </label>
-          <input
-            id="signInEmail"
-            type="email"
-            placeholder="johndoe@gmail.com"
-            name="email"
-            //required
-            className={`inputs ${
-              error.field === "email" ? "error-border" : ""
-            }`}
-            value={formData.email}
-            onChange={handleChange}
-          />
-
+            <div className="form-group">
+              <label className="label" htmlFor="signInEmail">
+                Email Address
+              </label>
+              <input
+                id="signInEmail"
+                type="email"
+                placeholder="johndoe@gmail.com"
+                name="email"
+                className={`inputs ${
+                  error.field === "email" ? "error-border" : ""
+                }`}
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
           <label className="label" htmlFor="password">
             Password
           </label>
@@ -240,9 +242,7 @@ const SignIn = ({ onToggle }) => {
               <p className="error-paragraph">{error.message}</p>
             </div>
           )}
-
           <button type="submit">Sign Up</button>
-
           <p>
             Already have an account?{" "}
             <span

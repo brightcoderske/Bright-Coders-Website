@@ -9,7 +9,7 @@
 
 .wrapper_container {
   width: 900px;
-  height: 600px;
+  height: 550px;
   position: relative;
   transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d; /* Allows children to be 3D */
@@ -31,4 +31,57 @@
 
 .signin-face {
   transform: rotateY(180deg); /* Starts facing the back */
+}
+
+/* ===============================
+   TABLETS & PHONES
+================================ */
+/* ===============================
+   MOBILE: DISABLE 3D COMPLETELY
+================================ */
+@media (max-width: 900px) {
+  .authlayout_container {
+    height: auto;
+    min-height: 100vh;
+    align-items: flex-start;
+    perspective: none; /* kill 3D camera */
+  }
+
+  .wrapper_container {
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    transform-style: flat; /* VERY important */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .wrapper_container.is-flipped {
+    transform: none !important;
+  }
+
+  .auth-face {
+    position: relative; /* remove absolute */
+    width: 100%;
+    height: auto;
+    backface-visibility: visible;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  /* hide both by default */
+  .login-face,
+  .signin-face {
+    display: none;
+  }
+
+  /* show correct one */
+  .wrapper_container:not(.is-flipped) .login-face {
+    display: block;
+  }
+
+  .wrapper_container.is-flipped .signin-face {
+    display: block;
+  }
 }
