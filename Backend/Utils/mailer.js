@@ -64,3 +64,45 @@ export const sendPaymentConfirmation = async (studentData, fileInfo) => {
   };
   return transporter.sendMail(mailOptions);
 };
+
+
+export const sendOTPEmail = async (email, otp) => {
+
+
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[DEV OTP] ${email}: ${otp}`);
+    return;
+  }
+
+  const mailOptions = {
+    from: '"Developer Isaac" <developerisaac92@gmail.com>',
+    to: email,
+    subject: "Your Login Verification Code",
+    html: `
+      <div style="max-width: 500px; margin: auto; padding: 20px; font-family: Arial, sans-serif; border: 1px solid #e5e7eb; border-radius: 8px;">
+        <h2 style="color: #2563eb; text-align: center;">Two-Factor Authentication</h2>
+
+        <p>Hello,</p>
+
+        <p>Your one-time verification code is:</p>
+
+        <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; text-align: center; margin: 20px 0; color: #111827;">
+          ${otp}
+        </div>
+
+        <p>This code will expire in <strong>5 minutes</strong>.</p>
+
+        <p>If you did not attempt to log in, please ignore this email.</p>
+
+        <hr style="margin: 30px 0;" />
+
+        <p style="font-size: 12px; color: #6b7280; text-align: center;">
+          © 2026 Bright Coders Academy<br/>
+          Nairobi, Kenya
+        </p>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};

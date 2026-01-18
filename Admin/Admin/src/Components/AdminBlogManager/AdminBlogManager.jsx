@@ -61,12 +61,12 @@ const AdminBlogManager = () => {
   }, []);
 
   useEffect(() => {
-  if (location.state?.openAddModal) {
-    handleAddNew();
-    // Clear the state so it doesn't reopen on every refresh
-    window.history.replaceState({}, document.title);
-  }
-}, [location]);
+    if (location.state?.openAddModal) {
+      handleAddNew();
+      // Clear the state so it doesn't reopen on every refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const fetchBlogs = async () => {
     try {
@@ -361,22 +361,12 @@ const AdminBlogManager = () => {
       )}
 
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>{editingBlog ? "Edit Blog" : "Add New Blog"}</h2>
-              <button className="close-x" onClick={() => setIsModalOpen(false)}>
-                &times;
-              </button>
-            </div>
-            <AddBlogForm
-              onClose={() => setIsModalOpen(false)}
-              refreshBlogs={fetchBlogs}
-              initialData={editingBlog}
-              triggerToast={triggerToast}
-            />
-          </div>
-        </div>
+        <AddBlogForm
+          onClose={() => setIsModalOpen(false)}
+          refreshBlogs={fetchBlogs}
+          initialData={editingBlog}
+          triggerToast={triggerToast}
+        />
       )}
     </>
   );

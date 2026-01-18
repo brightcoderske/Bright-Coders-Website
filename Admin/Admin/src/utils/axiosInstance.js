@@ -32,12 +32,16 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response) {
       const { status } = error.response;
-      
+
       // Get the current URL path
       const currentPath = window.location.pathname;
 
       // Only redirect if it's a 401 AND we are NOT already on the auth page
-      if (status === 401 && currentPath !== "/authentication") {
+      if (
+        status === 401 &&
+        currentPath !== "/authentication" &&
+        !error.config?.url?.includes("/verify-otp")
+      ) {
         console.warn("Unauthorized! Redirecting to login...");
         localStorage.removeItem("token"); // Optional: clear stale token
         window.location.href = "/authentication";
@@ -47,7 +51,7 @@ axiosInstance.interceptors.response.use(
     } else if (error.code === "ECONNABORTED") {
       console.error("Request timeout. Please try again.");
     }
-    
+
     // This allows your Login.js catch block to actually receive the error
     return Promise.reject(error);
   }

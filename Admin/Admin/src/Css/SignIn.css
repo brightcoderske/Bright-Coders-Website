@@ -176,6 +176,10 @@
 .sign-up-page form .toggle-link:hover {
   text-decoration: underline;
 }
+.error-paragraph{
+  color:red;
+  margin-top: 0px !important;
+}
 /* --- RESPONSIVENESS (The "Good" Media Queries) --- */
 
 /* 1. Large Laptops: Remove the scale before it clips */

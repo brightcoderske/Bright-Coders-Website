@@ -3,7 +3,7 @@ import { findUserById } from "../Database/Config/config.db.js";
 
 export const protect = async (request, response, next) => {
   let token = request.headers.authorization?.split(" ")[1];
-  console.log("this is the token: ", token);
+
   if (!token) {
     return response.status(401).json({ message: "Not authorized, no token!" });
   }
@@ -11,7 +11,7 @@ export const protect = async (request, response, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await findUserById(decoded.id);
     // Add a log here to see exactly what 'user' looks like in your terminal
-    console.log("Middleware found user:", user);
+  
 
     if (!user) {
       return response

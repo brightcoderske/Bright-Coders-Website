@@ -3,19 +3,29 @@ import { isTokenExpired } from "../utils/tokenUtils";
 
 const ProtectedRoute = () => {
   const token = localStorage.getItem("token");
+  let redirect = false;
 
-  // If not logged in → go to login
   if (!token) {
+    redirect = true;
+  } else {
+    try {
+      if (isTokenExpired(token)) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        sessionStorage.removeItem("2fa_temp");
+        redirect = true;
+      }
+    } catch (error) {
+      console.error("Token error:", error);
+      localStorage.clear();
+      redirect = true;
+    }
+  }
+
+  if (redirect) {
     return <Navigate to="/authentication" replace />;
   }
 
-    // If token exists but expired → log out
-if (isTokenExpired(token)) {
-    localStorage.removeItem("token");
-    return <Navigate to="/authentication" replace />;
-  }
-
-  // If logged in → allow access
   return <Outlet />;
 };
 

@@ -4,6 +4,7 @@ import {
   imageUpload,
   loginUser,
   registerUser,
+  verifyOTP,
 } from "../Controller/authController.js";
 import { protect } from "../Middleware/authMiddleware.js";
 
@@ -11,6 +12,8 @@ const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/verify-otp", verifyOTP);
+
 router.get("/getUser", protect, getUserInfo);
 router.post("/upload-image", imageUpload);
 

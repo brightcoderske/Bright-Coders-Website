@@ -7,11 +7,16 @@ import PopupScreen from "./AuthLayout/PopupScreen";
 import axiosInstance from "../utils/axiosInstance";
 
 import { API_PATHS } from "../utils/apiPaths";
+import OTPVerify from "./AuthLayout/OTPVerify";
+import { useEffect } from "react";
 const Login = ({ onToggle }) => {
   // added the states for  form data and errors
   const navigate = useNavigate();
   const { updateUser } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [tempToken, setTempToken] = useState("");
+
   const [error, setError] = useState({
     field: "",
     message: "",
@@ -21,9 +26,17 @@ const Login = ({ onToggle }) => {
     password: "",
   });
 
+  useEffect(() => {
+    const savedTempToken = sessionStorage.getItem("2fa_temp");
+    if (savedTempToken) {
+      setTempToken(savedTempToken);
+      setRequires2FA(true);
+    }
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
-      e.stopPropagation()
+    e.stopPropagation();
     setError({ field: "", message: "" }); // Reset error message
     const { email, password } = formData;
     // ========================================
@@ -36,13 +49,18 @@ const Login = ({ onToggle }) => {
         password,
       });
       // Backend returns: { message, user, token }
-      const { token, user } = response.data;
+      const data = response.data;
 
-      if (token) {
-        // Save token and update global user state
-        localStorage.setItem("token", token);
-        updateUser(user);
-        //  Redirect to home
+      if (data.twoFactorRequired) {
+        setFormData((prev) => ({ ...prev, password: "" }));
+        setRequires2FA(true);
+        setTempToken(data.tempToken);
+
+        // ✅ Persist temp token for refresh safety
+        sessionStorage.setItem("2fa_temp", data.tempToken);
+      } else if (data.token) {
+        localStorage.setItem("token", data.token);
+        updateUser(data.user);
         navigate("/home");
       }
     } catch (err) {
@@ -68,73 +86,97 @@ const Login = ({ onToggle }) => {
       return { ...prev, [name]: value };
     });
   };
+
+  if (requires2FA) {
+    return (
+      <OTPVerify
+        tempToken={tempToken}
+        onSuccess={(token, user) => {
+          sessionStorage.removeItem("2fa_temp"); // ✅ cleanup
+          localStorage.setItem("token", token);
+          updateUser(user);
+          navigate("/home");
+        }}
+
+              onCancel={() => {
+        setRequires2FA(false);
+        setTempToken("");
+        sessionStorage.removeItem("2fa_temp"); 
+      }}
+
+      />
+    );
+  }
+
   return (
-    <div className="login_page">
-      <form onSubmit={handleLogin}>
-        <div className="login_title">
-          <h2>Login In</h2>
-        </div>
-        <div className="login_social_icons">
-          <div className="social-icon">
-            <SiGoogle size={24} />
+    <>
+      <div className="login_page">
+        <form onSubmit={handleLogin}>
+          <div className="login_title">
+            <h2>Login In</h2>
           </div>
-          <div className="social-icon">
-            <SiFacebook size={24} />
+          <div className="login_social_icons">
+            <div className="social-icon">
+              <SiGoogle size={24} />
+            </div>
+            <div className="social-icon">
+              <SiFacebook size={24} />
+            </div>
+            <div className="social-icon">
+              <SiGithub size={24} />
+            </div>
+            <div className="social-icon">
+              <SiLinkedin size={24} />
+            </div>
           </div>
-          <div className="social-icon">
-            <SiGithub size={24} />
+          <div className="alternative">
+            <p style={{ fontSize: "1rem" }}>or use your email and password</p>
           </div>
-          <div className="social-icon">
-            <SiLinkedin size={24} />
-          </div>
-        </div>
-        <div className="alternative">
-          <p style={{ fontSize: "1rem" }}>or use your email and password</p>
-        </div>
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          autoComplete="email"
-          placeholder="enter email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          className={`inputs ${
-            error.field === "email" || error.field === "both"
-              ? "error-border"
-              : ""
-          }`}
-          //required
-        />
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          placeholder="enter your password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          className={`inputs ${
-            error.field === "password" || error.field === "both"
-              ? "error-border"
-              : ""
-          }`} //required
-        />
-        {error.message && (
-          <p
-            className="error-paragraph"
-            style={{ color: "red", textAlign: "center" }}
-          >
-            {error.message}
-          </p>
-        )}
-        <Link to="#">Forget Your Password?</Link>
-        <button type="submit" disabled={loading}>
-          {loading ? <span className="spinner"></span> : "Login In"}
-        </button>
-      </form>
-      <PopupScreen onToggle={onToggle} />
-    </div>
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            autoComplete="email"
+            placeholder="enter email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`inputs ${
+              error.field === "email" || error.field === "both"
+                ? "error-border"
+                : ""
+            }`}
+            //required
+          />
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            placeholder="enter your password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            className={`inputs ${
+              error.field === "password" || error.field === "both"
+                ? "error-border"
+                : ""
+            }`} //required
+          />
+          {error.message && (
+            <p
+              className="error-paragraph"
+              style={{ color: "red", textAlign: "center" }}
+            >
+              {error.message}
+            </p>
+          )}
+          <Link to="#">Forget Your Password?</Link>
+          <button type="submit" disabled={loading}>
+            {loading ? <span className="spinner"></span> : "Login In"}
+          </button>
+        </form>
+        <PopupScreen onToggle={onToggle} />
+      </div>
+    </>
   );
 };
 

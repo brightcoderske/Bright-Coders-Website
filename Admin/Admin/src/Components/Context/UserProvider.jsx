@@ -22,17 +22,19 @@ const UserProvider = ({ children }) => {
 
   // Function to update user data
   const updateUser = (userData) => {
-if (userData) {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
-  }
+    if (userData) {
+      localStorage.setItem("user", JSON.stringify(userData));
+    } else {
+      localStorage.removeItem("user");
+    }
   };
 
   const clearUser = () => {
     setUser(null);
     localStorage.removeItem("user");
   };
-
+  console.log("UserProvider Rendered. Current User:", user?.full_name);
   return (
     <UserContext.Provider value={{ user, updateUser, clearUser }}>
       {children}

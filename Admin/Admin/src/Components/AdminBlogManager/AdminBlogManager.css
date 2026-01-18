@@ -134,9 +134,15 @@
 
 /* Animation for Awaiting Verification */
 @keyframes pulse-orange {
-  0% { box-shadow: 0 0 0 0 rgba(239, 108, 0, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(239, 108, 0, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 108, 0, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 108, 0, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(239, 108, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 108, 0, 0);
+  }
 }
 
 /* Action Button Styles for the Checkmark */
@@ -158,4 +164,97 @@
 .push-row-btn:disabled {
   background-color: #bdc3c7;
   cursor: not-allowed;
+}
+
+/* --- TABLET & MOBILE FIXES --- */
+
+/* 1. Ensure Table is scrollable on small screens */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto; /* The primary fix for table overflow */
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+}
+
+/* Give the table a minimum width so columns don't squash */
+.admin-table {
+  min-width: 800px;
+}
+
+/* 2. Responsive Adjustments (1024px and below) */
+@media (max-width: 1024px) {
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .search-container {
+    flex-grow: 1;
+  }
+
+  .search-container input {
+    width: 100%; /* Search takes full width of available space */
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr); /* Force 3 columns for the stats */
+    gap: 1rem;
+  }
+}
+
+/* 3. Small Tablets & Mobile (768px and below) */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr; /* Stack stats cards vertically */
+  }
+
+  .stat-card {
+    justify-content: flex-start; /* Better alignment when stacked */
+  }
+
+  .category-header {
+    /* flex-direction: column; */
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .item-count {
+    margin-left: 0;
+    font-size: 0.8rem;
+  }
+
+
+}
+
+/* 4. Very Small Phones (480px and below) */
+@media (max-width: 480px) {
+  .admin-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .add-course-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
 }

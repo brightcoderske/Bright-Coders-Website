@@ -20,6 +20,7 @@ const SignIn = ({ onToggle }) => {
   // State to store the uploaded image
   const [profilePicFile, setProfilePicFile] = useState(null);
   const [profilePicPreview, setProfilePicPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState({
     field: "",
     message: "",
@@ -51,6 +52,7 @@ const SignIn = ({ onToggle }) => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+
     setError({ field: "", message: "" }); // Reset error at start
     let profileImageUrl = "";
     const { fullName, email, password } = formData;
@@ -83,6 +85,7 @@ const SignIn = ({ onToggle }) => {
     // 🔹 Sign up api call
     // ========================================
     try {
+      setLoading(true);
       // upload image if present
       if (profilePicFile) {
         const imageUploadResponse = await uploadImage(profilePicFile);
@@ -103,7 +106,7 @@ const SignIn = ({ onToggle }) => {
         localStorage.setItem("token", token);
         updateUser(newUser);
         setFormData({ fullName: "", email: "", password: "" });
-        navigate("/home");
+        navigate("/authentication");
       }
     } catch (error) {
       // 1. Extract the message regardless of where it came from (Axios or Upload Util)
@@ -132,6 +135,8 @@ const SignIn = ({ onToggle }) => {
       } else {
         setError({ field: "general", message: backendMsg });
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -186,7 +191,7 @@ const SignIn = ({ onToggle }) => {
               onChange={handleProfilePicChange}
             />
           </div>
-       
+
           <div className="form-row">
             <div className="form-group">
               <label className="label" htmlFor="fullName">
@@ -242,7 +247,10 @@ const SignIn = ({ onToggle }) => {
               <p className="error-paragraph">{error.message}</p>
             </div>
           )}
-          <button type="submit">Sign Up</button>
+          <button type="submit" disabled={loading}>
+            {loading ? <span className="spinner"></span> : "Sign Up"}
+          </button>
+
           <p>
             Already have an account?{" "}
             <span
