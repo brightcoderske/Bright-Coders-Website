@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ShieldCheck, ShieldX, Loader2, Search } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import "./CertificateVerify.css";
 
 const CertificateVerify = () => {
@@ -27,7 +28,6 @@ const CertificateVerify = () => {
       );
       setResult(res.data.data);
     } catch (err) {
-      // --- ADDED SECURE ERROR HANDLING HERE ---
       if (err.response?.status === 429) {
         setError(
           "Too many attempts. Please wait 15 minutes before trying again."
@@ -42,7 +42,6 @@ const CertificateVerify = () => {
             "An error occurred during verification."
         );
       }
-      // ------------------------------------------
     } finally {
       setLoading(false);
     }
@@ -62,84 +61,111 @@ const CertificateVerify = () => {
     }
   };
 
-  // VIEW 1: Loading State
-  if (loading) {
-    return (
-      <div className="verify-page">
-        <div className="verify-card loading">
-          <Loader2 className="spin" size={48} />
-          <p>Validating Credentials...</p>
-        </div>
-      </div>
-    );
-  }
+  const siteUrl = import.meta.env.VITE_SITE_URL;
 
-  // VIEW 2: Success State (Certificate Found)
-  if (result) {
-    return (
-      <div className="verify-page">
-        <div className="verify-card success-card">
-          <ShieldCheck size={80} color="#10b981" />
-          <h1>Authenticity Confirmed</h1>
-          <div className="data-grid">
-            <div className="data-item">
-              <span>Student Name</span>
-              <strong>{result.studentName}</strong>
-            </div>
-            <div className="data-item">
-              <span>Course</span>
-              <strong>{result.courseName}</strong>
-            </div>
-            <div className="data-item">
-              <span>Completion Date</span>
-              <strong>{new Date(result.issuedAt).toLocaleDateString()}</strong>
-            </div>
-            <div className="data-item">
-              <span>Registration ID</span>
-              <strong>{regNumber}</strong>
-            </div>
-          </div>
-          <button
-            className="btn-reset"
-            onClick={() => {
-              setResult(null);
-              navigate("/verify");
-            }}
-          >
-            Verify Another
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // VIEW 3: Search/Initial State (or Error)
   return (
-    <div className="verify-page">
-      <div className="verify-card search-card">
-        {error ? (
-          <ShieldX size={60} color="#ef4444" />
-        ) : (
-          <Search size={60} color="#3b82f6" />
-        )}
-        <h2>Verify Certificate</h2>
-        <p>Enter the student registration number to verify its authenticity.</p>
+    <>
+      {/* ================= SEO ================= */}
+      <Helmet>
+        <title>Verify Certificate | Bright Coders – Authenticity Check</title>
+        <meta
+          name="description"
+          content="Verify the authenticity of Bright Coders student certificates by entering the registration number. Ensure genuine completion records for all courses."
+        />
+        <meta
+          name="keywords"
+          content="certificate verification, Bright Coders certificates, check authenticity, student registration verification, coding course certificates"
+        />
+        <link rel="canonical" href={`${siteUrl}/verify`} />
 
-        <form onSubmit={handleSearchSubmit} className="search-box">
-          <input
-            type="text"
-            placeholder="e.g. BC-26-PY-001"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-          <button type="submit" disabled={loading || searchInput.length < 5}>
-            {loading ? "Validating..." : "Check Now"}
-          </button>
-        </form>
+        {/* Open Graph */}
+        <meta property="og:title" content="Verify Certificate | Bright Coders" />
+        <meta
+          property="og:description"
+          content="Easily verify the authenticity of Bright Coders student certificates using the registration number."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/verify`} />
+        <meta property="og:image" content={`${siteUrl}/og-verify.jpg`} />
+      </Helmet>
 
-        {error && <p className="error-text">{error}</p>}
-      </div>
-    </div>
+      {/* ================= PAGE ================= */}
+      {/* VIEW 1: Loading State */}
+      {loading ? (
+        <div className="verify-page">
+          <div className="verify-card loading">
+            <Loader2 className="spin" size={48} />
+            <p>Validating Credentials...</p>
+          </div>
+        </div>
+      ) : result ? (
+        // VIEW 2: Success State
+        <div className="verify-page">
+          <div className="verify-card success-card">
+            <ShieldCheck size={80} color="#10b981" />
+            <h1>Authenticity Confirmed</h1>
+            <div className="data-grid">
+              <div className="data-item">
+                <span>Student Name</span>
+                <strong>{result.studentName}</strong>
+              </div>
+              <div className="data-item">
+                <span>Course</span>
+                <strong>{result.courseName}</strong>
+              </div>
+              <div className="data-item">
+                <span>Completion Date</span>
+                <strong>
+                  {new Date(result.issuedAt).toLocaleDateString()}
+                </strong>
+              </div>
+              <div className="data-item">
+                <span>Registration ID</span>
+                <strong>{regNumber}</strong>
+              </div>
+            </div>
+            <button
+              className="btn-reset"
+              onClick={() => {
+                setResult(null);
+                navigate("/verify");
+              }}
+            >
+              Verify Another
+            </button>
+          </div>
+        </div>
+      ) : (
+        // VIEW 3: Search/Initial State (or Error)
+        <div className="verify-page">
+          <div className="verify-card search-card">
+            {error ? (
+              <ShieldX size={60} color="#ef4444" />
+            ) : (
+              <Search size={60} color="#3b82f6" />
+            )}
+            <h2>Verify Certificate</h2>
+            <p>
+              Enter the student registration number to verify its authenticity.
+            </p>
+
+            <form onSubmit={handleSearchSubmit} className="search-box">
+              <input
+                type="text"
+                placeholder="e.g. BC-26-PY-001"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              <button type="submit" disabled={loading || searchInput.length < 5}>
+                {loading ? "Validating..." : "Check Now"}
+              </button>
+            </form>
+
+            {error && <p className="error-text">{error}</p>}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

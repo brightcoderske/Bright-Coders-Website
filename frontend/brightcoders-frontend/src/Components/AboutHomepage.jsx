@@ -15,15 +15,6 @@ const AboutHomepage = () => {
 
   return (
     <>
-      {/* SEO META */}
-      <Helmet>
-        <title>About Bright Coders | Fun & Creative Coding Education</title>
-        <meta
-          name="description"
-          content="Learn about Bright Coders — empowering young minds through creative, fun, and practical coding education for future innovators."
-        />
-      </Helmet>
-
       <section className="about-section" aria-labelledby="about-heading">
         <h1 id="about-heading" className="header">
           About Us

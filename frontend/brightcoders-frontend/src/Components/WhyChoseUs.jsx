@@ -1,22 +1,8 @@
 import "../Css/WhyChooseUs.css";
 import whyChooseUsData from "../Utils/whyChoseUsData.js";
 import { motion } from "framer-motion";
-import { Helmet } from "react-helmet-async";
 
 const WhyChooseUs = () => {
-  // Structured data for SEO (Google understands this section)
-  const whyChooseUsJSONLD = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "Why Choose Bright Coders",
-    itemListElement: whyChooseUsData.map((feature, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name: feature.title,
-      description: feature.description,
-    })),
-  };
-
   return (
     <motion.section
       id="why-choose-us"
@@ -28,11 +14,6 @@ const WhyChooseUs = () => {
       aria-labelledby="why-choose-us-heading"
     >
       {/* SEO Structured Data */}
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(whyChooseUsJSONLD)}
-        </script>
-      </Helmet>
 
       {/* Section Heading */}
       <motion.h2

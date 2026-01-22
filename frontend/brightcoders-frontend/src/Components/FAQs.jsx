@@ -1,91 +1,132 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "../Css/FAQs.css";
 import { FaChevronDown } from "react-icons/fa";
+import { Helmet } from "react-helmet-async";
 import faqs from "../Utils/faqsData";
 
 const FAQs = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [visibleFaqs, setVisibleFaqs] = useState([]);
   const [remainingFaqs, setRemainingFaqs] = useState([...faqs]);
-  const faqListRef = useRef(null);
 
-  // Load initial 5 FAQs
+  const siteUrl = import.meta.env.VITE_SITE_URL;
+
+  // Load initial 5 FAQs on component mount
   useEffect(() => {
-    loadMoreFaqs();
+    const initialBatch = faqs.slice(0, 5);
+    const initialRemaining = faqs.slice(5);
+    setVisibleFaqs(initialBatch);
+    setRemainingFaqs(initialRemaining);
   }, []);
-
-  // Scroll event to load more FAQs
-  useEffect(() => {
-    const handleScroll = () => {
-      const faqList = faqListRef.current;
-      if (!faqList) return;
-
-      // Check if scrolled to bottom
-      if (faqList.scrollTop + faqList.clientHeight >= faqList.scrollHeight - 5) {
-        loadMoreFaqs();
-      }
-    };
-
-    const faqList = faqListRef.current;
-    faqList.addEventListener("scroll", handleScroll);
-
-    return () => faqList.removeEventListener("scroll", handleScroll);
-  }, [remainingFaqs, visibleFaqs]);
 
   const toggleFaq = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
-  // Load 5 FAQs at a time without repeating
   const loadMoreFaqs = () => {
     if (remainingFaqs.length === 0) return;
 
-    const nextBatch = remainingFaqs.slice(0, 5); // take first 5
-    const newRemaining = remainingFaqs.slice(5); // remaining FAQs
+    const nextBatch = remainingFaqs.slice(0, 5);
+    const newRemaining = remainingFaqs.slice(5);
 
-    setVisibleFaqs(prev => [...prev, ...nextBatch]);
+    setVisibleFaqs((prev) => [...prev, ...nextBatch]);
     setRemainingFaqs(newRemaining);
   };
 
+  // ================= Structured Data for SEO =================
+  const generateJSONLD = () => ({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  });
+
   return (
-    <div className="faq-container">
-     <div className="faq-header-section">
-       <h2 className="faq-title">Frequently Asked Questions</h2>
-      <p className="faq-subtitle">
-        Everything you need to know before enrolling at Bright Coders.
-      </p>
-     </div>
+    <>
+      {/* ================= SEO ================= */}
+      <Helmet>
+        <title>FAQs | Bright Coders | Kids Coding School in Kenya</title>
+        <meta
+          name="description"
+          content="Find answers to frequently asked questions about Bright Coders, Kenya’s coding academy for children aged 5–14."
+        />
+        <meta
+          name="keywords"
+          content="Bright Coders FAQ, kids coding questions, children coding school Kenya, programming for kids"
+        />
+        <link rel="canonical" href={`${siteUrl}/faqs`} />
 
-      <div
-        className="faq-list"
-        ref={faqListRef}
-        
-      >
-        {visibleFaqs.map((item, index) => (
-          <div
-            key={index}
-            className={`faq-item ${activeIndex === index ? "active" : ""}`}
-            onClick={() => toggleFaq(index)}
-          >
-            <div className="faq-question">
-              <span>{item.question}</span>
-              <FaChevronDown className="faq-icon" />
-            </div>
+        {/* Open Graph */}
+        <meta property="og:title" content="FAQs | Bright Coders" />
+        <meta
+          property="og:description"
+          content="Get answers to common questions about Bright Coders, the leading kids coding school in Kenya."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteUrl}/faqs`} />
+        <meta property="og:image" content={`${siteUrl}/og-faqs.jpg`} />
 
-            <div className="faq-answer">
-              <p>{item.answer}</p>
-            </div>
-          </div>
-        ))}
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(generateJSONLD())}
+        </script>
+      </Helmet>
 
-        {/* Optional message at the end */}
-        {remainingFaqs.length === 0 && visibleFaqs.length > 0 && (
-          <p style={{ textAlign: "center", marginTop: "15px", color: "#555" }}>
-            You’ve reached the end of the FAQs!
+      {/* ================= PAGE CONTENT ================= */}
+      <div className="faq-container">
+        <div className="faq-header-section">
+          <h1 className="faq-title">Frequently Asked Questions</h1>
+          <p className="faq-subtitle">
+            Everything you need to know before enrolling at Bright Coders.
           </p>
-        )}
+        </div>
+
+        <div className="faq-list">
+          {visibleFaqs.map((item, index) => (
+            <div
+              key={index}
+              className={`faq-item ${activeIndex === index ? "active" : ""}`}
+              onClick={() => toggleFaq(index)}
+              role="button"
+              tabIndex={0}
+              aria-expanded={activeIndex === index}
+            >
+              <div className="faq-question">
+                <span>{item.question}</span>
+                <FaChevronDown className="faq-icon" aria-hidden="true" />
+              </div>
+
+              <div className="faq-answer">
+                <p>{item.answer}</p>
+              </div>
+            </div>
+          ))}
+
+          {/* LOAD MORE BUTTON SECTION */}
+          <div className="faq-action-area">
+            {remainingFaqs.length > 0 ? (
+              <button
+                className="load-more-btn"
+                onClick={loadMoreFaqs}
+                aria-label="Load more FAQ questions"
+              >
+                Load More Questions
+              </button>
+            ) : (
+              visibleFaqs.length > 0 && (
+                <p className="end-message">You’ve reached the end of the FAQs!</p>
+              )
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

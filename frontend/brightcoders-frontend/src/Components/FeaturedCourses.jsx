@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import axios from "axios";
-import { Helmet } from "react-helmet-async";
 
 const FeaturedCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -61,18 +60,7 @@ const FeaturedCourses = () => {
 
   return (
     <div className="featured">
-      {/* SEO */}
-      <Helmet>
-        <title>Featured Programming Courses | Bright Coders</title>
-        <meta
-          name="description"
-          content="Check out the most popular programming courses at Bright Coders in Kenya. Learn web development, mobile apps, and software engineering from expert mentors."
-        />
-        <script type="application/ld+json">
-          {JSON.stringify(generateJSONLD())}
-        </script>
-      </Helmet>
-
+   
       {/* Heading */}
       <h2 className="header">Featured Courses</h2>
 
@@ -89,12 +77,10 @@ const FeaturedCourses = () => {
 
       {/* Courses */}
       {loading ? (
-        <div
-          className="loading-container"
-          style={{ display: "flex", justifyContent: "center", padding: "40px" }}
-        >
-          <Loader2 className="spinner" size={40} />
-        </div>
+      <div className="loading-container" id="programs-grid">
+              <div className="simple-spinner"></div>
+              <p>Loading featured courses...</p>
+            </div>
       ) : (
         <motion.div
           className="featured-cards-container"

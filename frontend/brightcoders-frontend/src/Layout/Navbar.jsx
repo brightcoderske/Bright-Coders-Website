@@ -23,6 +23,7 @@ import {
 import { IoMdArrowDropdown } from "react-icons/io";
 
 import "../Css/Navbar.css";
+import { HiOutlineAcademicCap } from "react-icons/hi";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -134,7 +135,7 @@ const Navbar = () => {
 
                 <li>
                   <NavLink to={"/verify"} onClick={closeAllMenus}>
-                    <FaBlog className="nav-icon" />
+                    <HiOutlineAcademicCap className="nav-icon" />
                     <span>Verify Certificate</span>
                   </NavLink>
                 </li>

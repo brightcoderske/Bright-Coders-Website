@@ -7,7 +7,6 @@ import { FaCheckCircle } from "react-icons/fa";
 import HowItWorksCard from "../Cards/HowItWorksCard";
 import { MdReadMore } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 
 const HowItWorks = () => {
   const navigate = useNavigate();
@@ -17,52 +16,11 @@ const HowItWorks = () => {
     navigate("/programs");
   };
 
-  /* ✅ Google-friendly HowTo structured data */
-  const howItWorksJSONLD = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: "How to Get Started with Bright Coders",
-    description:
-      "Learn how to start learning programming at Bright Coders in three simple steps.",
-    step: [
-      {
-        "@type": "HowToStep",
-        position: 1,
-        name: "Choose a Program",
-        text: "Select a programming course that matches your goals.",
-      },
-      {
-        "@type": "HowToStep",
-        position: 2,
-        name: "Enroll & Learn",
-        text: "Join the class and start learning with expert mentors.",
-      },
-      {
-        "@type": "HowToStep",
-        position: 3,
-        name: "Graduate & Get Certified",
-        text: "Complete the course and receive your Bright Coders certificate.",
-      },
-    ],
-  };
-
   return (
     <section
       className="howItWorkSection"
       aria-labelledby="how-it-works-heading"
     >
-      {/* ✅ SEO */}
-      <Helmet>
-        <title>How It Works | Start Learning at Bright Coders</title>
-        <meta
-          name="description"
-          content="Getting started with Bright Coders is easy. Follow three simple steps to enroll, learn programming, and earn your certification."
-        />
-        <script type="application/ld+json">
-          {JSON.stringify(howItWorksJSONLD)}
-        </script>
-      </Helmet>
-
       {/* Heading */}
       <h2 id="how-it-works-heading" className="header">
         How It Works

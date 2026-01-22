@@ -10,7 +10,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const [text] = useTypewriter({
-    words: ["Future.", "Games.", "Ideas.", "Success.", "Magic."],
+    words: ["Future", "Games", "Ideas", "Success", "Magic"],
     loop: 0,
     typeSpeed: 80,
     deleteSpeed: 50,
@@ -56,7 +56,7 @@ const Home = () => {
             variants={itemVariants}
             className="hero-main-title"
           >
-            Learn Programming & Tech Skills in Kenya <br />
+            Learn Programming & Tech Skills. <br />
             Build the{" "}
             <span className="text-highlight">{text}</span>
             <span className="cursor-style">

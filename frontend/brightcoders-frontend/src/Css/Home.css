@@ -50,6 +50,7 @@
   border-radius: 100px;
   display: inline-flex;
   align-items: center;
+  text-align: center;
   gap: 8px;
 }
 
@@ -85,7 +86,7 @@
 
 /* Main Title */
 .hero-main-title {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   line-height: 1.1;
   font-weight: 800;
   color: var(--dark-slate);
@@ -116,7 +117,7 @@
   color: #555;
   max-width: 500px;
   line-height: 1.7;
-  margin: 25px 0 40px;
+  margin: 25px 0 0px;
 }
 
 /* Buttons */
