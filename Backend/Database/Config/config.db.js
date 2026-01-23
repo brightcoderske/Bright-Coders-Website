@@ -1,16 +1,20 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { neon } from "@neondatabase/serverless";
+import { neon, neonConfig } from "@neondatabase/serverless";
 import bcrypt from "bcryptjs";
 import { courseTableSchema } from "./courseQueries.js";
 import { blogTableSchema } from "./blogQueries.js";
 import { testimonialTableSchema } from "./testimonialsQueries.js";
 import { registrationTableSchema } from "./registrationQueries.js";
+
+neonConfig.fetchConnectionCache = true;
+neonConfig.pipelineConnect = false;
 const { PGUSER, PGPASSWORD, PGHOST, PGDATABASE } = process.env;
 
 export const sql = neon(
-  `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=require`
+  `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=require&connect_timeout=30`,
 );
+console.log("🟢 DB HOST:", PGHOST);
 
 // ========================================
 //  🔹 Initialize Database & Tables
@@ -37,17 +41,10 @@ export async function initDb() {
 );
 `;
 
-    await sql(Object.assign([courseTableSchema], { raw: [courseTableSchema] }));
-
-    await sql(Object.assign([blogTableSchema], { raw: [blogTableSchema] }));
-    await sql(
-      Object.assign([registrationTableSchema], {
-        raw: [registrationTableSchema],
-      })
-    );
-    await sql(
-      Object.assign([testimonialTableSchema], { raw: [testimonialTableSchema] })
-    );
+    await sql`${courseTableSchema}`;
+    await sql`${blogTableSchema}`;
+    await sql`${registrationTableSchema}`;
+    await sql`${testimonialTableSchema}`;
 
     // await sql({ raw: [registrationTableSchema] });
 
@@ -71,7 +68,7 @@ export async function createUser(
   full_name,
   email,
   password,
-  profile_image_url = null
+  profile_image_url = null,
 ) {
   // Hash password before saving
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -136,7 +133,6 @@ export const saveOTP = async (userId, otp, expiresAt) => {
   `;
 };
 
-
 // Clear OTP after verification
 export const clearOTP = async (userId) => {
   await sql`
@@ -146,7 +142,6 @@ export const clearOTP = async (userId) => {
   `;
 };
 
-
 export async function findUserByIdWithOTP(id) {
   const result = await sql`
     SELECT id, full_name, email, profile_image_url, two_factor_code, two_factor_expires, created_at
@@ -155,8 +150,6 @@ export async function findUserByIdWithOTP(id) {
   `;
   return result[0] || null;
 }
-
-
 
 // Increment OTP attempts
 export const incrementOtpAttempts = async (userId) => {
