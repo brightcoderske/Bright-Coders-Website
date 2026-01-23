@@ -55,8 +55,6 @@ app.use(
   }),
 );
 
-app.options("*", cors());
-
 const __filename = fileURLToPath(import.meta.url); //Gets the absolute path of the current file
 const __dirname = path.dirname(__filename);
 
