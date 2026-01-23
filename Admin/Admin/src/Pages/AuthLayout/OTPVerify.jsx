@@ -3,6 +3,8 @@ import "./OTPVerify.css";
 import axios from "axios";
 
 export default function OTPVerify({ tempToken, onSuccess, onCancel,initialResendAvailableIn }) {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -75,7 +77,7 @@ export default function OTPVerify({ tempToken, onSuccess, onCancel,initialResend
       setError("");
 
       const res = await axios.post(
-        "http://localhost:8000/api/auth/verify-otp",
+        `${API_BASE}/api/auth/verify-otp`,
         { otp: otpCode },
         {
           headers: {
@@ -108,7 +110,7 @@ export default function OTPVerify({ tempToken, onSuccess, onCancel,initialResend
     setOtp(Array(6).fill(""));
 
     const res = await axios.post(
-      "http://localhost:8000/api/auth/resend-otp",
+      `${API_BASE}/api/auth/resend-otp`,
       {},
       { headers: { Authorization: `Bearer ${tempToken}` } }
     );
