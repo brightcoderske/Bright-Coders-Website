@@ -2,7 +2,10 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config();
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Route Imports
 import { initDb } from "./Database/Config/config.db.js";
 import authRouter from "./Router/authRouter.js";
 import courseRouter from "./Router/courseRouter.js";
@@ -10,80 +13,96 @@ import blogRouter from "./Router/blogRouter.js";
 import testimonialRouter from "./Router/testimonialRouter.js";
 import registrationRouter from "./Router/registrationRouter.js";
 
-import path from "path";
-import { fileURLToPath } from "url";
-// backend starts here
-const app = express();
+dotenv.config();
 
+const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ==========================================
+// 1. CORS MIDDLEWARE (MUST BE FIRST)
+// ==========================================
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://bright-coders-live-website.vercel.app",
+  "https://bright-coders-website-nu.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (Postman/Mobile)
+      if (!origin) return callback(null, true);
+
+      // Check if origin is in whitelist OR is any vercel.app subdomain
+      const isAllowed =
+        allowedOrigins.includes(origin) || origin.endsWith(".vercel.app");
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        // Instead of throwing an Error that crashes Render, we just block the request
+        console.error(`🛑 Blocked by CORS: ${origin}`);
+        callback(null, false);
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  }),
+);
+
+// ==========================================
+// 2. SECURITY & PARSING
+// ==========================================
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
     contentSecurityPolicy: {
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "img-src": [
-          "'self'",
-          "data:",
-          "http://localhost:8000",
-          "https://images.unsplash.com",
-        ], // Allow images from your backend
+        "img-src": ["'self'", "data:", "https:", "http://localhost:8000"],
       },
     },
   }),
 );
 
-//Midleware to handle CORS
-// Robust Middleware to handle CORS
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "https://bright-coders-live-website.vercel.app",
-  "https://bright-coders-website-nu.vercel.app"
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // 1. Allow internal requests or tools like Postman/Insomnia (no origin)
-    if (!origin) return callback(null, true);
-    
-    // 2. Check if the origin is in our whitelist
-    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes("vercel.app")) {
-      callback(null, true);
-    } else {
-      // 3. Log exactly WHAT was blocked so we can fix it
-      console.error(`🛑 CORS blocked for origin: ${origin}`);
-      callback(new Error("CORS blocked"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
-}));
-
-const __filename = fileURLToPath(import.meta.url); //Gets the absolute path of the current file
-const __dirname = path.dirname(__filename);
-
 app.use(express.json());
-// routes
+
+// ==========================================
+// 3. ROUTES
+// ==========================================
 app.use("/api/auth", authRouter);
 app.use("/api/courses", courseRouter);
 app.use("/api/blogs", blogRouter);
 app.use("/api/testimonials", testimonialRouter);
 app.use("/api/registration", registrationRouter);
 
-// serve uploads folder statically
+// Static folders
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-// uploads: name of the subfolder in the backend you want to reach
 
 app.get("/", (req, res) => {
-  res.send("API is running ✅");
+  res.send("Bright Coders API is running ✅");
 });
 
+// ==========================================
+// 4. SERVER INITIALIZATION
+// ==========================================
 const PORT = process.env.PORT || 8000;
 
-initDb().then(() =>
-  app.listen(PORT, () => console.log("Server running on port: ", PORT)),
-);
+// Initialize DB then start server
+initDb()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port: ${PORT}`);
+      console.log(`🌍 Production URL: https://brightcoders-api.onrender.com`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Failed to initialize DB:", err);
+    process.exit(1); // Exit if DB fails
+  });
 
 // {
 
