@@ -104,10 +104,9 @@ export const sendOTPEmail = async (email, otp) => {
     const info = await transporter.sendMail(mailOptions);
     console.log("OTP sent:", info.messageId);
   } catch (error) {
-    console.error("[OTP Email Error]:", err);
+    console.error("[OTP Email Error]:", error);
   }
 };
-
 
 export const sendAdminNotification = async (subject, htmlContent) => {
   const mailOptions = {
