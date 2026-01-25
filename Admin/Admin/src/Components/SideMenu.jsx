@@ -25,10 +25,16 @@ const SideMenu = () => {
     navigate(path);
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    clearUser();
-    navigate("/authentication");
+ const handleLogout = async () => {
+    try {
+      // call your UserContext clearUser which clears cookie on backend
+      await clearUser(); 
+      navigate("/authentication"); // redirect to login
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      setLogoutModal(false);
+    }
   };
 
   // Helper to determine if we should show the image

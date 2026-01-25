@@ -12,6 +12,9 @@ import {
 import path from "path";
 import fs from "fs";
 import rateLimit from "express-rate-limit";
+import csrf from "csurf";
+
+const csrfProtection = csrf({ cookie: true });
 
 const router = express.Router();
 
@@ -36,16 +39,17 @@ router.get("/verify/:regNumber", verifyLimiter, handleVerifyCertificate);
 // ==========================
 
 // Get all registrations (drafts + completed) for admin dashboard
-router.get("/StudentsRegistration", protect, handleGetAllRegistrations);
+router.get("/StudentsRegistration", protect, csrfProtection, handleGetAllRegistrations);
 
 // Update payment or receipt status
-router.patch("/payment/:id", protect, handleUpdatePayment);
+router.patch("/payment/:id", protect, csrfProtection, handleUpdatePayment);
 
 // Issue certificate / mark completion
-router.patch("/certificate/:id", protect, handleIssueCertificate);
+router.patch("/certificate/:id", protect, csrfProtection, handleIssueCertificate);
 
 // Delete a registration
-router.delete("/:id", protect, handleDeleteRegistration);
+router.delete("/:id", protect, csrfProtection, handleDeleteRegistration);
+
 // VERIFY CERTIFICATE (Public Route)
 
 // GET /api/registrations/download-receipt/:regNumber

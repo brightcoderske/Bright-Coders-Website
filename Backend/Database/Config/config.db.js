@@ -7,8 +7,8 @@ import { blogTableSchema } from "./blogQueries.js";
 import { testimonialTableSchema } from "./testimonialsQueries.js";
 import { registrationTableSchema } from "./registrationQueries.js";
 
-neonConfig.fetchConnectionCache = true;
-neonConfig.pipelineConnect = false;
+// neonConfig.fetchConnectionCache = true;
+// neonConfig.pipelineConnect = false;
 const { PGUSER, PGPASSWORD, PGHOST, PGDATABASE } = process.env;
 
 export const sql = neon(

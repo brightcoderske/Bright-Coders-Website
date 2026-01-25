@@ -9,6 +9,9 @@ import {
   handleHideTestimonial,
 } from "../Controller/testimonialController.js";
 import upload from "../Middleware/uploadMiddleware.js";
+import csrf from "csurf";
+
+const csrfProtection = csrf({ cookie: true });
 
 const router = express.Router();
 
@@ -21,16 +24,16 @@ router.post("/submit", upload.single("image"), handleAddTestimonial);
 
 // --- ADMIN ROUTES (Protected) ---
 // Admin can see all submissions (including pending ones)
-router.get("/", protect, handleGetAllTestimonials);
+router.get("/", protect, csrfProtection, handleGetAllTestimonials);
 
 // Admin can delete a testimonial
-router.delete("/:id", protect, handleDeleteTestimonial);
+router.delete("/:id", protect, csrfProtection, handleDeleteTestimonial);
 
 // --- MODERATION ROUTES ---
 // Admin approves a testimonial to show it on the live site
-router.post("/:id/approve", protect, handleApproveTestimonial);
+router.post("/:id/approve", protect, csrfProtection, handleApproveTestimonial);
 
 // Admin hides a testimonial from the live site
-router.post("/:id/hide", protect, handleHideTestimonial);
+router.post("/:id/hide", protect, csrfProtection, handleHideTestimonial);
 
 export default router;

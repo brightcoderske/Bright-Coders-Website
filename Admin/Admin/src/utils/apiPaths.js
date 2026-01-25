@@ -1,11 +1,15 @@
-export const BASE_URL =import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+export const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 export const API_PATHS = {
   AUTH: {
     LOGIN: "/api/auth/login",
     REGISTER: "/api/auth/register",
     GET_USER_INFO: "/api/auth/getUser",
-     VERIFY_OTP: "/api/auth/verify-otp", 
+    VERIFY_OTP: "/api/auth/verify-otp",
+  },
+  SECURITY: {
+    CSRF_TOKEN: "/api/csrf-token",
   },
   DASHBOARD: {
     GET_DATA: "/api/dashboard",
@@ -38,8 +42,8 @@ export const API_PATHS = {
     HIDE: (id) => `/api/testimonials/${id}/hide`,
   },
   REGISTRATIONS: {
-    GET_ALL: "/api/registration/StudentsRegistration", 
-    UPDATE_PAYMENT: (id) => `/api/registration/payment/${id}`, 
+    GET_ALL: "/api/registration/StudentsRegistration",
+    UPDATE_PAYMENT: (id) => `/api/registration/payment/${id}`,
     ISSUE_CERTIFICATE: (id) => `/api/registration/certificate/${id}`,
     DELETE: (id) => `/api/registration/${id}`,
   },

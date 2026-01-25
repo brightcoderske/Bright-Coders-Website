@@ -1,32 +1,23 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { isTokenExpired } from "../utils/tokenUtils";
+import { useContext } from "react";
+import UserContext from "../Components/Context/UserContext";
 
 const ProtectedRoute = () => {
-  const token = localStorage.getItem("token");
-  let redirect = false;
+  const { user, loading } = useContext(UserContext);
 
-  if (!token) {
-    redirect = true;
-  } else {
-    try {
-      if (isTokenExpired(token)) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        sessionStorage.removeItem("2fa_temp");
-        redirect = true;
-      }
-    } catch (error) {
-      console.error("Token error:", error);
-      localStorage.clear();
-      redirect = true;
-    }
+  console.log("🛡️ [ProtectedRoute] user:", user, "| loading:", loading);
+
+  if (loading) {
+    console.log("⏳ [ProtectedRoute] Still loading, showing spinner...");
+    return <div>Loading...</div>;
   }
 
-  if (redirect) {
+  if (!user) {
+    console.warn("🚫 [ProtectedRoute] No user found, redirecting to login.");
     return <Navigate to="/authentication" replace />;
   }
 
+  console.log("🔓 [ProtectedRoute] Access granted.");
   return <Outlet />;
 };
-
 export default ProtectedRoute;

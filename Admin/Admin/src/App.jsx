@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,6 +17,33 @@ import AdminBlogManager from "./Components/AdminBlogManager/AdminBlogManager";
 import AdminTestimonialManager from "./Components/AdminTestimonialManager/AdminTestimonialManager";
 import AdminRegistrationManager from "./Components/AdminRegistrationManager/AdminRegistrationManager";
 import ProtectedRoute from "./Pages/ProtectedRoute";
+import { useState } from "react";
+import { useEffect } from "react";
+import axiosInstance from "./utils/axiosInstance";
+import { API_PATHS } from "./utils/apiPaths";
+import UserContext from "./Components/Context/UserContext";
+import { fetchCsrfToken } from "./utils/csrf";
+
+// =====================
+// ROOT COMPONENT
+// =====================
+
+/* Root redirect */
+const Root = () => {
+  const { user, loading } = useContext(UserContext);
+
+  if (loading) return <div>Loading...</div>;
+
+  return user ? (
+    <Navigate to="/home" replace />
+  ) : (
+    <Navigate to="/authentication" replace />
+  );
+}
+
+// =====================
+// ROUTES COMPONENT
+// =====================
 
 function AppRoutes() {
   return (
@@ -44,7 +71,12 @@ function AppRoutes() {
   );
 }
 
+// =====================
+// APP COMPONENT
+// =====================
 function App() {
+
+
   return (
     <UserProvider>
       <Router>
@@ -53,11 +85,5 @@ function App() {
     </UserProvider>
   );
 }
-
-/* Root redirect */
-const Root = () => {
-  const token = localStorage.getItem("token");
-  return token ? <Navigate to="/home" /> : <Navigate to="/authentication" />;
-};
 
 export default App;

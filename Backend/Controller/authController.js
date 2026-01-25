@@ -14,7 +14,11 @@ import {
 } from "../Database/Config/config.db.js";
 import upload from "../Middleware/uploadMiddleware.js";
 import { sendOTPEmail } from "../Utils/mailer.js";
-import { canResendOTP, generateOTP, getResendRemainingSeconds } from "../Utils/otp.js";
+import {
+  canResendOTP,
+  generateOTP,
+  getResendRemainingSeconds,
+} from "../Utils/otp.js";
 import { SECURITY_LIMITS } from "../Utils/securityLimits.js";
 
 // Generate JWT token
@@ -27,6 +31,15 @@ const generateTempToken = (id) => {
   return jwt.sign({ id, twoFactor: true }, process.env.JWT_SECRET, {
     expiresIn: "5m",
   });
+};
+
+// Defining cookies
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  // secure: process.env.NODE_ENV === "production",
+  secure: false,
+  sameSite: "lax", // REQUIRED for Vercel + Render
+  maxAge: 60 * 60 * 1000, // 1 hour
 };
 
 // ========================================
@@ -143,10 +156,13 @@ export const loginUser = async (request, response) => {
     // SECURITY: Strip sensitive data
     const { password_hash, ...userWithoutPassword } = user;
 
+    const token = generateToken(user.id);
+
+    response.cookie("access_token", token, COOKIE_OPTIONS);
+
     return response.status(200).json({
       message: "Login successful.",
       user: userWithoutPassword,
-      token: generateToken(user.id),
     });
   } catch (error) {
     console.error("[Login Error]:", error);
@@ -199,15 +215,16 @@ export const imageUpload = async (request, response) => {
 };
 
 export const verifyOTP = async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const authHeader = req.headers.authorization;
+  const tempToken = authHeader?.split(" ")[1]; // renamed from 'token'
   const { otp } = req.body;
 
-  if (!token || !otp) {
+  if (!tempToken || !otp) {
     return res.status(400).json({ message: "OTP required." });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(tempToken, process.env.JWT_SECRET);
 
     if (!decoded.twoFactor) {
       return res.status(401).json({ message: "Invalid token." });
@@ -242,18 +259,20 @@ export const verifyOTP = async (req, res) => {
 
     const { password_hash, ...userWithoutPassword } = user;
 
+    const finalToken = generateToken(user.id);
+
+    res.cookie("access_token", finalToken, COOKIE_OPTIONS);
+
     return res.status(200).json({
-      message: "Login successful",
-      token: generateToken(user.id),
+      message: "Login successful.",
       user: userWithoutPassword,
+      token: finalToken
     });
   } catch (error) {
     console.error("[OTP Error]", error);
     return res.status(401).json({ message: "OTP verification failed." });
   }
 };
-
-
 
 export const resendOTP = async (req, res) => {
   try {

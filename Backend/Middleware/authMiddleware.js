@@ -2,26 +2,27 @@ import jwt from "jsonwebtoken";
 import { findUserById } from "../Database/Config/config.db.js";
 
 export const protect = async (request, response, next) => {
-  let token = request.headers.authorization?.split(" ")[1];
-
-  if (!token) {
-    return response.status(401).json({ message: "Not authorized, no token!" });
-  }
   try {
+    // ✅ 1. Read token from cookies
+    const token = request.cookies?.access_token;
+    if (!token) {
+      return response.status(401).json({ message: "Not authenticated" });
+    }
+
+    // ✅ 2. Verify JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // ✅ 3. Fetch user
     const user = await findUserById(decoded.id);
-    // Add a log here to see exactly what 'user' looks like in your terminal
-  
 
     if (!user) {
-      return response
-        .status(404)
-        .json({ message: "User not found in the database" });
+      return res.status(401).json({ message: "User no longer exists" });
     }
+    // ✅ 4. Attach user to request
     request.user = user;
     next();
   } catch (error) {
-    console.log("Authorization Failed!: ", error);
-    response.status(401).json({ message: "Token is invalid or expired" });
+    console.error("Auth Error: ", error);
+    return response.status(401).json({ message: "Invalid or expired token" });
   }
 };

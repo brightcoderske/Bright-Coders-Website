@@ -16,25 +16,29 @@ import {
   toggleFeaturedSchema, // Import the smaller schema for toggling
 } from "../Middleware/Validators/courseValidator.js";
 
+import csrf from "csurf";
+const csrfProtection = csrf({ cookie: true });
+
 const router = express.Router();
 
 // --- ADMIN ROUTES (Management) ---
-router.get("/", protect, handleGetCourses); // Usually admin only
-router.post("/", protect, validate(courseSchema), handleAddCourse);
-router.put("/:id", protect, validate(courseSchema), handleUpdateCourse); // Added validation here
-router.delete("/:id", protect, handleDeleteCourse);
+router.get("/", protect, csrfProtection, handleGetCourses);
+router.post("/", protect, validate(courseSchema), csrfProtection,handleAddCourse);
+router.put("/:id", protect, validate(courseSchema), csrfProtection,handleUpdateCourse); 
+router.delete("/:id", protect, csrfProtection,handleDeleteCourse);
 
 //  One-click Featured Toggle
 router.patch(
   "/:id/featured",
   protect,
+  csrfProtection,
   validate(toggleFeaturedSchema),
   handleToggleFeatured
 );
 
 // Sync Actions
-router.post("/:id/push", protect, handlePushToLive);
-router.post("/:id/withdraw", protect, withdrawCourse);
+router.post("/:id/push", protect, csrfProtection,handlePushToLive);
+router.post("/:id/withdraw", protect,csrfProtection, withdrawCourse);
 
 // --- PUBLIC ROUTES (Website) ---
 // This route is used by the student-facing homepage

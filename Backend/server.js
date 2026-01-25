@@ -3,6 +3,9 @@ import helmet from "helmet";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
+import rateLimit from "express-rate-limit";
+import cookieParser from "cookie-parser";
+import csrf from "csurf";
 import { fileURLToPath } from "url";
 
 // Route Imports
@@ -18,9 +21,17 @@ dotenv.config();
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+// ==========================================
+// 1. TRUST PROXY (IMPORTANT FOR RENDER)
+// ==========================================
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1); // common for most cloud hosts
+} else {
+  app.set("trust proxy", 0); // localhost / dev
+}
 
 // ==========================================
-// 1. CORS MIDDLEWARE (MUST BE FIRST)
+// 2. STRICT CORS (HARDENED)
 // ==========================================
 const allowedOrigins = [
   "http://localhost:3000",
@@ -31,30 +42,27 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (Postman/Mobile)
-      if (!origin) return callback(null, true);
-
-      // Check if origin is in whitelist OR is any vercel.app subdomain
-      const isAllowed =
-        allowedOrigins.includes(origin) || origin.endsWith(".vercel.app");
-
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        // Instead of throwing an Error that crashes Render, we just block the request
-        console.error(`🛑 Blocked by CORS: ${origin}`);
-        callback(null, false);
+    origin: (origin, callback) => {
+      // !origin means server to server
+      if (!origin) {
+        return callback(null, true); //postman, mobile
       }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.error("🛑 Blocked by CORS:", origin);
+      return callback(new Error("CORS not allowed"));
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
   }),
 );
 
 // ==========================================
-// 2. SECURITY & PARSING
+// 3. SECURITY HEADERS (HELMET)
 // ==========================================
 app.use(
   helmet({
@@ -62,16 +70,58 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "img-src": ["'self'", "data:", "https:", "http://localhost:8000"],
+        "img-src": [
+          "'self'",
+          "data:",
+          "https:",
+          ...(process.env.NODE_ENV !== "production"
+            ? ["http://localhost:8000"]
+            : []),
+        ],
       },
     },
   }),
 );
 
-app.use(express.json());
+// ==========================================
+// 4. BODY & COOKIE PARSING
+// ==========================================
+
+app.use(express.json({ limit: "10kb" })); // prevent payload abuse
+app.use(cookieParser());
 
 // ==========================================
-// 3. ROUTES
+// 5. RATE LIMITING (ANTI-ABUSE)
+// ==========================================
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 mins
+  max: 10, // login / otp attempts
+  message: "Too many atempts. Please try again later.",
+});
+app.use("/api/auth", authLimiter);
+
+// ==========================================
+// 6. CSRF PROTECTION (COOKIE-BASED)
+// ==========================================
+const csrfProtection = csrf({
+  // csrf - Cross-Site Request Forgery
+  //  CSRF protects cookie-based, authenticated, state-changing actions.
+  // We should NEVER protect public routes, login, OTP, or file downloads.
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  },
+});
+
+// Provide CSRF token to frontend
+app.get("/api/csrf-token", csrfProtection, (req, res) => {
+  const token = req.csrfToken();
+  res.json({ csrfToken: token });
+});
+
+// ==========================================
+// 7. ROUTES
 // ==========================================
 app.use("/api/auth", authRouter);
 app.use("/api/courses", courseRouter);
@@ -79,15 +129,41 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/testimonials", testimonialRouter);
 app.use("/api/registration", registrationRouter);
 
-// Static folders
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// ==========================================
+// 8. STATIC FILES (SAFE)
+// ==========================================
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"), {
+    maxAge: "1d",
+    setHeaders: (res) => {
+      res.set("X-Content-Type-Options", "nosniff");
+    },
+  }),
+);
 
+// ==========================================
+// 9. HEALTH CHECK
+// ==========================================
 app.get("/", (req, res) => {
   res.send("Bright Coders API is running ✅");
 });
 
 // ==========================================
-// 4. SERVER INITIALIZATION
+// 10. GLOBAL ERROR HANDLER
+// ==========================================
+app.use((err, req, res, next) => {
+  console.error("❌ Error:", err.message);
+
+  if (err.code === "EBADCSRFTOKEN") {
+    return res.status(403).json({ message: "Invalid CSRF token" });
+  }
+
+  res.status(500).json({ message: "Internal server error" });
+});
+
+// ==========================================
+// 11. SERVER INITIALIZATION
 // ==========================================
 const PORT = process.env.PORT || 8000;
 
@@ -103,8 +179,6 @@ initDb()
     console.error("❌ Failed to initialize DB:", err);
     process.exit(1); // Exit if DB fails
   });
-
-// {
 
 //   remember to include this for security purposes
 

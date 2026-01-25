@@ -1,8 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import "./OTPVerify.css";
 import axios from "axios";
+import { fetchCsrfToken } from "../../utils/csrf";
+import axiosInstance from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths";
 
-export default function OTPVerify({ tempToken, onSuccess, onCancel,initialResendAvailableIn }) {
+export default function OTPVerify({
+  tempToken,
+  onSuccess,
+  onCancel,
+  initialResendAvailableIn,
+}) {
   const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
   const [otp, setOtp] = useState(Array(6).fill(""));
@@ -10,9 +18,9 @@ export default function OTPVerify({ tempToken, onSuccess, onCancel,initialResend
   const [loading, setLoading] = useState(false);
 
   // Resend OTP state
- const [resendCooldown, setResendCooldown] = useState(
-  initialResendAvailableIn
-);
+  const [resendCooldown, setResendCooldown] = useState(
+    initialResendAvailableIn,
+  );
 
   const [canResend, setCanResend] = useState(false);
 
@@ -76,8 +84,8 @@ export default function OTPVerify({ tempToken, onSuccess, onCancel,initialResend
       setLoading(true);
       setError("");
 
-      const res = await axios.post(
-        `${API_BASE}/api/auth/verify-otp`,
+      const res = await axiosInstance.post(
+        API_PATHS.AUTH.VERIFY_OTP,
         { otp: otpCode },
         {
           headers: {
@@ -86,6 +94,7 @@ export default function OTPVerify({ tempToken, onSuccess, onCancel,initialResend
         },
       );
 
+      await fetchCsrfToken();
       onSuccess(res.data.token, res.data.user);
     } catch (err) {
       if (err.response?.status === 401) {
@@ -105,23 +114,26 @@ export default function OTPVerify({ tempToken, onSuccess, onCancel,initialResend
   /* -------------------- */
   const handleResendOTP = async () => {
     try {
-    setError("");
-    setCanResend(false);
-    setOtp(Array(6).fill(""));
+      setError("");
+      setCanResend(false);
+      setOtp(Array(6).fill(""));
 
-    const res = await axios.post(
-      `${API_BASE}/api/auth/resend-otp`,
-      {},
-      { headers: { Authorization: `Bearer ${tempToken}` } }
-    );
+      const res = await axios.post(
+        `${API_BASE}/api/auth/resend-otp`,
+        {},
+        { headers: { Authorization: `Bearer ${tempToken}` } },
+      );
 
-    // <-- use backend cooldown
-    setResendCooldown(res.data.resendAvailableIn || 90);
+      // <-- use backend cooldown
+      setResendCooldown(res.data.resendAvailableIn || 90);
 
-    setError("A new OTP has been sent to your email.");
-  } catch (err) {
-    setError(err.response?.data?.message || "Please wait before requesting another OTP.");
-  }
+      setError("A new OTP has been sent to your email.");
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          "Please wait before requesting another OTP.",
+      );
+    }
   };
 
   /* -------------------- */

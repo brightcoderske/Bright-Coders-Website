@@ -15,7 +15,9 @@
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
     "bcryptjs": "^3.0.3",
-    "cors": "^2.8.5",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "csurf": "^1.11.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
