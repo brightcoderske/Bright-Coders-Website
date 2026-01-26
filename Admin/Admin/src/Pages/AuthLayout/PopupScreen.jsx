@@ -1,6 +1,6 @@
 import React from "react";
 import "../../Css/PopupScreen.css";
-import logo from "../../assets/logo2.png";
+import logo from "../../../public/logo2.png";
 
 const PopupScreen = ({ onToggle }) => {
   return (

@@ -1,4 +1,4 @@
-import { sql } from "./config.db.js";
+import  pool  from "./config.db.js";
 
 /* =========================
    TESTIMONIAL TABLE SCHEMA
@@ -20,77 +20,88 @@ CREATE TABLE IF NOT EXISTS testimonials (
    CREATE TESTIMONIAL
 ========================= */
 export const createTestimonial = async (data) => {
-  const rows = await sql(
-    `INSERT INTO testimonials 
+  const result = await pool.query(
+    `INSERT INTO testimonials
       (user_name, user_role, message, rating, image_url, is_approved)
-    VALUES ($1, $2, $3, $4, $5, false)
-    RETURNING *`,
+     VALUES ($1, $2, $3, $4, $5, false)
+     RETURNING *`,
     [
       data.userName,
       data.userRole || "Student",
       data.message,
       data.rating || 5,
       data.imageUrl || null,
-    ],
+    ]
   );
-  return rows[0];
+
+  return result.rows[0];
 };
 
 /* =========================
    READ ALL TESTIMONIALS (ADMIN)
 ========================= */
 export const getAllTestimonials = async () => {
-  return await sql("SELECT * FROM testimonials ORDER BY created_at DESC");
+  const result = await pool.query(
+    `SELECT * FROM testimonials
+     ORDER BY created_at DESC`
+  );
+
+  return result.rows;
 };
 
 /* =========================
    APPROVE TESTIMONIAL
 ========================= */
 export const approveTestimonial = async (id) => {
-  const rows = await sql(
+  const result = await pool.query(
     `UPDATE testimonials
-    SET is_approved = true
-    WHERE id = $1
-    RETURNING *`,
-    [id],
+     SET is_approved = true
+     WHERE id = $1
+     RETURNING *`,
+    [id]
   );
-  return rows[0];
+
+  return result.rows[0];
 };
 
 /* =========================
-   HIDE/UNAPPROVE TESTIMONIAL
+   HIDE / UNAPPROVE TESTIMONIAL
 ========================= */
 export const hideTestimonial = async (id) => {
-  const rows = await sql(
+  const result = await pool.query(
     `UPDATE testimonials
-    SET is_approved = false
-    WHERE id = $1
-    RETURNING *`,
-    [id],
+     SET is_approved = false
+     WHERE id = $1
+     RETURNING *`,
+    [id]
   );
-  return rows[0];
+
+  return result.rows[0];
 };
 
 /* =========================
    READ LIVE TESTIMONIALS (PUBLIC)
 ========================= */
 export const getLiveTestimonials = async () => {
-  return await sql(
+  const result = await pool.query(
     `SELECT * FROM testimonials
-    WHERE is_approved = true
-    ORDER BY created_at DESC`,
+     WHERE is_approved = true
+     ORDER BY created_at DESC`
   );
+
+  return result.rows;
 };
 
 /* =========================
    DELETE TESTIMONIAL
 ========================= */
 export const deleteTestimonialById = async (id) => {
-  const rows = await sql(
+  const result = await pool.query(
     `DELETE FROM testimonials
-    WHERE id = $1
-    RETURNING id`,
-    [id],
+     WHERE id = $1
+     RETURNING id`,
+    [id]
   );
-  return rows[0];
+
+  return result.rows[0];
 };

@@ -1,4 +1,6 @@
-import { sql } from "./config.db.js";
+// import { pool } from "./config.db.js";
+
+import pool from "./config.db.js";
 
 /* =========================
    BLOG TABLE SCHEMA
@@ -28,10 +30,10 @@ const normalizeBlogData = (data) => ({
   category: data.category || "General",
   summary: data.summary,
   content: data.content,
-  keyHighlights: data.keyHighlights || [],
+  keyHighlights: Array.isArray(data.keyHighlights) ? data.keyHighlights : [],
   author: data.author || "Bright Coders Team",
   imageUrl: data.imageUrl || "https://via.placeholder.com/400x200",
-  isPublic: false,
+  isPublic: Boolean(data.isPublic),
 });
 
 /* =========================
@@ -40,9 +42,11 @@ const normalizeBlogData = (data) => ({
 export const createBlog = async (data) => {
   const blog = normalizeBlogData(data);
 
-  const rows = await sql(
-    `INSERT INTO blogs
-      (title, category, summary, content, key_highlights, author, image_url, is_public)
+  const result = await pool.query(
+    `INSERT INTO blogs (
+      title, category, summary, content,
+      key_highlights, author, image_url, is_public
+    )
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`,
     [
@@ -54,17 +58,20 @@ export const createBlog = async (data) => {
       blog.author,
       blog.imageUrl,
       blog.isPublic,
-    ],
+    ]
   );
 
-  return rows[0];
+  return result.rows[0];
 };
 
 /* =========================
    READ ALL BLOGS (ADMIN)
 ========================= */
 export const getAllBlogs = async () => {
-  return await sql("SELECT * FROM blogs ORDER BY created_at DESC");
+  const result = await pool.query(
+    `SELECT * FROM blogs ORDER BY created_at DESC`
+  );
+  return result.rows;
 };
 
 /* =========================
@@ -73,17 +80,17 @@ export const getAllBlogs = async () => {
 export const updateBlogById = async (id, data) => {
   const blog = normalizeBlogData(data);
 
-  const rows = await sql(
+  const result = await pool.query(
     `UPDATE blogs
-    SET title = $1,
-        category = $2,
-        summary = $3,
-        content = $4,
-        key_highlights = $5,
-        author = $6,
-        image_url = $7
-    WHERE id = $8
-    RETURNING *`,
+     SET title = $1,
+         category = $2,
+         summary = $3,
+         content = $4,
+         key_highlights = $5,
+         author = $6,
+         image_url = $7
+     WHERE id = $8
+     RETURNING *`,
     [
       blog.title,
       blog.category,
@@ -93,57 +100,63 @@ export const updateBlogById = async (id, data) => {
       blog.author,
       blog.imageUrl,
       id,
-    ],
+    ]
   );
 
-  return rows[0];
+  return result.rows[0];
 };
 
 /* =========================
    DELETE BLOG
 ========================= */
 export const deleteBlogById = async (id) => {
-  const rows = await sql("DELETE FROM blogs WHERE id = $1 RETURNING id", [id]);
-  return rows[0];
+  const result = await pool.query(
+    `DELETE FROM blogs WHERE id = $1 RETURNING id`,
+    [id]
+  );
+  return result.rows[0];
 };
 
 /* =========================
    PUSH BLOG LIVE
 ========================= */
 export const pushBlogToLiveDb = async (id) => {
-  const rows = await sql(
+  const result = await pool.query(
     `UPDATE blogs
-    SET is_public = true,
-        last_pushed_at = CURRENT_TIMESTAMP
-    WHERE id = $1
-    RETURNING *`,
-    [id],
+     SET is_public = true,
+         last_pushed_at = CURRENT_TIMESTAMP
+     WHERE id = $1
+     RETURNING *`,
+    [id]
   );
 
-  return rows[0];
+  return result.rows[0];
 };
 
 /* =========================
    WITHDRAW BLOG
 ========================= */
-export const withdrawBlogsFromLiveWeb = async (id) => {
-  const rows = await sql(
+export const withdrawBlogFromLiveWeb = async (id) => {
+  const result = await pool.query(
     `UPDATE blogs
-    SET is_public = false,
-        last_withdrawn_at = CURRENT_TIMESTAMP
-    WHERE id = $1
-    RETURNING *`,
-    [id],
+     SET is_public = false,
+         last_withdrawn_at = CURRENT_TIMESTAMP
+     WHERE id = $1
+     RETURNING *`,
+    [id]
   );
 
-  return rows[0];
+  return result.rows[0];
 };
 
 /* =========================
    READ LIVE BLOGS (PUBLIC)
 ========================= */
 export const getLiveBlogs = async () => {
-  return await sql(
-    "SELECT * FROM blogs WHERE is_public = true ORDER BY last_pushed_at DESC",
+  const result = await pool.query(
+    `SELECT * FROM blogs
+     WHERE is_public = true
+     ORDER BY last_pushed_at DESC`
   );
+  return result.rows;
 };
