@@ -101,13 +101,12 @@ const SignIn = ({ onToggle }) => {
       });
 
       // Backend returns: { newUser, token, message, id }
-      const { token, newUser } = response.data;
-      if (token) {
-        localStorage.setItem("token", token);
+      const {  newUser } = response.data;
+     
         updateUser(newUser);
         setFormData({ fullName: "", email: "", password: "" });
         navigate("/authentication");
-      }
+     
     } catch (error) {
       // 1. Extract the message regardless of where it came from (Axios or Upload Util)
       const backendMsg =
