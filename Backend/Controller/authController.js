@@ -228,7 +228,7 @@ export const imageUpload = (req, res) => {
 
       // Convert buffer → base64 for Cloudinary
       const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString(
-        "base64"
+        "base64",
       )}`;
 
       const result = await cloudinary.uploader.upload(base64Image, {

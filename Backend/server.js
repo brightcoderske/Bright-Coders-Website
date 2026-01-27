@@ -101,7 +101,7 @@ const authLimiter = rateLimit({
 
 // 📊 Relaxed limiter for general data fetching
 const generalLimiter = rateLimit({
-  windowMs: 1*60, 
+  windowMs: 1 * 60,
   max: 50, // Allows for dashboard refreshes without blocking
   message: "Slow down! You are refreshing too fast.",
 });
