@@ -10,7 +10,7 @@ import {
   verifyOTP,
 } from "../Controller/authController.js";
 import { protect } from "../Middleware/authMiddleware.js";
-import { csrfProtection } from "../server.js";
+import { csrfProtection } from "../Middleware/csrfMiddleware.js";
 
 const router = express.Router();
 // const csrfProtection = csrf({ cookie: true });
