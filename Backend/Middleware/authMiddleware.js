@@ -16,7 +16,7 @@ export const protect = async (request, response, next) => {
     const user = await findUserById(decoded.id);
 
     if (!user) {
-      return res.status(401).json({ message: "User no longer exists" });
+      return response.status(401).json({ message: "User no longer exists" });
     }
     // ✅ 4. Attach user to request
     request.user = user;
