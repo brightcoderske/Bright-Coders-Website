@@ -1,5 +1,6 @@
 import express from "express";
-import csrf from "csurf";
+
+// import csrf from "csurf";
 import {
   getUserInfo,
   imageUpload,
@@ -9,9 +10,10 @@ import {
   verifyOTP,
 } from "../Controller/authController.js";
 import { protect } from "../Middleware/authMiddleware.js";
+import { csrfProtection } from "../server.js";
 
 const router = express.Router();
-const csrfProtection = csrf({ cookie: true });
+// const csrfProtection = csrf({ cookie: true });
 
 // PUBLIC
 router.post("/register", registerUser);

@@ -21,6 +21,7 @@ import {
 } from "../Utils/otp.js";
 import { SECURITY_LIMITS } from "../Utils/securityLimits.js";
 import cloudinary from "../Utils/cloudinary.js";
+import { COOKIE_OPTIONS } from "../server.js";
 
 // Generate JWT token
 const generateToken = (id) => {
@@ -34,14 +35,7 @@ const generateTempToken = (id) => {
   });
 };
 
-// Defining cookies
-const COOKIE_OPTIONS = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  // secure: false,
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // REQUIRED for Vercel + Render
-  maxAge: 60 * 60 * 1000, // 1 hour
-};
+
 
 // ========================================
 // 🔹 Register User
