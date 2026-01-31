@@ -2,37 +2,54 @@ import { testimonialValidationSchema } from "../Middleware/Validators/testimonia
 import * as Queries from "../Database/Config/testimonialsQueries.js";
 import { sendAdminNotification } from "../Utils/mailer.js";
 import { generateTestimonialAdminEmail } from "../Utils/mailhelper.js";
+import cloudinary from "../Utils/cloudinary.js";
 
 // 1. ADD NEW TESTIMONIAL (Public Submission)
+
+
 export const handleAddTestimonial = async (request, response) => {
   try {
-    // 1. Validate the text fields from the body
+    // 1. Validate text fields
     const { error, value } = testimonialValidationSchema.validate(
       request.body,
-      { abortEarly: false },
+      { abortEarly: false }
     );
 
     if (error) {
       const errorMessages = error.details.map((err) => err.message);
-      return response
-        .status(400)
-        .json({ message: "Validation failed!", errors: errorMessages });
+      return response.status(400).json({ message: "Validation failed!", errors: errorMessages });
     }
 
-    // 2. Capture the image path if a file was uploaded
-    // We use request.file.filename (or path) provided by Multer
-    const imagePath = request.file ? `/uploads/${request.file.filename}` : null;
+    // 2. Handle Cloudinary Upload
+    let cloudinaryImageUrl = null;
 
-    // 3. Merge the validated text with the image path
+    if (request.file) {
+      try {
+        // Convert buffer to base64 (matching your user profile logic)
+        const base64Image = `data:${request.file.mimetype};base64,${request.file.buffer.toString("base64")}`;
+        
+        const uploadResponse = await cloudinary.uploader.upload(base64Image, {
+          folder: "testimonials", // Saved in a specific folder
+          resource_type: "image",
+        });
+
+        cloudinaryImageUrl = uploadResponse.secure_url;
+      } catch (uploadErr) {
+        console.error("CLOUDINARY_UPLOAD_ERROR:", uploadErr);
+        return response.status(500).json({ message: "Failed to upload image to cloud." });
+      }
+    }
+
+    // 3. Merge data with the Cloudinary URL
     const testimonialData = {
       ...value,
-      imageUrl: imagePath, // This must match the column name in your database
+      imageUrl: cloudinaryImageUrl, 
     };
 
-    // 4. Pass the combined object to your Query
+    // 4. Save to Database
     const newTestimonial = await Queries.createTestimonial(testimonialData);
 
-    // ✅ SEND EMAIL
+    // 5. Send Admin Notification
     const email = generateTestimonialAdminEmail({
       userName: value.userName,
       message: value.message,

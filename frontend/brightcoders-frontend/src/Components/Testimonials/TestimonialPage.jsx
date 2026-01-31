@@ -73,7 +73,7 @@ const TestimonialPage = () => {
   const fetchLiveReviews = async () => {
     try {
       const response = await axios.get(
-        `${API_URL.replace(/\/$/, "")}/testimonials/live`
+        `${API_URL.replace(/\/$/, "")}/testimonials/live`,
       );
       setLiveTestimonials(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
@@ -92,7 +92,7 @@ const TestimonialPage = () => {
     e.preventDefault();
     const { isValid, errors: validationErrors } = validateTestimonial(
       formData,
-      image
+      image,
     );
 
     if (!isValid) {
@@ -183,20 +183,13 @@ const TestimonialPage = () => {
                     <div className="user-img-wrapper">
                       {item.image_url ? (
                         <img
-                          src={
-                            item.image_url.startsWith("http")
-                              ? item.image_url
-                              : `${API_URL.replace(/\/api$/, "").replace(
-                                  /\/$/,
-                                  ""
-                                )}/${item.image_url.replace(/^\/+/, "")}`
-                          }
+                          src={item.image_url} // Simply use the URL directly from DB
                           alt={item.user_name}
                           onError={(e) => {
                             e.target.style.display = "none";
                             const fallback =
                               e.target.parentElement.querySelector(
-                                ".user-fallback-icon"
+                                ".user-fallback-icon",
                               );
                             if (fallback) fallback.style.display = "block";
                           }}
@@ -220,7 +213,7 @@ const TestimonialPage = () => {
                         <FaStar key={i} className="star-filled" />
                       ) : (
                         <FaRegStar key={i} />
-                      )
+                      ),
                     )}
                   </div>
                 </div>
