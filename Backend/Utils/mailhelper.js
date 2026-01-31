@@ -75,7 +75,7 @@ export const generateAdminEmailHtml = (newRegistration) => {
 
 
 export const generateTestimonialAdminEmail = ({ userName, message }) => {
-  const ADMIN_DASHBOARD_URL = process.env.FRONTEND_URL || "http://localhost:5173"
+  const ADMIN_DASHBOARD_URL = process.env.ADMIN_URL || "http://localhost:5173"
   return {
     subject: "🌟 New Testimonial Received",
     html: `
