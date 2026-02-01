@@ -8,7 +8,7 @@ const PopupScreen = ({ onToggle }) => {
       <div className="logo-section">
         <img src={logo} alt="" />
       </div>
-      <h1>Hello, Friend?</h1>
+      <h1 style={{color:"white"}}>Hello, Friend?</h1>
       <p>Login with your personal details to use all site features</p>
       <button
         onClick={() => {

@@ -5,24 +5,24 @@ import confetti from 'canvas-confetti';
 import "./SignupSuccess.css";
 
 const SignupSuccess = () => {
-  useEffect(() => {
-  const duration = 3 * 1000;
+useEffect(() => {
+  const duration = 6 * 1000;
   const animationEnd = Date.now() + duration;
-
+ const colors = ["#22c55e", "#3b82f6", "#a855f7", "#06b6d4", "#f59e0b", "#ef4444"];
   const frame = () => {
     confetti({
-      particleCount: 2,
+      particleCount: 3,
       angle: 60,
       spread: 55,
-      origin: { x: 0 },
-      colors: ['#22c55e', '#16a34a']
+      origin: { x: 0, y: 0.6 },
+      colors: colors,
     });
     confetti({
-      particleCount: 2,
+      particleCount: 3,
       angle: 120,
       spread: 55,
-      origin: { x: 1 },
-      colors: ['#22c55e', '#16a34a']
+      origin: { x: 1, y: 0.6 },
+      colors: colors,
     });
 
     if (Date.now() < animationEnd) {
@@ -31,6 +31,7 @@ const SignupSuccess = () => {
   };
   frame();
 }, []);
+
   const navigate = useNavigate();
   const location = useLocation();
   const userEmail = location.state?.email || "your email";
@@ -42,14 +43,16 @@ const SignupSuccess = () => {
       <div className="bg-blob blob-2"></div>
 
       <div className="signup-success-card">
-        <div className="status-badge">
-          <ShieldCheck size={16} />
-          <span>Verified Secure</span>
-        </div>
+        
 
         <div className="icon-wrapper">
           <div className="pulse-ring"></div>
           <CheckCircle size={80} className="success-icon" />
+        </div>
+
+        <div className="status-badge">
+          <ShieldCheck size={16} />
+          <span>Verified Secure</span>
         </div>
 
         <div className="text-content">

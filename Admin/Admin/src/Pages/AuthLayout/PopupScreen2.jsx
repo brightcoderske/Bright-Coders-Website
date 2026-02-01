@@ -7,7 +7,7 @@ const PopupScreen2 = ({ onToggle }) => {
       <div className="logo-section">
         <img src={logo} alt="" />
       </div>
-      <h1>Hello, Friend?</h1>
+      <h1 style={{color:"white"}}>Hello, Friend?</h1>
       <p style={{ color: "white" }}>
         Register with your personal details to use all site features
       </p>

@@ -288,6 +288,8 @@ export const sendStepUpOTPEmail = async (email, otp) => {
 };
 
 export const sendAdminWelcomeEmail = async (adminData) => {
+  const name = adminData.full_name || adminData.fullName || "Admin";
+  const email = adminData.email;
   try {
     const { data, error } = await resend.emails.send({
       from: "Bright Coders Academy <onboarding@resend.dev>",
@@ -303,7 +305,7 @@ export const sendAdminWelcomeEmail = async (adminData) => {
                 <table width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
                   <tr>
                     <td align="center" style="background-color: #0f172a; padding: 40px 20px;">
-                      <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: -0.5px;">Welcome Aboard, ${adminData.fullName}!</h1>
+                      <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: -0.5px;">Welcome Aboard, ${name}!</h1>
                       <p style="color: #94a3b8; margin-top: 10px;">Your Administrator account is officially active.</p>
                     </td>
                   </tr>
@@ -311,7 +313,7 @@ export const sendAdminWelcomeEmail = async (adminData) => {
                   <tr>
                     <td style="padding: 40px;">
                       <p style="font-size: 16px; color: #334155; line-height: 1.6;">
-                        Hello <strong>${adminData.fullName}</strong>,
+                        Hello <strong>${name}</strong>,
                       </p>
                       <p style="font-size: 16px; color: #334155; line-height: 1.6;">
                         You have been successfully onboarded as an administrator for <strong>Bright Coders Academy</strong>. You now have access to manage students, verify payments, and oversee the academy's growth.

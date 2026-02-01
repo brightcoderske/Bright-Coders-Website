@@ -35,8 +35,6 @@ const generateTempToken = (id) => {
   });
 };
 
-
-
 // ========================================
 // 🔹 Register User
 // ========================================
@@ -71,7 +69,7 @@ export const registerUser = async (request, response) => {
     // SECURITY: Remove password from the user object before sending to frontend
     const { password_hash, ...userWithoutPassword } = newUser;
 
-    await sendAdminWelcomeEmail(newUser)
+    await sendAdminWelcomeEmail(userWithoutPassword);
     return response.status(201).json({
       message: "User registered successfully.",
       user: userWithoutPassword,
