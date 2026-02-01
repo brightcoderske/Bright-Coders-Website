@@ -13,7 +13,7 @@ import {
   updateLastLogin,
 } from "../Database/Config/config.db.js";
 import upload from "../Middleware/uploadMiddleware.js";
-import { sendOTPEmail } from "../Utils/mailer.js";
+import { sendAdminWelcomeEmail, sendOTPEmail } from "../Utils/mailer.js";
 import {
   canResendOTP,
   generateOTP,
@@ -71,6 +71,7 @@ export const registerUser = async (request, response) => {
     // SECURITY: Remove password from the user object before sending to frontend
     const { password_hash, ...userWithoutPassword } = newUser;
 
+    await sendAdminWelcomeEmail(newUser)
     return response.status(201).json({
       message: "User registered successfully.",
       user: userWithoutPassword,

@@ -14,7 +14,7 @@ if (!process.env.RESEND_API_KEY) {
 export const sendPaymentConfirmation = async (studentData, fileInfo) => {
   try {
     let attachments = [];
-    
+
     // Only try to attach if the local path exists
     if (fileInfo?.filePath && fs.existsSync(fileInfo.filePath)) {
       const fileBuffer = fs.readFileSync(fileInfo.filePath);
@@ -120,7 +120,6 @@ export const sendAdminNotification = async (subject, htmlContent) => {
   }
 };
 
-
 export const sendResetEmail = async (email, resetUrl) => {
   try {
     const { data, error } = await resend.emails.send({
@@ -208,15 +207,14 @@ export const sendResetEmail = async (email, resetUrl) => {
   }
 };
 
-
 export const sendStepUpOTPEmail = async (email, otp) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Bright Coders Security <onboarding@resend.dev>", 
+      from: "Bright Coders Security <onboarding@resend.dev>",
       to: email,
       // Pro move: Putting the OTP in the subject for mobile lock-screen previews
       // good move
-      subject: `${otp} is your verification code`, 
+      subject: `${otp} is your verification code`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -285,6 +283,77 @@ export const sendStepUpOTPEmail = async (email, otp) => {
     return data;
   } catch (error) {
     console.error("[OTP Email Error]:", error);
+    throw error;
+  }
+};
+
+export const sendAdminWelcomeEmail = async (adminData) => {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "Bright Coders Academy <onboarding@resend.dev>",
+      to: adminData.email,
+      subject: "Welcome to the Admin Council | Bright Coders Academy",
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <body style="background-color: #f8fafc; margin: 0; padding: 0; font-family: sans-serif;">
+          <table width="100%" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+              <td align="center" style="padding: 40px 20px;">
+                <table width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+                  <tr>
+                    <td align="center" style="background-color: #0f172a; padding: 40px 20px;">
+                      <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: -0.5px;">Welcome Aboard, ${adminData.fullName}!</h1>
+                      <p style="color: #94a3b8; margin-top: 10px;">Your Administrator account is officially active.</p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="padding: 40px;">
+                      <p style="font-size: 16px; color: #334155; line-height: 1.6;">
+                        Hello <strong>${adminData.fullName}</strong>,
+                      </p>
+                      <p style="font-size: 16px; color: #334155; line-height: 1.6;">
+                        You have been successfully onboarded as an administrator for <strong>Bright Coders Academy</strong>. You now have access to manage students, verify payments, and oversee the academy's growth.
+                      </p>
+
+                      <div style="background-color: #f1f5f9; border-radius: 12px; padding: 25px; margin: 30px 0;">
+                        <h3 style="margin-top: 0; font-size: 14px; color: #0f172a; text-transform: uppercase; letter-spacing: 1px;">Getting Started</h3>
+                        <ul style="padding-left: 20px; color: #475569; font-size: 14px; line-height: 2;">
+                          <li>Access the <strong>Admin Dashboard</strong> to view enrollment requests.</li>
+                          <li>Review the latest <strong>Testimonials</strong> submitted by students.</li>
+                          <li>Keep your <strong>Two-Factor Authentication</strong> active at all times.</li>
+                        </ul>
+                      </div>
+
+                      <div style="text-align: center; margin-top: 40px;">
+                        <a href="${process.env.ADMIN_URL}" 
+                           style="background-color: #16a34a; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 700; display: inline-block;">
+                           Enter Admin Dashboard
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td align="center" style="background-color: #f8fafc; padding: 20px; border-top: 1px solid #e2e8f0;">
+                      <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+                        &copy; 2026 Bright Coders Academy • Baricho, Kenya
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `,
+    });
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Admin Welcome Email Error:", error);
     throw error;
   }
 };

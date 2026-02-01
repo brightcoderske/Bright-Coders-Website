@@ -1,43 +1,171 @@
-.signup-success-container {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #f8fafc;
+/* SignupSuccess.css */
+:root {
+  --primary-green: #22c55e;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
 }
+
+.signup-success-wrapper {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Background Animations */
+.bg-blob {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  filter: blur(80px);
+  z-index: 0;
+  border-radius: 50%;
+  opacity: 0.4;
+}
+.blob-1 { background: #86efac; top: -100px; left: -100px; }
+.blob-2 { background: #dcfce7; bottom: -100px; right: -100px; }
 
 .signup-success-card {
-  background: white;
-  padding: 40px;
-  border-radius: 14px;
+  z-index: 10;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 3rem;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 480px;
   text-align: center;
-  max-width: 420px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.signup-success-card h2 {
-  margin-top: 20px;
-  font-size: 22px;
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0fdf4;
+  color: #15803d;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.75rem;
   font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
 }
 
-.signup-success-card p {
-  margin-top: 10px;
-  color: #64748b;
-  font-size: 14px;
+/* Icon & Pulse */
+.icon-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1.5rem;
 }
 
-.signup-success-btn {
-  margin-top: 25px;
-  padding: 12px 20px;
-  background: #2563eb;
+.success-icon {
+  color: var(--primary-green);
+  position: relative;
+  z-index: 2;
+}
+
+.pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background: #dcfce7;
+  border-radius: 50%;
+  z-index: 1;
+  animation: pulse 2s infinite;
+}
+
+/* Typography */
+h1 {
+  color: var(--text-dark);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+}
+
+/* Info Box */
+.info-box {
+  background: #f1f5f9;
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  margin-bottom: 2.5rem;
+}
+
+.info-box p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.info-icon { color: #3b82f6; flex-shrink: 0; }
+
+/* Buttons */
+.primary-success-btn {
+  width: 100%;
+  background: #0f172a;
   color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
   border: none;
-  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   cursor: pointer;
-  font-size: 15px;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
 }
 
-.signup-success-btn:hover {
-  background: #1e40af;
+.primary-success-btn:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.secondary-link {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.secondary-link:hover { color: var(--text-dark); }
+
+/* Animations */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
 }

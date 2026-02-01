@@ -3,19 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import PopupScreen2 from "./AuthLayout/PopupScreen2";
 import "../Css/SignIn.css";
 
-// image imports
-import user_pic from "../assets/user.svg";
-import upload from "../assets/upload.svg";
-import delete_icon from "../assets/trash-2.svg";
 import axiosInstance from "../utils/axiosInstance.js";
 import { API_PATHS } from "../utils/apiPaths";
 import { validateEmail, validateName, validatePassword } from "../utils/helper";
 import UserContext from "../Components/Context/UserContext";
-import uploadImage from "../utils/uploadImage";
 
 const SignIn = ({ onToggle }) => {
   const navigate = useNavigate();
-  const { updateUser } = useContext(UserContext);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({
@@ -29,25 +23,11 @@ const SignIn = ({ onToggle }) => {
     password: "",
   });
 
-
-
-  const handleProfilePicChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProfilePicFile(file); // store actual file for upload
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePicPreview(reader.result); // base64 string for preview
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSignUp = async (e) => {
     e.preventDefault();
 
     setError({ field: "", message: "" }); // Reset error at start
-  
+
     const { fullName, email, password } = formData;
 
     // form validation
@@ -79,7 +59,6 @@ const SignIn = ({ onToggle }) => {
     // ========================================
     try {
       setLoading(true);
-     
 
       // Register User
       const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
@@ -87,18 +66,15 @@ const SignIn = ({ onToggle }) => {
         email,
         password,
         // profileImageUrl,
-        
-        
       });
 
-      // Backend returns: { newUser, token, message, id }
-      // const {  newUser } = response.data;
-     
-        // updateUser(newUser);
+      if (response.status === 200 || response.status === 201) {
+        // Passing the email into the state object
+        navigate("/signup-success", { state: { email: formData.email } });
         setFormData({ fullName: "", email: "", password: "" });
-        navigate("/signup-success");
+      }
 
-     
+      // navigate("/signup-success");
     } catch (error) {
       // 1. Extract the message regardless of where it came from (Axios or Upload Util)
       const backendMsg =
@@ -150,7 +126,6 @@ const SignIn = ({ onToggle }) => {
           <p className="signIn-p">
             Join us today by entering your details below.
           </p>
-          
 
           <div className="form-row">
             <div className="form-group">
