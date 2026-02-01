@@ -159,6 +159,11 @@ const handleDeleteConfirm = async () => {
     setLoading(true);
     setMessage({ type: "", text: "" });
     try {
+
+    //   // 1. Fetch a fresh token
+    // const { data } = await axiosInstance.get("/csrf-token");
+    // const token = data.csrfToken;
+
       await axiosInstance.post(API_PATHS.ADMIN_ACCOUNT.VERIFY_OTP, { otp });
       setIsVerified(true);
 

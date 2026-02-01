@@ -260,8 +260,8 @@ export const handleVerifyCertificate = async (req, res) => {
     return res.status(200).json({
       success: true,
       data: {
-        studentName: registration.child_name, // Match the frontend key
-        courseName: registration.course_name, // Match the frontend key
+        studentName: registration.child_name, 
+        courseName: registration.course_name, 
         issuedAt: registration.certificate_issued_at || registration.created_at,
       },
     });

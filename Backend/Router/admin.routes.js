@@ -47,7 +47,6 @@ router.get(
   "/profile",
   protect,
    requireStepUp,
-  
   handleGetAdminProfile
 );
 
