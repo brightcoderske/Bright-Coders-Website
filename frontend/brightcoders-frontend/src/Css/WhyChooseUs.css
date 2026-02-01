@@ -36,7 +36,7 @@
 /* Better readability + responsive SEO text */
 .section-subheader {
   margin-bottom: 40px;
-  font-size: clamp(18px, 4vw, 24PX);
+  /* font-size: clamp(18px, 4vw, 24PX); */
   font-family: "mv boli", serif !important;
   color: #1e3a8a;
   line-height: 1.25;
@@ -130,8 +130,3 @@
    MOBILE TWEAKS
 ================================ */
 
-@media (max-width: 599px) {
-  .section-subheader {
-    font-size: 35px;
-  }
-}
