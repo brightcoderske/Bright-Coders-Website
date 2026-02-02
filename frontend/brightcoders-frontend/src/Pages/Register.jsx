@@ -174,6 +174,10 @@ export default function Register() {
       amountPaid: amountToPay,
       totalCoursePrice: numericCoursePrice,
     };
+    console.log(
+  "🚀 Sending to backend:",
+  JSON.stringify(submissionData, null, 2)
+);
 
     try {
       const response = await axios.post(
