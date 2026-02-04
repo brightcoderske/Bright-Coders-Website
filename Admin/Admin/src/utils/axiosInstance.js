@@ -11,15 +11,15 @@ const axiosInstance = axios.create({
   },
 });
 
-// 1. Request Interceptor: Automatically attach the CSRF token
+// // 1. Request Interceptor: Automatically attach the CSRF token
 
-axiosInstance.interceptors.request.use((config) => {
-  const token = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN'))?.split('=')[1];
-  if (token) {
-    config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token);
-  }
-  return config;
-});
+// axiosInstance.interceptors.request.use((config) => {
+//   const token = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN'))?.split('=')[1];
+//   if (token) {
+//     config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token);
+//   }
+//   return config;
+// });
 
 axiosInstance.interceptors.response.use(
   (response) => response,

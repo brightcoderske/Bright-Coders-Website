@@ -52,7 +52,7 @@ const [showForgot, setShowForgot] = useState(false);
       const response = await axiosInstance.post(
         API_PATHS.AUTH.LOGIN,
         { email, password },
-        { withCredentials: true },
+   
       );
 
       const data = response.data;
@@ -84,9 +84,10 @@ const [showForgot, setShowForgot] = useState(false);
     return (
       <OTPVerify
         tempToken={tempToken}
-        onSuccess={(token, user) => {
+        onSuccess={async (token, user) => {
           sessionStorage.removeItem("2fa_temp"); // cleanup
-          // no need to store token manually
+          
+          await fetchCsrfToken();
           updateUser(user);
           navigate("/home");
         }}

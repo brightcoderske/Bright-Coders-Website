@@ -148,12 +148,12 @@ export const handleDeleteAdminAccount = async (request, response) => {
   }
 
   //  Step-up freshness (10 mins)
-  // const TEN_MINUTES = 10 * 60 * 1000;
-  // if (Date.now() - new Date(admin.last_verified).getTime() > TEN_MINUTES) {
-  //   return response.status(403).json({
-  //     message: "Step-up verification expired. Please verify again.",
-  //   });
-  // }
+  const TEN_MINUTES = 10 * 60 * 1000;
+  if (Date.now() - new Date(admin.last_verified).getTime() > TEN_MINUTES) {
+    return response.status(403).json({
+      message: "Step-up verification expired. Please verify again.",
+    });
+  }
 
   if (!password || !admin.password_hash) {
       return response.status(400).json({ 

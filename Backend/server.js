@@ -18,7 +18,7 @@ import registrationRouter from "./Router/registrationRouter.js";
 import adminRouter from "./Router/admin.routes.js"
 import stepUpRouter from "./Router/stepUp.routes.js"
 import forgotPasswordRouter from "./Router/authResetRoutes.js"
-import { csrfProtection } from "./Middleware/csrfMiddleware.js";
+// import { csrfProtection } from "./Middleware/csrfMiddleware.js";
 
 
 dotenv.config();
@@ -135,7 +135,7 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/testimonials", testimonialRouter);
 app.use("/api/registration", registrationRouter);
 app.use("/api/admin/",adminRouter)
-app.use("/api/admin/step-up",stepUpRouter)
+app.use("/api/admin/step-up", stepUpRouter)
 app.use("/api/auth-reset", forgotPasswordRouter);
 
 // ==========================================

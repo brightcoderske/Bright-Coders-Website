@@ -340,3 +340,4 @@ export const resendOTP = async (req, res) => {
     res.status(401).json({ message: "Invalid or expired temp token" });
   }
 };
+

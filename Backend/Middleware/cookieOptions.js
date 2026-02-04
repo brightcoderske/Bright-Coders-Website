@@ -7,7 +7,7 @@ export const AUTH_COOKIE_OPTIONS = {
 };
 
 export const CSRF_COOKIE_OPTIONS = {
-  httpOnly: true,
+  httpOnly: false,
   secure: process.env.NODE_ENV === "production",
   sameSite: "lax",
   path: "/",

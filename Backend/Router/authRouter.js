@@ -25,6 +25,6 @@ router.post("/upload-image", imageUpload); //public image route
 // PROTECTED + CSRF
 // router.get("/getUser", protect, csrfProtection, getUserInfo);
 router.get("/getUser", protect,  getUserInfo);
-// router.post("/upload-image", protect, csrfProtection, imageUpload);
+router.post("/upload-image", protect, csrfProtection, imageUpload);
 
 export default router;
