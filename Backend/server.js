@@ -18,7 +18,7 @@ import registrationRouter from "./Router/registrationRouter.js";
 import adminRouter from "./Router/admin.routes.js"
 import stepUpRouter from "./Router/stepUp.routes.js"
 import forgotPasswordRouter from "./Router/authResetRoutes.js"
-// import { csrfProtection } from "./Middleware/csrfMiddleware.js";
+import { csrfProtection } from "./Middleware/csrfMiddleware.js";
 
 
 dotenv.config();
