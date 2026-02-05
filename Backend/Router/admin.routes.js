@@ -17,7 +17,6 @@ import {
   handleGetAdminProfile,
   handleUpdateAdminProfile,
 } from "../Controller/adminController.js";
-// import { getAdminProfile, requestStepUpOTP,  verifyStepUpOTP } from "../Controller/adminController.js";
 import { csrfProtection } from "../Middleware/csrfMiddleware.js";
 // const csrfProtection = csrf({ cookie: true });
 const router = express.Router();
