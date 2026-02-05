@@ -3,7 +3,7 @@ import csrf from "csurf";
 export const CSRF_COOKIE_OPTIONS = {
   httpOnly: false,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "lax", // important
+  sameSite: "none", // important
   path: "/",
 };
 

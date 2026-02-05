@@ -27,6 +27,10 @@ axiosInstance.interceptors.request.use((config) => {
   if (token) {
     // 2. Use the header name you whitelisted in your Express CORS
     config.headers['X-CSRF-Token'] = decodeURIComponent(token);
+    console.log("Found CSRF Token in cookies, attaching to header...");
+  }
+  else {
+    console.warn("CSRF Token NOT found in cookies!");
   }
   
   return config;
