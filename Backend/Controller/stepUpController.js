@@ -8,6 +8,8 @@ import {
 
 // import { logAdminAudit } from "../Database/Config/adminAuditQueries.js";
 import { generateOTP } from "../Utils/otp.js";
+import { sendStepUpOTPEmail } from "../Utils/mailer.js";
+import { findUserById } from "../Database/Config/config.db.js";
 
 // import { sendOTPEmail } from "../Utils/sendEmail.js";
 
@@ -20,32 +22,34 @@ const MAX_OTP_ATTEMPTS = 3;
    REQUEST STEP-UP OTP
 ========================= */
 export const handleRequestStepUpOTP = async (request, response) => {
-  try {
-    const adminId = request.user.id;
-
-    const otp = generateOTP();
-    const expiresAt = new Date(
-      Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000
-    );
-
-    await saveStepUpOTP(adminId, otp, expiresAt);
-
-    // await sendOTPEmail(request.user.email, otp);
-
-    // await logAdminAudit({
-    //   action: "STEP_UP_OTP_SENT",
-    //   metadata: { method: "email" },
-    //   req: request,
-    // });
-
-    return response.status(200).json({
-      message: "Verification code sent",
-      expiresInMinutes: OTP_EXPIRY_MINUTES,
-    });
+    try {
+      const adminId = request.user.id;
+  
+      // 1. Find the user to get their email address
+      const user = await findUserById(adminId);
+      if (!user) {
+        return response.status(404).json({ message: "Admin not found." });
+      }
+  
+      // 2. Generate OTP and Expiry
+      const otp = generateOTP();
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
+  
+      // 3. Persist to Database
+      await saveStepUpOTP(adminId, otp, expiresAt);
+  
+      // 4. 🔔 Send the Email using your template function
+      await sendStepUpOTPEmail(user.email, otp);
+      
+      console.log(`STEP-UP OTP sent to ${user.email}:`, otp);
+  
+      response.status(200).json({
+        message: "Security code sent to your registered email.",
+      });
   } catch (error) {
     console.error("Step-up request error:", error);
     return response.status(500).json({
-      message: "Failed to send verification code",
+      message: "Failed to send security code. Please try again." 
     });
   }
 };

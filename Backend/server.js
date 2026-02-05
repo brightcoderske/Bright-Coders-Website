@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import path from "path";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
-// import csrf from "csurf";
 import { fileURLToPath } from "url";
 
 // Route Imports
@@ -62,7 +61,13 @@ app.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
+    allowedHeaders: [
+  "Content-Type",
+  "Authorization",
+  "X-CSRF-Token",
+  "X-XSRF-TOKEN"
+]
+
   }),
 );
 
@@ -135,7 +140,7 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/testimonials", testimonialRouter);
 app.use("/api/registration", registrationRouter);
 app.use("/api/admin/",adminRouter)
-app.use("/api/admin/step-up", stepUpRouter)
+app.use("/api/step-up", stepUpRouter)
 app.use("/api/auth-reset", forgotPasswordRouter);
 
 // ==========================================

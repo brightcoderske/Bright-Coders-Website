@@ -17,26 +17,7 @@ import { csrfProtection } from "../Middleware/csrfMiddleware.js"
 // const csrfProtection = csrf({ cookie: true });
 const router = express.Router();
 
-/* =========================
-   STEP-UP VERIFICATION
-========================= */
-// router.use(csrfProtection);
 
-// Send OTP
-router.post(
-  "/step-up/request",
-  protect,
-  csrfProtection,
-  requestStepUpOTP
-);
-
-// Verify OTP
-router.post(
-  "/step-up/verify",
-  protect,
-  csrfProtection,
-  verifyStepUpOTP
-);
 
 /* =========================
    ADMIN PROFILE (SINGLE ADMIN)

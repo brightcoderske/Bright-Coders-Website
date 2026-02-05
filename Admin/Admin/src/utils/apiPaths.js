@@ -58,8 +58,8 @@ PASSWORD_RESET: {
     CONFIRM: "/api/auth-reset/confirm", // The one for the new password
 },
 ADMIN_ACCOUNT: {
-    REQUEST_OTP: "/api/admin/step-up/request",   // To send the code
-    VERIFY_OTP: "/api/admin/step-up/verify",     // To lift the "security curtain"
+    REQUEST_OTP: "/api/step-up/request",   // To send the code
+    VERIFY_OTP: "/api/step-up/verify",     // To lift the "security curtain"
     GET_PROFILE: "/api/admin/profile",           // Fetch basic info
     UPDATE_PROFILE: "/api/admin/profile-update", // PUT request for name/image
     CHANGE_PASSWORD: "/api/admin/change-password",

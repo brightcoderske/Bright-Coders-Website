@@ -11,68 +11,6 @@ import { deleteAdminById, getAdminAuthData, getAdminById, updateAdminPassword, u
 import { findUserById } from "../Database/Config/config.db.js";
 import { sendStepUpOTPEmail } from "../Utils/mailer.js";
 
-
-/* =========================
-   REQUEST STEP-UP OTP
-========================= */
-export const requestStepUpOTP = async (request, response) => {
-  try {
-    const adminId = request.user.id;
-
-    // 1. Find the user to get their email address
-    const user = await findUserById(adminId);
-    if (!user) {
-      return response.status(404).json({ message: "Admin not found." });
-    }
-
-    // 2. Generate OTP and Expiry
-    const otp = crypto.randomInt(100000, 999999).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
-
-    // 3. Persist to Database
-    await saveStepUpOTP(adminId, otp, expiresAt);
-
-    // 4. 🔔 Send the Email using your template function
-    await sendStepUpOTPEmail(user.email, otp);
-    
-    console.log(`STEP-UP OTP sent to ${user.email}:`, otp);
-
-    response.status(200).json({
-      message: "Security code sent to your registered email.",
-    });
-  } catch (error) {
-    console.error("[Step-Up OTP Error]:", error);
-    response.status(500).json({ 
-      message: "Failed to send security code. Please try again." 
-    });
-  }
-};
-
-/* =========================
-   VERIFY STEP-UP OTP
-========================= */
-export const verifyStepUpOTP = async (request, response) => {
-  const adminId = request.user.id;
-  const { otp } = request.body;
-
-  const data = await getStepUpData(adminId);
-
-  if (!data || data.otp_code !== otp) {
-    await incrementStepUpAttempts(adminId);
-    return response.status(401).json({ message: "Invalid OTP" });
-  }
-
-  if (new Date(data.otp_expires) < new Date()) {
-    return response.status(401).json({ message: "OTP expired" });
-  }
-
-  await markStepUpVerified(adminId);
-
-  response.status(200).json({
-    message: "Step-up verification successful",
-  });
-};
-
 /* =========================
    GET ADMIN PROFILE
 ========================= */
