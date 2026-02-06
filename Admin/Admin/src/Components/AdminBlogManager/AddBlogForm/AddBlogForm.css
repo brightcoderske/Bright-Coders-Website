@@ -127,7 +127,8 @@
   gap: 1.4rem;
   font-family: "Inter", sans-serif;
   /* background-color: red; */
-  min-width: 600px;
+  /* min-width: 600px; */
+  width: 100%;
 
 }
 

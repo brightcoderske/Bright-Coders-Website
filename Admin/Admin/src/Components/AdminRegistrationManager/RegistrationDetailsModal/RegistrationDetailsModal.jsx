@@ -11,6 +11,7 @@ import {
   Settings,
   Wallet,
   Receipt,
+  Loader2,
 } from "lucide-react";
 import "./RegistrationDetailsModal.css";
 import { CertificateTemplate } from "./CertificateTemplate";
