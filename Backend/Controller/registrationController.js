@@ -18,30 +18,35 @@ const processReceiptUpload = async (registration) => {
     fileInfo = await generateAndSaveReceipt(registration);
     
     // 3. Upload to Cloudinary
-    const uploadResponse = await cloudinary.uploader.upload(fileInfo.filePath, {
-      folder: "receipts",
-      public_id: `Receipt_${registration.registration_number}`,
-      resource_type: "raw",
-      type: "upload",        // Explicitly set to 'upload' (public)
-  access_mode: "public",
-      flags: "attachment"
-    });
+   const uploadResponse = await cloudinary.uploader.upload(fileInfo.filePath, {
+  folder: "receipts",
+  public_id: `Receipt_${registration.registration_number}`,
+  resource_type: "raw",
+  type: "upload",
+});
+
+const publicReceiptUrl = cloudinary.url(uploadResponse.public_id, {
+  resource_type: "raw",
+  type: "upload",
+  secure: true,
+  flags: "attachment", // forces download, avoids 401
+});
 
     // 4. Update DB FIRST (This stops the "forever loader" on the frontend)
-    await Queries.updateReceiptUrl(registration.id, uploadResponse.secure_url);
+    await Queries.updateReceiptUrl(registration.id, publicReceiptUrl);
 
     // 5. Attempt to send email
     try {
       await sendPaymentConfirmation(registration, { 
         ...fileInfo, 
-        downloadUrl: uploadResponse.secure_url 
+        downloadUrl: publicReceiptUrl 
       });
     } catch (mailErr) {
       // If email fails (like the Resend 403 error), we log it but DON'T stop the process
       console.error("📧 Mailer failed but receipt is saved:", mailErr.message);
     }
 
-    return uploadResponse.secure_url;
+    return publicReceiptUrl;
 
   } catch (err) {
     console.error("❌ Receipt Processing Error:", err);
