@@ -8,6 +8,7 @@ import {
   handleIssueCertificate,
   handleDeleteRegistration,
   handleVerifyCertificate,
+  downloadReceipt,
 } from "../Controller/registrationController.js";
 import path from "path";
 import fs from "fs";
@@ -51,36 +52,12 @@ router.patch("/certificate/:id", protect, csrfProtection, handleIssueCertificate
 // Delete a registration
 router.delete("/:id", protect, csrfProtection, handleDeleteRegistration);
 
-// VERIFY CERTIFICATE (Public Route)
+router.get(
+  "/download-receipt/:id",
+  protect,
+  csrfProtection,
+  downloadReceipt
+);
 
-// GET /api/registrations/download-receipt/:regNumber
-router.get("/download-receipt/:regNumber", async (req, res) => {
-  try {
-    const { regNumber } = req.params;
-    const filePath = path.resolve(`./receipts/Receipt_${regNumber}.pdf`);
-
-    // 1. Check if the file exists locally
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ message: "Receipt file not found on server." });
-    }
-
-    // 2. Upload to Cloudinary 
-    // We use the regNumber as the public_id so we don't duplicate files
-    const uploadResponse = await cloudinary.uploader.upload(filePath, {
-      folder: "receipts",
-      public_id: `Receipt_${regNumber}`,
-      resource_type: "raw", // CRITICAL: Must be "raw" for PDFs
-      flags: "attachment"   // Tells Cloudinary to force download instead of viewing
-    });
-
-    // 3. Redirect the user to the Cloudinary URL
-    // This triggers the download in the browser
-    return res.redirect(uploadResponse.secure_url);
-
-  } catch (error) {
-    console.error("[Cloudinary Receipt Error]:", error);
-    res.status(500).json({ message: "Error processing receipt download." });
-  }
-});
 
 export default router;

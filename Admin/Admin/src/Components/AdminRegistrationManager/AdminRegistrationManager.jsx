@@ -177,6 +177,23 @@ const AdminRegistrationManager = () => {
     }
   };
 
+const handleDownloadReceipt = async (id) => {
+  try {
+    const res = await axiosInstance.get(
+      API_PATHS.REGISTRATIONS.DOWNLOAD_RECEIPT(id)
+    );
+
+    // Force browser download
+    window.location.href = res.data.url;
+  } catch (err) {
+    triggerToast(
+      err.response?.data?.message || "Failed to download receipt",
+      "error"
+    );
+  }
+};
+
+
   const handleDelete = (id) => {
     setAlertConfig({
       isOpen: true,
@@ -393,7 +410,8 @@ const AdminRegistrationManager = () => {
       <button
         className="push-row-btn"
         style={{ backgroundColor: "#10b981", color: "white", border: "none" }}
-        onClick={() => window.open(reg.receipt_url, "_blank")}
+        onClick={() => handleDownloadReceipt(reg.id)}
+
         title="Download Official Receipt"
       >
         <Download size={16} />
