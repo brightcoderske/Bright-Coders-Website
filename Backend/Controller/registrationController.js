@@ -23,8 +23,8 @@ const processReceiptUpload = async (registration) => {
       public_id: `Receipt_${registration.registration_number}`,
       resource_type: "raw",
       type: "upload",        // Explicitly set to 'upload' (public)
-  access_mode: "public"
-      // flags: "attachment"
+  access_mode: "public",
+      flags: "attachment"
     });
 
     // 4. Update DB FIRST (This stops the "forever loader" on the frontend)
