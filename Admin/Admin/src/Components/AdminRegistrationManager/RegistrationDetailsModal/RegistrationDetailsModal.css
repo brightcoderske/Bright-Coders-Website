@@ -280,6 +280,13 @@
   display: block;
   margin-top: 4px;
 }
+
+.doc-pending {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* --- Print Styles --- */
 @media print {
   .modal-overlay {

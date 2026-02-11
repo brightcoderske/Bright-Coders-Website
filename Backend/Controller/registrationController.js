@@ -135,7 +135,7 @@ export const handleGetAllRegistrations = async (req, res) => {
 };
 
 // ==========================
-// 3. UPDATE PAYMENT & RECEIPT STATUS
+// 3. UPDATE PAYMENT & RECEIPT STATUS (FIXED)
 // =========================
 export const handleUpdatePayment = async (req, res) => {
   try {
@@ -145,24 +145,20 @@ export const handleUpdatePayment = async (req, res) => {
     const student = await Queries.getRegistrationById(id);
     if (!student) return res.status(404).json({ message: "Not found." });
 
-    // Use DB names: total_course_price
     const coursePrice = parseFloat(student.total_course_price);
     const previousPaid = parseFloat(student.amount_paid) || 0;
     const amountSent = Number(confirmedAmount);
+    
     if (!Number.isFinite(amountSent) || amountSent <= 0) {
       return res.status(400).json({ message: "Invalid amount" });
     }
 
-    let newTotalPaid = isVerifyingExisting
-      ? amountSent
-      : previousPaid + amountSent;
+    let newTotalPaid = isVerifyingExisting ? amountSent : previousPaid + amountSent;
     const newBalance = Math.max(0, coursePrice - newTotalPaid);
-
     const newStatus = newBalance <= 0 ? "paid" : "partial";
-
     const safeMpesa = mpesaCode?.toUpperCase() || "PAY_LATER";
 
-    // Update DB
+    // 1. Update the Basic Payment Info First
     const updatedRegistration = await Queries.updatePaymentStatus(
       id,
       newStatus,
@@ -171,19 +167,18 @@ export const handleUpdatePayment = async (req, res) => {
       safeMpesa,
     );
 
-    // GENERATE RECEIPT
+    // 2. 🔥 THE FIX: Trigger the Cloudinary Upload process
+    // We don't use setImmediate here because we want to make sure the 
+    // process starts correctly. processReceiptUpload handles local gen, 
+    // upload, DB update, and email.
+    processReceiptUpload(updatedRegistration).catch(err => 
+       console.error("Background Receipt Error:", err)
+    );
 
-    setImmediate(async () => {
-      try {
-        const fileInfo = await generateAndSaveReceipt(updatedRegistration);
-        await sendPaymentConfirmation(updatedRegistration, fileInfo);
-      } catch (err) {
-        console.error("Receipt background error:", err);
-      }
-    });
-
+    // 3. Return the updated info
     return res.status(200).json(updatedRegistration);
   } catch (err) {
+    console.error("UPDATE_PAYMENT_ERROR:", err);
     return res.status(500).json({ message: "Failed to verify." });
   }
 };
