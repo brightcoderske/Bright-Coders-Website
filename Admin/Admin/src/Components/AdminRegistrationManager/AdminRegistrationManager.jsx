@@ -167,7 +167,9 @@ const AdminRegistrationManager = () => {
 
       triggerToast("Payment confirmed successfully!", "success");
       setPaymentModalData(null); // Close modal
-      fetchRegistrations(); // Refresh list
+     setTimeout(() => {
+        fetchRegistrations();
+      },
     } catch (error) {
       triggerToast(error.response?.data?.message || "Update failed.", "error");
     } finally {
