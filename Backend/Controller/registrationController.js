@@ -22,6 +22,8 @@ const processReceiptUpload = async (registration) => {
       folder: "receipts",
       public_id: `Receipt_${registration.registration_number}`,
       resource_type: "auto",
+      type: "upload",        // Explicitly set to 'upload' (public)
+  access_mode: "public"
       // flags: "attachment"
     });
 
