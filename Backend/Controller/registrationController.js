@@ -176,10 +176,8 @@ export const handleUpdatePayment = async (req, res) => {
       safeMpesa,
     );
 
-    // 2. 🔥 THE FIX: Trigger the Cloudinary Upload process
-    // We don't use setImmediate here because we want to make sure the 
-    // process starts correctly. processReceiptUpload handles local gen, 
-    // upload, DB update, and email.
+    // 2. 🔥 Trigger the Cloudinary Upload process
+
     processReceiptUpload(updatedRegistration).catch(err => 
        console.error("Background Receipt Error:", err)
     );

@@ -175,7 +175,7 @@ export const RegistrationDetailsModal = ({ registration, onClose }) => {
     <div className="doc-actions">
       <div className="button-group">
         {/* 🔹 UPDATED: Use Cloudinary URL instead of Local Backend Route */}
-        {registration.receipt_url ? (
+        {registration.receipt_url==="generated" ? (
           <button
             className="doc-btn receipt"
             onClick={() => window.open(registration.receipt_url, "_blank")}
