@@ -21,7 +21,7 @@ const processReceiptUpload = async (registration) => {
     const uploadResponse = await cloudinary.uploader.upload(fileInfo.filePath, {
       folder: "receipts",
       public_id: `Receipt_${registration.registration_number}`,
-      resource_type: "raw",
+      resource_type: "auto",
       flags: "attachment"
     });
 
