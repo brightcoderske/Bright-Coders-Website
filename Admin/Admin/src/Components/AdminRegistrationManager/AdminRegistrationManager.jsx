@@ -155,7 +155,7 @@ const AdminRegistrationManager = () => {
     const isAwaiting = reg.payment_status === "awaiting_verification";
 
     setIsUpdatingId(reg.id);
-    
+
     try {
       await axiosInstance.patch(
         API_PATHS.REGISTRATIONS.UPDATE_PAYMENT(reg.id),
@@ -410,7 +410,7 @@ const handleDownloadReceipt = async (id) => {
                       <div className="action-btns">
 
                         {/* 🔹 NEW: Cloudinary Receipt Download Button */}
-    {reg.receipt_url==="generated" && (
+    {reg.receipt_url && (
       <button
         className="push-row-btn"
         style={{ backgroundColor: "#10b981", color: "white", border: "none" }}
