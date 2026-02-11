@@ -22,7 +22,7 @@ const processReceiptUpload = async (registration) => {
       folder: "receipts",
       public_id: `Receipt_${registration.registration_number}`,
       resource_type: "auto",
-      flags: "attachment"
+      // flags: "attachment"
     });
 
     // 4. Update DB FIRST (This stops the "forever loader" on the frontend)
