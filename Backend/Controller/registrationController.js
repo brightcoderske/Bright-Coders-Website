@@ -276,38 +276,26 @@ export const handleVerifyCertificate = async (req, res) => {
   }
 };
 
-
 export const downloadReceipt = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // 1. Fetch registration
     const registration = await Queries.getRegistrationById(id);
+
     if (!registration || !registration.receipt_url) {
       return res.status(404).json({ message: "Receipt not found" });
     }
 
-    // 2. Generate SIGNED download URL
-    const signedUrl = cloudinary.utils.private_download_url(
-      registration.receipt_url, // 👈 public_id from DB
-      "pdf",
-      {
-        resource_type: "raw",
-        expires_at: Math.floor(Date.now() / 1000) + 60, // 1 min
-        attachment: true, // 👈 FORCE DOWNLOAD
-      }
-    );
+    // Generate a signed URL for a PUBLIC asset that forces download
+    const downloadUrl = cloudinary.url(registration.receipt_url, {
+      resource_type: "raw",
+      flags: "attachment", // This forces the "Save As" dialog
+      sign_url: true,      // Adds security
+      type: "upload"       // Matches your upload type
+    });
 
-    
-
-    console.log("SIGNED DOWNLOAD URL:", signedUrl);
-
-
-    // 3. Send URL
-    return res.json({ url: signedUrl });
-
+    return res.json({ url: downloadUrl });
   } catch (err) {
     console.error("DOWNLOAD_RECEIPT_ERROR:", err);
-    return res.status(500).json({ message: "Failed to generate receipt" });
+    return res.status(500).json({ message: "Failed to generate download link" });
   }
 };

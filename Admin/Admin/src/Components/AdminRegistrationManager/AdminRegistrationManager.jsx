@@ -155,6 +155,7 @@ const AdminRegistrationManager = () => {
     const isAwaiting = reg.payment_status === "awaiting_verification";
 
     setIsUpdatingId(reg.id);
+    
     try {
       await axiosInstance.patch(
         API_PATHS.REGISTRATIONS.UPDATE_PAYMENT(reg.id),
@@ -165,13 +166,16 @@ const AdminRegistrationManager = () => {
         },
       );
 
-      triggerToast("Payment confirmed successfully!", "success");
+      triggerToast("Payment confirmed successfully! Generating receipt...", "success");
       setPaymentModalData(null); // Close modal
+
+      // Refresh immediately to show the "Paid" badge
+    await fetchRegistrations();
      setTimeout(() => {
         fetchRegistrations();
-      },
+      },5000)
     } catch (error) {
-      triggerToast(error.response?.data?.message || "Update failed.", "error");
+      triggerToast( "Update failed.", "error");
     } finally {
       setIsUpdatingId(null);
     }
