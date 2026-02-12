@@ -9,6 +9,8 @@ import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
 import { fetchCsrfToken } from "../utils/csrf";
 import ForgotPassword from "./ForgotPassword/ForgotPassword";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+
 
 const Login = ({ onToggle }) => {
   const navigate = useNavigate();
@@ -19,7 +21,8 @@ const Login = ({ onToggle }) => {
   const [requires2FA, setRequires2FA] = useState(false);
   const [tempToken, setTempToken] = useState("");
   const [resendAvailableIn, setResendAvailableIn] = useState(60);
-const [showForgot, setShowForgot] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [error, setError] = useState({ field: "", message: "" });
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -49,11 +52,10 @@ const [showForgot, setShowForgot] = useState(false);
     try {
       setLoading(true);
 
-      const response = await axiosInstance.post(
-        API_PATHS.AUTH.LOGIN,
-        { email, password },
-   
-      );
+      const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
+        email,
+        password,
+      });
 
       const data = response.data;
 
@@ -86,7 +88,7 @@ const [showForgot, setShowForgot] = useState(false);
         tempToken={tempToken}
         onSuccess={async (token, user) => {
           sessionStorage.removeItem("2fa_temp"); // cleanup
-          
+
           await fetchCsrfToken();
           updateUser(user);
           navigate("/home");
@@ -104,89 +106,102 @@ const [showForgot, setShowForgot] = useState(false);
   // Main login form
   return (
     <>
-        <div className="login_page">
-      <form onSubmit={handleLogin}>
-        <div className="login_title">
-          <h2>Login In</h2>
-        </div>
-
-        <div className="login_social_icons">
-          <div className="social-icon">
-            <SiGoogle size={24} />
+      <div className="login_page">
+        <form onSubmit={handleLogin}>
+          <div className="login_title">
+            <h2>Login In</h2>
           </div>
-          <div className="social-icon">
-            <SiFacebook size={24} />
+
+          <div className="login_social_icons">
+            <div className="social-icon">
+              <SiGoogle size={24} />
+            </div>
+            <div className="social-icon">
+              <SiFacebook size={24} />
+            </div>
+            <div className="social-icon">
+              <SiGithub size={24} />
+            </div>
+            <div className="social-icon">
+              <SiLinkedin size={24} />
+            </div>
           </div>
-          <div className="social-icon">
-            <SiGithub size={24} />
+
+          <div className="alternative">
+            <p style={{ fontSize: "1rem" }}>or use your email and password</p>
           </div>
-          <div className="social-icon">
-            <SiLinkedin size={24} />
+
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            autoComplete="email"
+            placeholder="Enter email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`inputs ${error.field === "email" || error.field === "both" ? "error-border" : ""}`}
+          />
+
+          <label htmlFor="password">Password</label>
+
+          <div className="password-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`inputs ${
+                error.field === "password" || error.field === "both"
+                  ? "error-border"
+                  : ""
+              }`}
+            />
+
+            <span
+              className="password-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+              role="button"
+              tabIndex={0}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <AiOutlineEyeInvisible size={20} />
+              ) : (
+                <AiOutlineEye size={20} />
+              )}
+            </span>
           </div>
-        </div>
 
-        <div className="alternative">
-          <p style={{ fontSize: "1rem" }}>or use your email and password</p>
-        </div>
+          {error.message && (
+            <p
+              className="error-paragraph"
+              style={{ color: "red", textAlign: "center" }}
+            >
+              {error.message}
+            </p>
+          )}
 
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          autoComplete="email"
-          placeholder="Enter email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          className={`inputs ${error.field === "email" || error.field === "both" ? "error-border" : ""}`}
-        />
-
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          placeholder="Enter your password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          className={`inputs ${error.field === "password" || error.field === "both" ? "error-border" : ""}`}
-        />
-
-        {error.message && (
           <p
-            className="error-paragraph"
-            style={{ color: "red", textAlign: "center" }}
+            role="button"
+            tabIndex={0}
+            className="forgot-link"
+            onClick={() => setShowForgot(true)}
           >
-            {error.message}
+            Forget Your Password?
           </p>
-        )}
 
-        <p
+          <button type="submit" disabled={loading}>
+            {loading ? <span className="spinner"></span> : "Login In"}
+          </button>
+        </form>
 
-role="button" 
- tabIndex={0}
+        <PopupScreen onToggle={onToggle} />
+      </div>
 
-  className="forgot-link"
-  onClick={() => setShowForgot(true)}
->
-  Forget Your Password?
-</p>
-
-
-        <button type="submit" disabled={loading}>
-          {loading ? <span className="spinner"></span> : "Login In"}
-        </button>
-      </form>
-
-      <PopupScreen onToggle={onToggle} />
-    </div>
-
-    {showForgot && (
-  <ForgotPassword onClose={() => setShowForgot(false)} />
-)}
-    
+      {showForgot && <ForgotPassword onClose={() => setShowForgot(false)} />}
     </>
-
-
   );
 };
 

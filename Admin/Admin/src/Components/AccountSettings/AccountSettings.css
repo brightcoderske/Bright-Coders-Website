@@ -371,8 +371,8 @@
   border: 1px solid #fecaca;
 }
 
-/* .admin-account-loader {
-    height: 100vh;
+.admin-account-loader {
+    /* height: 100%; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -380,23 +380,12 @@
     color: #64748b;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    /* background-color: red; */
+    margin-top: 30%;
+    margin-left: 50%;
     animation: pulse 2s infinite;
-} */
-
-.admin-account-loader {
-  position: fixed; /* 🔑 Changed from static/relative to fixed */
-  inset: 0; /* 🔑 Shorthand for top, bottom, left, right: 0 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  color: #64748b;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  animation: pulse 2s infinite;
-  background: #ffffff; /* Optional: adds a solid background so content doesn't pop in behind it */
-  z-index: 10000; /* Ensure it stays above everything else */
 }
+
 
 .avatar-initials {
   width: 100%;

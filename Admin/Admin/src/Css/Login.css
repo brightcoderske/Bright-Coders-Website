@@ -8,6 +8,33 @@
   overflow: visible;
 }
 
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 45px; /* space for eye icon */
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #777;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle:hover {
+  color: #000;
+}
+
+
 /* --- Form Container --- */
 .login_page form {
   display: flex;
