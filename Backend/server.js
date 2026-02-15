@@ -39,37 +39,27 @@ if (process.env.NODE_ENV === "production") {
 // ==========================================
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(",") 
+  ? process.env.ALLOWED_ORIGINS.split(",").map(origin => origin.trim()) // .trim() removes accidental spaces
   : [];
 
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // 1. Allow server-to-server requests (Postman/Mobile)
-      if (!origin) {
-        return callback(null, true); //postman, mobile
-      }
-// 2. Check if the origin is in our allowed list
-      if (allowedOrigins.includes(origin)) {
+      // Allow if no origin (Postman) or if it's in the list
+      if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-// 3. Log and block if not found
-      console.error("🛑 Blocked by CORS:", origin);
-      return callback(new Error("CORS not allowed"));
+      
+      // LOG IT so you can see it in Render logs, but don't "crash" the middleware
+      console.error("🛑 CORS Blocked for:", origin);
+      return callback(null, false); // This sends a clean 403/block without an exception
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    allowedHeaders: [
-  "Content-Type",
-  "Authorization",
-  "X-CSRF-Token",
-  "X-XSRF-TOKEN"
-]
-
-  }),
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Added OPTIONS
+    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token", "X-XSRF-TOKEN"]
+  })
 );
-
 // ==========================================
 // 3. SECURITY HEADERS (HELMET)
 // ==========================================
@@ -185,7 +175,6 @@ initDb()
   .then(() => {
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port: ${PORT}`);
-      console.log(`🌍 Production URL: https://brightcoders-api.onrender.com`);
     });
   })
   .catch((err) => {
