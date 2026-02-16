@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import fs from "fs";
+import { EMAIL_SENDERS } from "./emailSenders";
 
 // Initialize Resend with your API Key from Render Environment Variables
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -25,7 +26,7 @@ export const sendPaymentConfirmation = async (studentData, fileInfo) => {
     }
 
     const { data, error } = await resend.emails.send({
-      from: "Bright Coders <onboarding@resend.dev>",
+      from: EMAIL_SENDERS.BILLING,
       to: studentData.parent_email,
       subject: `Payment Confirmed: Enrollment for ${studentData.child_name}`,
       html: `
@@ -79,7 +80,7 @@ export const sendPaymentConfirmation = async (studentData, fileInfo) => {
 export const sendOTPEmail = async (email, otp) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Bright Coders <onboarding@resend.dev>",
+      from: EMAIL_SENDERS.SECURITY,
       to: email,
       subject: "Your Login Verification Code",
       html: `
@@ -108,7 +109,7 @@ export const sendOTPEmail = async (email, otp) => {
 export const sendAdminNotification = async (subject, htmlContent) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Academy Alerts <onboarding@resend.dev>",
+      from: EMAIL_SENDERS.ALERTS,
       to: process.env.ADMIN_EMAIL,
       subject: subject,
       html: htmlContent,
@@ -123,7 +124,7 @@ export const sendAdminNotification = async (subject, htmlContent) => {
 export const sendResetEmail = async (email, resetUrl) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Bright Coders <onboarding@resend.dev>",
+      from: EMAIL_SENDERS.SECURITY,
       to: email,
       subject: "Action Required: Reset Your Password",
       html: `
@@ -210,7 +211,8 @@ export const sendResetEmail = async (email, resetUrl) => {
 export const sendStepUpOTPEmail = async (email, otp) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Bright Coders Security <onboarding@resend.dev>",
+      from: EMAIL_SENDERS.SECURITY,
+
       to: email,
       // Pro move: Putting the OTP in the subject for mobile lock-screen previews
       // good move
@@ -292,7 +294,7 @@ export const sendAdminWelcomeEmail = async (adminData) => {
   const email = adminData.email;
   try {
     const { data, error } = await resend.emails.send({
-      from: "Bright Coders Academy <onboarding@resend.dev>",
+      from: EMAIL_SENDERS.ADMIN,
       to: adminData.email,
       subject: "Welcome to the Admin Council | Bright Coders Academy",
       html: `
