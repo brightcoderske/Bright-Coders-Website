@@ -713,7 +713,7 @@ console.groupEnd();
                       </p>
                       <div className="copy-box">
                         <span>Till Number</span>
-                        <span>Account: 6185495</span>
+                        <span>Account: 5385002</span>
                         <button type="button" onClick={handleCopy}>
                           <FaCopy /> Copy
                         </button>
