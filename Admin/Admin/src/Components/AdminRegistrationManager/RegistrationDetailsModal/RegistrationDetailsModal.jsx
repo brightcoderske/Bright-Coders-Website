@@ -20,9 +20,9 @@ import axiosInstance from "../../../utils/axiosInstance";
 import { API_PATHS } from "../../../utils/apiPaths";
 
 export const RegistrationDetailsModal = ({ registration, onClose }) => {
-  const [directorName, setDirectorName] = useState("Dr. Floyed Muchiri");
+  const [directorName, setDirectorName] = useState("Floyed Muchiri");
   const [instructorName, setInstructorName] = useState(
-    "Developer Isaac Mugwimi"
+    "Isaac Mugwimi"
   );
   const [showCertPreview, setShowCertPreview] = useState(false);
 
