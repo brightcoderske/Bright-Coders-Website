@@ -2,6 +2,7 @@ import { registrationValidationSchema } from "../Middleware/Validators/registrat
 import * as Queries from "../Database/Config/registrationQueries.js";
 import {
   sendAdminNotification,
+  sendGraduationInvoiceEmail,
   sendPaymentConfirmation,
 } from "../Utils/mailer.js";
 import { generateAndSaveReceipt } from "../Utils/receiptsGenerator.js";
@@ -221,6 +222,58 @@ export const handleIssueCertificate = async (req, res) => {
 };
 
 // ==========================
+// GRADUATE TO NEXT MODULE
+// ==========================
+export const handleGraduateRegistration = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nextCourseId, preferredTime } = req.body;
+
+    if (!nextCourseId) {
+      return res.status(400).json({ message: "Next course is required." });
+    }
+
+    const current = await Queries.getRegistrationById(id);
+    if (!current) {
+      return res.status(404).json({ message: "Registration not found." });
+    }
+
+    if (current.payment_status !== "paid") {
+      return res.status(400).json({
+        message: "Student must be fully paid before graduation.",
+      });
+    }
+
+    const nextRegistration = await Queries.graduateRegistrationToCourse({
+      registrationId: id,
+      nextCourseId,
+      preferredTime,
+    });
+
+    if (!nextRegistration) {
+      return res.status(404).json({ message: "Registration not found." });
+    }
+
+    try {
+      await sendGraduationInvoiceEmail(nextRegistration);
+      await Queries.markInvoiceSent(nextRegistration.id);
+    } catch (mailErr) {
+      console.error("Graduation invoice email failed:", mailErr.message);
+    }
+
+    return res.status(201).json({
+      message: "Student graduated to the next module.",
+      data: nextRegistration,
+    });
+  } catch (err) {
+    console.error("GRADUATE_REGISTRATION_ERROR:", err);
+    return res
+      .status(err.statusCode || 500)
+      .json({ message: err.message || "Failed to graduate student." });
+  }
+};
+
+// ==========================
 // 5. DELETE REGISTRATION
 // =========================
 export const handleDeleteRegistration = async (req, res) => {
@@ -259,12 +312,25 @@ export const handleVerifyCertificate = async (req, res) => {
       });
     }
 
+    const modules = registration.student_key
+      ? await Queries.getRegistrationsByStudentKey(registration.student_key)
+      : [registration];
+
     return res.status(200).json({
       success: true,
       data: {
         studentName: registration.child_name,
         courseName: registration.course_name,
         issuedAt: registration.certificate_issued_at || registration.created_at,
+        studentAdmissionNumber: registration.student_admission_number,
+        modules: modules.map((module) => ({
+          registrationNumber: module.registration_number,
+          courseName: module.course_name,
+          paymentStatus: module.payment_status,
+          completionStatus: module.completion_status,
+          enrollmentStatus: module.enrollment_status,
+          issuedAt: module.certificate_issued_at || module.created_at,
+        })),
       },
     });
   } catch (error) {

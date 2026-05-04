@@ -19,6 +19,8 @@ import contactRouter from "./Router/contactRouter.js";
 import adminRouter from "./Router/admin.routes.js";
 import stepUpRouter from "./Router/stepUp.routes.js";
 import forgotPasswordRouter from "./Router/authResetRoutes.js";
+import studentWorkRouter from "./Router/studentWorkRouter.js";
+import paymentRouter from "./Router/paymentRouter.js";
 import { csrfProtection } from "./Middleware/csrfMiddleware.js";
 import { initSocket } from "./Socket/socket.js";
 import axios from "axios";
@@ -181,7 +183,7 @@ const authLimiter = rateLimit({
 
 // 📊 Relaxed limiter for general data fetching
 const generalLimiter = rateLimit({
-  windowMs: 1 * 60,
+  windowMs: 1 * 60 * 1000,
   max: 50, // Allows for dashboard refreshes without blocking
   message: "Slow down! You are refreshing too fast.",
 });
@@ -208,6 +210,8 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/testimonials", testimonialRouter);
 app.use("/api/registration", registrationRouter);
 app.use("/api/contact", contactRouter);
+app.use("/api/student-work", studentWorkRouter);
+app.use("/api/payments", paymentRouter);
 app.use("/api/admin/", adminRouter);
 app.use("/api/step-up", stepUpRouter);
 app.use("/api/auth-reset", forgotPasswordRouter);

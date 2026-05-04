@@ -6,6 +6,7 @@ import {
   handleGetAllRegistrations,
   handleUpdatePayment,
   handleIssueCertificate,
+  handleGraduateRegistration,
   handleDeleteRegistration,
   handleVerifyCertificate,
   downloadReceipt,
@@ -48,6 +49,9 @@ router.patch("/payment/:id", protect, csrfProtection, handleUpdatePayment);
 
 // Issue certificate / mark completion
 router.patch("/certificate/:id", protect, csrfProtection, handleIssueCertificate);
+
+// Graduate a fully paid student into the next module
+router.post("/graduate/:id", protect, csrfProtection, handleGraduateRegistration);
 
 // Delete a registration
 router.delete("/:id", protect, csrfProtection, handleDeleteRegistration);

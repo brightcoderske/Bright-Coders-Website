@@ -18,6 +18,7 @@ import "../Css/Register.css";
 import { validateStep } from "../helper/validateStep";
 import axios from "axios";
 import SuccessScreen from "../Components/SuccessScreen/SuccessScreen";
+import { loadCachedList } from "../Utils/cachedApi";
 
 export default function Register() {
   const location = useLocation();
@@ -30,6 +31,7 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [coursePrice, setCoursePrice] = useState("5,000");
   const [depositPaid, setDepositPaid] = useState("");
+  const [expressAmount, setExpressAmount] = useState("");
   // Payment Selection States
   const [paymentMode, setPaymentMode] = useState("full"); // "full" or "deposit"
   const DEPOSIT_AMOUNT = "Any amount"; // Define your fixed deposit amount here
@@ -64,11 +66,11 @@ export default function Register() {
   useEffect(() => {
     const fetchAndInitialize = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/courses/live`,
-        );
-        const courses = response.data;
-        setDbCourses(courses);
+        const courses = await loadCachedList({
+          cacheKey: "brightcoders:live-courses",
+          url: `${import.meta.env.VITE_API_BASE_URL}/courses/live`,
+          onData: setDbCourses,
+        });
 
         // Handle pre-selected course from navigation state
         if (location.state?.selectedCourse) {
@@ -147,9 +149,16 @@ export default function Register() {
     let amountToPay = 0;
     let currentPaymentPlan = paymentMode;
 
-    if (method === "Pay Later") {
+    if (method === "Pay Later" || method === "M-Pesa Express") {
       finalCode = "PAY_LATER";
-      amountToPay = 0;
+      amountToPay =
+        method === "M-Pesa Express"
+          ? Number(
+              (expressAmount || numericCoursePrice)
+                .toString()
+                .replace(/[^0-9.-]+/g, ""),
+            )
+          : 0;
       currentPaymentPlan = "pay_later";
     } else {
       const rawDeposit = depositPaid
@@ -189,10 +198,32 @@ export default function Register() {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/registration`,
-        submissionData,
+        method === "M-Pesa Express"
+          ? { ...submissionData, amountPaid: 0, mpesaCode: "PAY_LATER" }
+          : submissionData,
       );
 
       if (response.status === 201 || response.status === 200) {
+        if (method === "M-Pesa Express") {
+          try {
+            await axios.post(
+              `${import.meta.env.VITE_API_BASE_URL}/payments/mpesa/stk-push`,
+              {
+                registrationId: response.data.id,
+                phoneNumber: formData.parentPhone,
+                amount: amountToPay,
+              },
+            );
+            finalCode = "M-PESA EXPRESS SENT";
+          } catch (paymentError) {
+            alert(
+              paymentError.response?.data?.message ||
+                "M-Pesa Express is not available. Your registration was saved; you can pay later or contact admin.",
+            );
+            finalCode = "PAY_LATER";
+          }
+        }
+
         setMpesaCode(finalCode);
         setFormData((prev) => ({
           ...prev,
@@ -672,6 +703,28 @@ export default function Register() {
                         </div>
                         <div className="choice-badge">Deposit</div>
                       </button>
+                      <button
+                        className="choice-card"
+                        onClick={() => {
+                          setPaymentMode("full");
+                          setExpressAmount(
+                            Number(
+                              (coursePrice || "0")
+                                .toString()
+                                .replace(/[^0-9.-]+/g, ""),
+                            ).toString(),
+                          );
+                          setPaymentStep(3);
+                        }}
+                      >
+                        <div className="choice-info">
+                          <span className="choice-title">M-Pesa Express</span>
+                          <span className="choice-amount">
+                            Prompt parent phone
+                          </span>
+                        </div>
+                        <div className="choice-badge">STK</div>
+                      </button>
                       <div className="modal-divider1">
                         <span>OR</span>
                       </div>
@@ -688,6 +741,52 @@ export default function Register() {
                         <div className="choice-badge special">Reserve</div>
                       </button>
                     </div>
+                  </div>
+                ) : paymentStep === 3 ? (
+                  <div className="animate-slide-up">
+                    <button
+                      className="back-btn changePlan"
+                      onClick={() => {
+                        setPaymentStep(1);
+                        setDepositPaid("");
+                      }}
+                    >
+                      â† <span>Change Plan</span>
+                    </button>
+                    <h2>M-Pesa Express</h2>
+                    <div className="instruction-card">
+                      <p>We will send a payment prompt to:</p>
+                      <div className="copy-box">
+                        <span>Phone</span>
+                        <span>{formData.parentPhone}</span>
+                      </div>
+                      <div className="input-group" style={{ marginTop: "18px" }}>
+                        <label>Amount (Ksh)</label>
+                        <input
+                          type="number"
+                          className="mpesa-code-input"
+                          min="1"
+                          max={Number(
+                            (coursePrice || "0")
+                              .toString()
+                              .replace(/[^0-9.-]+/g, ""),
+                          )}
+                          value={expressAmount}
+                          onChange={(e) => setExpressAmount(e.target.value)}
+                        />
+                      </div>
+                      <p className="small-text">
+                        The payment will update this student's module record
+                        when Safaricom confirms the callback.
+                      </p>
+                    </div>
+                    <button
+                      className="confirm-btn"
+                      disabled={!expressAmount || Number(expressAmount) <= 0}
+                      onClick={() => handleRegistrationSubmit("M-Pesa Express")}
+                    >
+                      Send STK Push
+                    </button>
                   </div>
                 ) : (
                   <div className="animate-slide-up">

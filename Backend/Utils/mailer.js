@@ -77,6 +77,46 @@ export const sendPaymentConfirmation = async (studentData, fileInfo) => {
   }
 };
 
+export const sendGraduationInvoiceEmail = async (studentData) => {
+  try {
+    const amountDue = Number(studentData.balance_due || studentData.total_course_price || 0);
+    const paymentLink = `${process.env.SITE_URL || ""}/register`;
+
+    const { data, error } = await resend.emails.send({
+      from: EMAIL_SENDERS.BILLING,
+      to: studentData.parent_email,
+      subject: `Next Module Invoice: ${studentData.child_name} - ${studentData.course_name}`,
+      html: `
+        <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+          <div style="background:#2563eb; color:#fff; padding:22px;">
+            <h1 style="margin:0; font-size:22px;">Next Module Enrollment</h1>
+          </div>
+          <div style="padding:28px; color:#1f2937;">
+            <p>Hello <strong>${studentData.parent_name}</strong>,</p>
+            <p><strong>${studentData.child_name}</strong> has been moved to the next Bright Coders module.</p>
+            <table style="width:100%; border-collapse:collapse; margin:20px 0;">
+              <tr><td style="padding:8px; color:#64748b;">Student Admission No:</td><td style="padding:8px; font-weight:bold;">${studentData.student_admission_number}</td></tr>
+              <tr><td style="padding:8px; color:#64748b;">Module Registration No:</td><td style="padding:8px; font-weight:bold;">${studentData.registration_number}</td></tr>
+              <tr><td style="padding:8px; color:#64748b;">New Module:</td><td style="padding:8px; font-weight:bold;">${studentData.course_name}</td></tr>
+              <tr><td style="padding:8px; color:#64748b;">Amount Due:</td><td style="padding:8px; font-weight:bold;">Ksh ${amountDue.toLocaleString()}</td></tr>
+            </table>
+            <div style="text-align:center; margin:28px 0;">
+              <a href="${paymentLink}" style="background:#16a34a; color:#fff; padding:12px 22px; border-radius:8px; text-decoration:none; font-weight:bold;">Open Payment Page</a>
+            </div>
+            <p style="font-size:13px; color:#64748b;">If you prefer to pay later, no action is needed now. The admin team can also update payment manually after confirmation.</p>
+          </div>
+        </div>
+      `,
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Graduation Invoice Email Error:", error);
+    throw error;
+  }
+};
+
 export const sendOTPEmail = async (email, otp) => {
   try {
     const { data, error } = await resend.emails.send({

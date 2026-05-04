@@ -7,6 +7,7 @@ import {
   Users,
   Settings,
   Mail, 
+  Palette,
 } from "lucide-react";
 
 export const SIDE_MENU_DATA = [
@@ -36,24 +37,30 @@ export const SIDE_MENU_DATA = [
   },
   {
     id: "05",
+    label: "Student Work",
+    icon: Palette,
+    path: "/student-work",
+  },
+  {
+    id: "06",
     label: "Inquiries", 
     icon: Mail,
     path: "/contacts",
   },
   {
-    id: "06",
+    id: "07",
     label: "Students",
     icon: Users,      
     path: "/studentRegistration",
   },
   {
-    id: "07",
+    id: "08",
     label: "Account Settings",
     icon: Settings,      
     path: "/account-settings",
   },
   {
-    id: "08",
+    id: "09",
     label: "Logout",
     icon: LogOut,
     path: "/logout",

@@ -123,7 +123,29 @@ const CertificateVerify = () => {
                 <span>Registration ID</span>
                 <strong>{regNumber}</strong>
               </div>
+              {result.studentAdmissionNumber && (
+                <div className="data-item">
+                  <span>Student Admission No</span>
+                  <strong>{result.studentAdmissionNumber}</strong>
+                </div>
+              )}
             </div>
+            {Array.isArray(result.modules) && result.modules.length > 1 && (
+              <div className="module-history">
+                <h2>Student Module History</h2>
+                {result.modules.map((module) => (
+                  <div className="module-history-item" key={module.registrationNumber}>
+                    <div>
+                      <strong>{module.courseName}</strong>
+                      <span>{module.registrationNumber}</span>
+                    </div>
+                    <span className="module-status">
+                      {module.completionStatus || module.enrollmentStatus}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
             <button
               className="btn-reset"
               onClick={() => {

@@ -10,8 +10,13 @@ import bcrypt from "bcryptjs";
 import { courseTableSchema } from "./courseQueries.js";
 import { blogTableSchema } from "./blogQueries.js";
 import { testimonialTableSchema } from "./testimonialsQueries.js";
-import { registrationTableSchema } from "./registrationQueries.js";
+import {
+  registrationTableSchema,
+  registrationUpgradeSchema,
+} from "./registrationQueries.js";
 import { contactTableSchema } from "./contactQuries.js";
+import { studentWorkTableSchema } from "./studentWorkQueries.js";
+import { paymentTableSchema } from "./paymentQueries.js";
 
 // ========================================
 // 🔹 Environment Variables
@@ -104,8 +109,11 @@ export const initDb = async () => {
     await query(courseTableSchema);
     await query(blogTableSchema);
     await query(registrationTableSchema);
+    await query(registrationUpgradeSchema);
     await query(testimonialTableSchema);
     await query(contactTableSchema);
+    await query(studentWorkTableSchema);
+    await query(paymentTableSchema);
 
     console.log("✅ All Tables Initialized Successfully");
   } catch (error) {

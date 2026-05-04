@@ -45,6 +45,7 @@ export const API_PATHS = {
     GET_ALL: "/api/registration/StudentsRegistration",
     UPDATE_PAYMENT: (id) => `/api/registration/payment/${id}`,
     DOWNLOAD_RECEIPT: (id) => `/api/registration/download-receipt/${id}`,
+    GRADUATE: (id) => `/api/registration/graduate/${id}`,
 
     ISSUE_CERTIFICATE: (id) => `/api/registration/certificate/${id}`,
     DELETE: (id) => `/api/registration/${id}`,
@@ -71,6 +72,13 @@ ADMIN_ACCOUNT: {
   GET_ALL: "/api/contact",
   UPDATE_STATUS: (id) => `/api/contact/${id}/status`,
   DELETE: (id) => `/api/contact/${id}`,
-}
+},
+  STUDENT_WORK: {
+    GET_ALL: "/api/student-work",
+    GET_LIVE: "/api/student-work/live",
+    CREATE: "/api/student-work",
+    UPDATE: (id) => `/api/student-work/${id}`,
+    DELETE: (id) => `/api/student-work/${id}`,
+  }
 
 };

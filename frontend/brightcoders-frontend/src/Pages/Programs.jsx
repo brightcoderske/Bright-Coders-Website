@@ -10,7 +10,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import axios from "axios";
+import { loadCachedList } from "../Utils/cachedApi";
 
 const Programs = () => {
   const navigate = useNavigate();
@@ -26,8 +26,11 @@ const Programs = () => {
     const fetchLiveCourses = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/courses/live`);
-        setCourses(response.data);
+        await loadCachedList({
+          cacheKey: "brightcoders:live-courses",
+          url: `${API_URL}/courses/live`,
+          onData: setCourses,
+        });
       } catch (err) {
         console.error("Error fetching programs:", err);
       } finally {

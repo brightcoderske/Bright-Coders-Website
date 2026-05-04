@@ -17,6 +17,7 @@ import Contact from "./Pages/Contact";
 import Founder from "./Components/Founder";
 import FAQs from "./Components/FAQs";
 import Blog from "./Pages/BlogPage";
+import StudentWork from "./Pages/StudentWork";
 import CourseDetail from "./Components/CourseDetail";
 import TestimonialPage from "./Components/Testimonials/TestimonialPage";
 import CertificateVerify from "./Components/CertificateVerify/CertificateVerify";
@@ -35,6 +36,7 @@ function AppRoutes() {
       <Route path="/faqs" element={<FAQs />} />
       <Route path="/blogs" element={<Blog />} />
       <Route path="/blog/:id" element={<Blog />} />
+      <Route path="/student-work" element={<StudentWork />} />
       <Route path="/founder" element={<Founder />} />
       <Route path="/testimonials" element={<TestimonialPage />} />
       {/* 1. This handles clicking "Verify" from the Navbar (Search Mode) */}

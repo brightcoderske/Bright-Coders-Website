@@ -146,3 +146,34 @@ https://github.com/isaacmugwimi
 ## ⭐ Support
 
 If you like this project, consider **starring the repository** to support the project.
+
+---
+
+## Production Upgrade Notes
+
+### Public caching
+The public frontend caches live courses, blogs, testimonials, and student work in the browser. Cached data renders quickly, then the app refreshes from the backend periodically in the background.
+
+### Module graduation
+Registrations support linked module history. When a fully paid student is graduated to the next module, the system creates a new module registration, keeps the student admission identity connected, sends the parent an invoice-style email, and preserves the module history for certificate verification.
+
+### M-Pesa Express / STK Push
+M-Pesa Express is optional. If the credentials below are missing, the existing manual payment and Pay Later flow stays available.
+
+Backend environment variables:
+
+```
+MPESA_ENV=sandbox
+MPESA_CONSUMER_KEY=
+MPESA_CONSUMER_SECRET=
+MPESA_SHORTCODE=
+MPESA_PARTY_B=
+MPESA_PASSKEY=
+MPESA_CALLBACK_URL=https://your-api-domain.com/api/payments/mpesa/callback
+MPESA_TRANSACTION_TYPE=CustomerPayBillOnline
+```
+
+For production, set `MPESA_ENV=production` and use live Daraja credentials from Safaricom. The callback URL must be public HTTPS.
+
+### Student work showcase
+Admins can publish student projects under Scratch, Web Development, AI, and Graphics Design. Scratch, Web, and AI projects use project links; Graphics Design projects can use uploaded images. Published work appears on `/student-work`.

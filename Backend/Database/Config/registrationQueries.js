@@ -44,6 +44,23 @@ CREATE TABLE IF NOT EXISTS registrations (
 );
 `;
 
+export const registrationUpgradeSchema = `
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS student_key VARCHAR(40);
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS student_admission_number VARCHAR(30);
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS previous_registration_id INTEGER REFERENCES registrations(id);
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS module_sequence INTEGER DEFAULT 1;
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS enrollment_status VARCHAR(30) DEFAULT 'active';
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS graduated_to_registration_id INTEGER REFERENCES registrations(id);
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS graduated_at TIMESTAMP;
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS invoice_status VARCHAR(30) DEFAULT 'not_sent';
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS invoice_sent_at TIMESTAMP;
+
+UPDATE registrations SET student_key = CONCAT('STU-', id) WHERE student_key IS NULL;
+UPDATE registrations SET student_admission_number = registration_number WHERE student_admission_number IS NULL;
+UPDATE registrations SET module_sequence = 1 WHERE module_sequence IS NULL;
+UPDATE registrations SET enrollment_status = COALESCE(enrollment_status, 'active');
+`;
+
 /* =========================
    NORMALIZE INPUT
 ========================= */
@@ -158,6 +175,18 @@ export const getRegistrationById = async (id) => {
   return rows[0];
 };
 
+export const getRegistrationsByStudentKey = async (studentKey) => {
+  return await query(
+    `
+    SELECT *
+    FROM registrations
+    WHERE student_key = $1
+    ORDER BY module_sequence ASC, created_at ASC
+    `,
+    [studentKey],
+  );
+};
+
 /* =========================
    UPDATE PAYMENT
 ========================= */
@@ -204,6 +233,128 @@ export const issueCertificate = async (id, certificateUrl) => {
   return rows[0];
 };
 
+export const graduateRegistrationToCourse = async ({
+  registrationId,
+  nextCourseId,
+  preferredTime,
+}) => {
+  const currentRows = await query(`SELECT * FROM registrations WHERE id = $1`, [
+    registrationId,
+  ]);
+  const current = currentRows[0];
+  if (!current) return null;
+
+  const nextCourseRows = await query(`SELECT * FROM courses WHERE id = $1`, [
+    nextCourseId,
+  ]);
+  const nextCourse = nextCourseRows[0];
+  if (!nextCourse) {
+    const error = new Error("Next course not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const year = new Date().getFullYear().toString().slice(-2);
+  const nextSequence = Number(current.module_sequence || 1) + 1;
+  const studentKey = current.student_key || `STU-${current.id}`;
+  const studentAdmission =
+    current.student_admission_number || current.registration_number;
+  const price =
+    Number(String(nextCourse.price || "0").replace(/[^0-9.-]+/g, "")) || 0;
+
+  const insertRows = await query(
+    `
+    INSERT INTO registrations (
+      parent_name, parent_phone, parent_email, child_name, age_group,
+      grade_group, gender, course_name, preferred_time, device_type,
+      internet_quality, emergency_contact, emergency_phone, notes,
+      heard_from, consent, mpesa_code, total_course_price,
+      amount_paid, balance_due, payment_plan, payment_status,
+      student_key, student_admission_number, previous_registration_id,
+      module_sequence, enrollment_status, invoice_status
+    )
+    VALUES (
+      $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
+      $11,$12,$13,$14,$15,$16,$17,$18,
+      $19,$20,$21,$22,$23,$24,$25,$26,$27,$28
+    )
+    RETURNING id
+    `,
+    [
+      current.parent_name,
+      current.parent_phone,
+      current.parent_email,
+      current.child_name,
+      current.age_group,
+      current.grade_group,
+      current.gender,
+      nextCourse.title,
+      preferredTime || current.preferred_time,
+      current.device_type,
+      current.internet_quality,
+      current.emergency_contact,
+      current.emergency_phone,
+      current.notes,
+      current.heard_from,
+      current.consent,
+      "PAY_LATER",
+      price,
+      0,
+      price,
+      "pay_later",
+      "pending",
+      studentKey,
+      studentAdmission,
+      current.id,
+      nextSequence,
+      "active",
+      "pending",
+    ],
+  );
+
+  const newId = insertRows[0].id;
+  const serial = newId.toString().padStart(3, "0");
+  const regNumber = `BC-${year}-${nextCourse.code || "GEN"}-${serial}`;
+
+  const newRows = await query(
+    `
+    UPDATE registrations
+    SET registration_number = $1
+    WHERE id = $2
+    RETURNING *
+    `,
+    [regNumber, newId],
+  );
+
+  await query(
+    `
+    UPDATE registrations
+    SET enrollment_status = 'completed',
+        graduated_to_registration_id = $1,
+        graduated_at = CURRENT_TIMESTAMP
+    WHERE id = $2
+    `,
+    [newId, current.id],
+  );
+
+  return newRows[0];
+};
+
+export const markInvoiceSent = async (id) => {
+  const rows = await query(
+    `
+    UPDATE registrations
+    SET invoice_status = 'sent',
+        invoice_sent_at = CURRENT_TIMESTAMP
+    WHERE id = $1
+    RETURNING *
+    `,
+    [id],
+  );
+
+  return rows[0];
+};
+
 /* =========================
    DELETE REGISTRATION
 ========================= */
@@ -221,7 +372,7 @@ export const deleteRegistrationById = async (id) => {
 export const verifyCertificate = async (regNumber) => {
   const rows = await query(
     `
-    SELECT child_name, course_name, certificate_issued_at, created_at
+    SELECT *
     FROM registrations
     WHERE registration_number = $1
       AND payment_status = 'paid'

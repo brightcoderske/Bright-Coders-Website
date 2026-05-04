@@ -4,8 +4,7 @@ import FeaturedCourseCard from "../Cards/FeaturedCourseCard";
 import { MdReadMore } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
-import axios from "axios";
+import { loadCachedList } from "../Utils/cachedApi";
 
 const FeaturedCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -18,11 +17,12 @@ const FeaturedCourses = () => {
       try {
         setLoading(true);
         const API_URL = import.meta.env.VITE_API_BASE_URL;
-        const response = await axios.get(`${API_URL}/courses/live`);
-        const onlyFeatured = response.data.filter(
-          (course) => course.is_featured === true,
-        );
-        setCourses(onlyFeatured);
+        await loadCachedList({
+          cacheKey: "brightcoders:featured-courses",
+          url: `${API_URL}/courses/live`,
+          mapData: (data) => data.filter((course) => course.is_featured === true),
+          onData: setCourses,
+        });
       } catch (err) {
         console.error("Failed to fetch featured courses", err);
       } finally {

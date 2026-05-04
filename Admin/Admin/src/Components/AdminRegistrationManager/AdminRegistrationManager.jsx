@@ -15,6 +15,7 @@ import {
   Wallet,
   AlertCircle,
   Download,
+  GraduationCap,
 } from "lucide-react";
 import axiosInstance from "../../utils/axiosInstance.js";
 import { API_PATHS } from "../../utils/apiPaths.js";
@@ -32,6 +33,9 @@ const AdminRegistrationManager = () => {
   const [filterMode, setFilterMode] = useState("total");
   const [isUpdatingId, setIsUpdatingId] = useState(null);
   const [paymentModalData, setPaymentModalData] = useState(null);
+  const [graduateModalData, setGraduateModalData] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [nextCourseId, setNextCourseId] = useState("");
   const [highlightId, setHighlightId] = useState(null);
   const location = useLocation();
 
@@ -90,6 +94,19 @@ const AdminRegistrationManager = () => {
       setLoading(false);
     }
   };
+
+  const fetchCourses = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.COURSES.GET_ALL);
+      setCourses(response.data || []);
+    } catch (err) {
+      triggerToast("Error fetching courses", "error");
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
 
   // --- STATS LOGIC ---
   const stats = useMemo(() => {
@@ -217,6 +234,37 @@ const AdminRegistrationManager = () => {
         }
       },
     });
+  };
+
+  const openGraduateModal = (reg) => {
+    setGraduateModalData(reg);
+    setNextCourseId("");
+  };
+
+  const executeGraduation = async () => {
+    if (!graduateModalData || !nextCourseId) {
+      triggerToast("Select the next module first", "error");
+      return;
+    }
+
+    setIsUpdatingId(graduateModalData.id);
+    try {
+      await axiosInstance.post(
+        API_PATHS.REGISTRATIONS.GRADUATE(graduateModalData.id),
+        { nextCourseId: Number(nextCourseId) },
+      );
+      triggerToast("Student moved to next module and invoice email queued.");
+      setGraduateModalData(null);
+      setNextCourseId("");
+      await fetchRegistrations();
+    } catch (error) {
+      triggerToast(
+        error.response?.data?.message || "Graduation failed",
+        "error",
+      );
+    } finally {
+      setIsUpdatingId(null);
+    }
   };
 
   return (
@@ -447,6 +495,21 @@ const AdminRegistrationManager = () => {
                             )}
                           </button>
                         )}
+                        {reg.payment_status === "paid" &&
+                          reg.enrollment_status !== "completed" && (
+                            <button
+                              className="push-row-btn"
+                              onClick={() => openGraduateModal(reg)}
+                              disabled={isUpdatingId === reg.id}
+                              title="Graduate to next module"
+                            >
+                              {isUpdatingId === reg.id ? (
+                                <Loader2 size={16} className="spinner" />
+                              ) : (
+                                <GraduationCap size={16} />
+                              )}
+                            </button>
+                          )}
                         <button
                           className="edit-btn"
                           onClick={() => setSelectedRegistration(reg)}
@@ -483,6 +546,73 @@ const AdminRegistrationManager = () => {
           onClose={() => setPaymentModalData(null)}
           onConfirm={executePaymentUpdate}
         />
+      )}
+
+      {graduateModalData && (
+        <div className="modal-overlay1">
+          <div className="modal-content1" style={{ maxWidth: "440px" }}>
+            <div className="modal-header1">
+              <h3>Graduate Student</h3>
+              <button
+                onClick={() => setGraduateModalData(null)}
+                className="close-btn"
+                disabled={isUpdatingId === graduateModalData.id}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="modal-body1">
+              <div className="registration-summary">
+                <strong>{graduateModalData.child_name}</strong>
+                <p style={{ margin: "6px 0 0", color: "#64748b" }}>
+                  Current module: {graduateModalData.course_name}
+                </p>
+              </div>
+
+              <div className="form-group">
+                <label>Next Module</label>
+                <select
+                  className="admin-input"
+                  value={nextCourseId}
+                  onChange={(e) => setNextCourseId(e.target.value)}
+                >
+                  <option value="">Select next module</option>
+                  {courses
+                    .filter((course) => course.title !== graduateModalData.course_name)
+                    .map((course) => (
+                      <option key={course.id} value={course.id}>
+                        {course.title} - Ksh {course.price}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div
+                className="modal-footer1"
+                style={{ display: "flex", gap: "12px" }}
+              >
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setGraduateModalData(null)}
+                  disabled={isUpdatingId === graduateModalData.id}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="confirm-btn"
+                  onClick={executeGraduation}
+                  disabled={!nextCourseId || isUpdatingId === graduateModalData.id}
+                >
+                  {isUpdatingId === graduateModalData.id
+                    ? "Moving..."
+                    : "Graduate & Email Invoice"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       <CustomAlerts

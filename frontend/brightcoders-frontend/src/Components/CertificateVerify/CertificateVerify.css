@@ -127,6 +127,46 @@
   margin-top: 4px;
 }
 
+.module-history {
+  text-align: left;
+  margin: 0 0 28px;
+}
+
+.module-history h2 {
+  font-size: 1rem;
+  color: #064e3b;
+  margin: 0 0 12px;
+}
+
+.module-history-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.module-history-item div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.module-history-item span {
+  color: #64748b;
+  font-size: 0.86rem;
+}
+
+.module-status {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534 !important;
+  padding: 4px 10px;
+  font-weight: 700;
+}
+
 .btn-reset {
   background: transparent;
   color: #64748b;

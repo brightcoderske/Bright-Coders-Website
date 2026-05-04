@@ -25,6 +25,7 @@ import SignupSuccess from "./Pages/SignupSuccess/SignupSuccess";
 import { useEffect } from "react";
 import { fetchCsrfToken } from "./utils/csrf";
 import AdminContactManager from "./Components/AdminContact/AdminContact";
+import StudentWorkManager from "./Components/StudentWorkManager/StudentWorkManager";
 
 // =====================
 // ROOT COMPONENT
@@ -65,6 +66,7 @@ function AppRoutes() {
           <Route path="/contacts" element={<AdminContactManager />} />
           <Route path="/programs" element={<ProgramManagement />} />
           <Route path="/blogs" element={<AdminBlogManager />} />
+          <Route path="/student-work" element={<StudentWorkManager />} />
           <Route path="/testimonials" element={<AdminTestimonialManager />} />
           <Route path="/account-settings" element={<AccountSettings />} />
           <Route

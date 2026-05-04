@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "../Css/BlogData.css";
-import axios from "axios";
 import {
   Loader2,
   X,
@@ -12,6 +11,7 @@ import {
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router-dom";
+import { loadCachedList } from "../Utils/cachedApi";
 
 const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
@@ -26,13 +26,17 @@ const BlogPage = () => {
     const fetchPublicBlogs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/blogs/live`);
-        const rawData = response.data.data || response.data;
-
-        const publicOnly = rawData.filter(
-          (blog) => blog.is_public === true || blog.is_public === 1,
-        );
-        setBlogs(publicOnly);
+        await loadCachedList({
+          cacheKey: "brightcoders:live-blogs",
+          url: `${API_URL}/blogs/live`,
+          mapData: (data) => {
+            const rawData = data.data || data;
+            return rawData.filter(
+              (blog) => blog.is_public === true || blog.is_public === 1,
+            );
+          },
+          onData: setBlogs,
+        });
       } catch (err) {
         console.error("Failed to fetch blogs:", err);
       } finally {

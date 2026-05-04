@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
@@ -23,6 +22,7 @@ import {
 } from "react-icons/fa";
 import { RiDoubleQuotesR } from "react-icons/ri";
 import "../Css/TestimonialsCard.css";
+import { loadCachedList } from "../Utils/cachedApi";
 
 const TestimonialsCard = () => {
   const API_URL = import.meta.env.VITE_API_BASE_URL;
@@ -32,11 +32,12 @@ const TestimonialsCard = () => {
   useEffect(() => {
     const fetchLiveReviews = async () => {
       try {
-        const response = await axios.get(
-          `${API_URL.replace(/\/$/, "")}/testimonials/live`,
-        );
-
-        setLiveTestimonials(response.data.slice(0, 15));
+        await loadCachedList({
+          cacheKey: "brightcoders:live-testimonials",
+          url: `${API_URL.replace(/\/$/, "")}/testimonials/live`,
+          mapData: (data) => data.slice(0, 15),
+          onData: setLiveTestimonials,
+        });
       } catch (error) {
         console.error("Error loading testimonials:", error);
       } finally {

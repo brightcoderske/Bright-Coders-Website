@@ -1,0 +1,158 @@
+.student-work-page {
+  background: #f8fafc;
+  color: #0f172a;
+  min-height: 80vh;
+}
+
+.student-work-hero {
+  min-height: 280px;
+  display: flex;
+  align-items: end;
+  padding: 72px clamp(20px, 6vw, 88px) 44px;
+  background:
+    linear-gradient(90deg, rgba(15, 23, 42, 0.84), rgba(15, 23, 42, 0.36)),
+    url("../assets/web-img.webp") center/cover;
+  color: #fff;
+}
+
+.student-work-hero span {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+
+.student-work-hero h1 {
+  margin: 8px 0;
+  font-size: clamp(2.3rem, 6vw, 4.8rem);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.student-work-hero p {
+  margin: 0;
+  max-width: 560px;
+  color: #e2e8f0;
+  font-size: 1.05rem;
+}
+
+.student-work-sections {
+  padding: 38px clamp(16px, 5vw, 72px) 70px;
+}
+
+.student-work-category {
+  margin-bottom: 42px;
+}
+
+.category-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.category-heading h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  letter-spacing: 0;
+}
+
+.category-scroll-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.category-scroll-actions button {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #fff;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.student-work-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, 340px);
+  gap: 18px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  padding-bottom: 10px;
+}
+
+.student-project-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  scroll-snap-align: start;
+}
+
+.student-project-card img,
+.project-link-preview {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.project-link-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.student-project-body {
+  padding: 16px;
+}
+
+.student-project-body span {
+  color: #2563eb;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.student-project-body h3 {
+  margin: 6px 0;
+  font-size: 1.1rem;
+  letter-spacing: 0;
+}
+
+.student-project-body p {
+  color: #64748b;
+  line-height: 1.5;
+  min-height: 48px;
+}
+
+.student-project-body a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #0f766e;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.student-work-loading,
+.student-work-empty {
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+@media (max-width: 640px) {
+  .student-work-row {
+    grid-auto-columns: minmax(238px, 82vw);
+  }
+}

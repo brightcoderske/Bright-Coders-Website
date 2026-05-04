@@ -14,7 +14,7 @@ import {
   FaComments, // Testimonials
   FaBlog, // Blogs
   FaQuestionCircle, // FAQs
-  FaImages, // Gallery
+  FaImages, // Student Work
   FaStarHalfAlt, // Why Us
   FaBars,
   FaTimes,
@@ -130,6 +130,13 @@ const Navbar = () => {
                   <NavLink to={"/blogs"} onClick={closeAllMenus}>
                     <FaBlog className="nav-icon" />
                     <span>Blogs</span>
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink to={"/student-work"} onClick={closeAllMenus}>
+                    <FaImages className="nav-icon" />
+                    <span>Student Work</span>
                   </NavLink>
                 </li>
 
