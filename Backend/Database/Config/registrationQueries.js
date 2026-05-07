@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS registrations (
   parent_name VARCHAR(255) NOT NULL,
   parent_phone VARCHAR(50) NOT NULL,
   parent_email VARCHAR(255) NOT NULL,
+  child_email VARCHAR(255),
   child_name VARCHAR(255) NOT NULL,
   age_group VARCHAR(50) NOT NULL,
   grade_group VARCHAR(50) NOT NULL,
@@ -54,6 +55,7 @@ ALTER TABLE registrations ADD COLUMN IF NOT EXISTS graduated_to_registration_id 
 ALTER TABLE registrations ADD COLUMN IF NOT EXISTS graduated_at TIMESTAMP;
 ALTER TABLE registrations ADD COLUMN IF NOT EXISTS invoice_status VARCHAR(30) DEFAULT 'not_sent';
 ALTER TABLE registrations ADD COLUMN IF NOT EXISTS invoice_sent_at TIMESTAMP;
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS child_email VARCHAR(255);
 
 UPDATE registrations SET student_key = CONCAT('STU-', id) WHERE student_key IS NULL;
 UPDATE registrations SET student_admission_number = registration_number WHERE student_admission_number IS NULL;
@@ -68,6 +70,7 @@ const normalizeRegistrationData = (data) => ({
   parentName: data.parentName,
   parentPhone: data.parentPhone,
   parentEmail: data.parentEmail,
+  childEmail: data.childEmail ?? data.child_email ?? null,
   childName: data.childName,
   ageGroup: data.ageGroup,
   gradeGroup: data.gradeGroup,
@@ -106,8 +109,8 @@ export const createRegistration = async (data) => {
   const insertRows = await query(
     `
     INSERT INTO registrations (
-      parent_name, parent_phone, parent_email, child_name, age_group,
-      grade_group, gender, course_name, preferred_time, device_type,
+      parent_name, parent_phone, parent_email, child_email, child_name,
+      age_group, grade_group, gender, course_name, preferred_time, device_type,
       internet_quality, emergency_contact, emergency_phone, notes,
       heard_from, consent, mpesa_code, total_course_price,
       amount_paid, balance_due, payment_plan, payment_status
@@ -115,7 +118,7 @@ export const createRegistration = async (data) => {
     VALUES (
       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
       $11,$12,$13,$14,$15,$16,$17,$18,
-      $19,$20,$21,$22
+      $19,$20,$21,$22,$23
     )
     RETURNING id
     `,
@@ -123,6 +126,7 @@ export const createRegistration = async (data) => {
       d.parentName,
       d.parentPhone,
       d.parentEmail,
+      d.childEmail,
       d.childName,
       d.ageGroup,
       d.gradeGroup,
@@ -265,8 +269,8 @@ export const graduateRegistrationToCourse = async ({
   const insertRows = await query(
     `
     INSERT INTO registrations (
-      parent_name, parent_phone, parent_email, child_name, age_group,
-      grade_group, gender, course_name, preferred_time, device_type,
+      parent_name, parent_phone, parent_email, child_email, child_name,
+      age_group, grade_group, gender, course_name, preferred_time, device_type,
       internet_quality, emergency_contact, emergency_phone, notes,
       heard_from, consent, mpesa_code, total_course_price,
       amount_paid, balance_due, payment_plan, payment_status,
@@ -276,7 +280,7 @@ export const graduateRegistrationToCourse = async ({
     VALUES (
       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
       $11,$12,$13,$14,$15,$16,$17,$18,
-      $19,$20,$21,$22,$23,$24,$25,$26,$27,$28
+      $19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29
     )
     RETURNING id
     `,
@@ -284,6 +288,7 @@ export const graduateRegistrationToCourse = async ({
       current.parent_name,
       current.parent_phone,
       current.parent_email,
+      current.child_email,
       current.child_name,
       current.age_group,
       current.grade_group,

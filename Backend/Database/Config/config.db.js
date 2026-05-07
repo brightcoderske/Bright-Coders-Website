@@ -17,6 +17,7 @@ import {
 import { contactTableSchema } from "./contactQuries.js";
 import { studentWorkTableSchema } from "./studentWorkQueries.js";
 import { paymentTableSchema } from "./paymentQueries.js";
+import { lmsTableSchema, seedWebDevelopmentCourse } from "./lmsQueries.js";
 
 // ========================================
 // 🔹 Environment Variables
@@ -114,6 +115,8 @@ export const initDb = async () => {
     await query(contactTableSchema);
     await query(studentWorkTableSchema);
     await query(paymentTableSchema);
+    await query(lmsTableSchema);
+    await seedWebDevelopmentCourse();
 
     console.log("✅ All Tables Initialized Successfully");
   } catch (error) {

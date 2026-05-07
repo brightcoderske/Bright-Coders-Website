@@ -30,6 +30,13 @@ export const registrationValidationSchema = async () => {
         "string.email": "Please provide a valid email",
       }),
 
+    childEmail: Joi.string()
+      .email({ tlds: { allow: false } })
+      .allow("", null)
+      .messages({
+        "string.email": "Please provide a valid learner email",
+      }),
+
     childName: Joi.string().min(2).max(255).required().messages({
       "any.required": "Child name is required",
       "string.min": "Child name must be at least 2 characters",

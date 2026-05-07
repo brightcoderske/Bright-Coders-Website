@@ -15,6 +15,7 @@ import {
   FaBlog, // Blogs
   FaQuestionCircle, // FAQs
   FaImages, // Student Work
+  FaLaptopCode,
   FaStarHalfAlt, // Why Us
   FaBars,
   FaTimes,
@@ -141,6 +142,13 @@ const Navbar = () => {
                 </li>
 
                 <li>
+                  <NavLink to={"/teacher/login"} onClick={closeAllMenus}>
+                    <FaLaptopCode className="nav-icon" />
+                    <span>Teacher Login</span>
+                  </NavLink>
+                </li>
+
+                <li>
                   <NavLink to={"/verify"} onClick={closeAllMenus}>
                     <HiOutlineAcademicCap className="nav-icon" />
                     <span>Verify Certificate</span>
@@ -176,6 +184,12 @@ const Navbar = () => {
             <NavLink to="/contact" onClick={closeAllMenus}>
               <FaEnvelope className="nav-icon" />
               <span>Contact</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/learn/login" onClick={closeAllMenus}>
+              <FaLaptopCode className="nav-icon" />
+              <span>Learn</span>
             </NavLink>
           </li>
           {mobileMenuOpen && (

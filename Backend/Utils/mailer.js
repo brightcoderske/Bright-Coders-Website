@@ -117,6 +117,117 @@ export const sendGraduationInvoiceEmail = async (studentData) => {
   }
 };
 
+export const sendLearnerWelcomeEmail = async ({
+  registration,
+  learner,
+  course,
+  plainPassword,
+}) => {
+  const loginUrl = `${process.env.SITE_URL || ""}/learn/login`;
+  const recipients = [
+    registration.parent_email,
+    registration.child_email || learner.learner_email,
+  ].filter(Boolean);
+
+  const { data, error } = await resend.emails.send({
+    from: EMAIL_SENDERS.INFO,
+    to: [...new Set(recipients)],
+    subject: `Bright Coders login details for ${registration.child_name}`,
+    html: `
+      <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+        <div style="background:#0f172a; color:#fff; padding:24px;">
+          <h1 style="margin:0; font-size:22px;">Learner Portal Access</h1>
+        </div>
+        <div style="padding:28px; color:#1f2937;">
+          <p>Hello <strong>${registration.parent_name}</strong>,</p>
+          <p>${registration.child_name} has access to <strong>${course.title}</strong> on the Bright Coders learning system.</p>
+          <table style="width:100%; border-collapse:collapse; background:#f8fafc; margin:20px 0;">
+            <tr><td style="padding:10px; color:#64748b;">Login URL</td><td style="padding:10px;"><a href="${loginUrl}">${loginUrl}</a></td></tr>
+            <tr><td style="padding:10px; color:#64748b;">Email</td><td style="padding:10px; font-weight:bold;">${learner.learner_email}</td></tr>
+            <tr><td style="padding:10px; color:#64748b;">Temporary Password</td><td style="padding:10px; font-weight:bold;">${plainPassword}</td></tr>
+          </table>
+          <p style="font-size:13px; color:#64748b;">Please keep these details private. Full learner work is visible only to the learner, parent, and admin unless an admin publishes a selected public version.</p>
+        </div>
+      </div>
+    `,
+  });
+
+  if (error) throw error;
+  return data;
+};
+
+export const sendLessonCompletionEmail = async ({
+  learner,
+  lesson,
+  progress,
+  workUrl,
+}) => {
+  const recipients = [learner.parent_email, learner.child_email].filter(Boolean);
+  const subject = `${learner.display_name} completed: ${lesson.title}`;
+
+  const { data, error } = await resend.emails.send({
+    from: EMAIL_SENDERS.INFO,
+    to: [...new Set(recipients)],
+    subject,
+    html: `
+      <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+        <div style="background:#2563eb; color:#fff; padding:22px;">
+          <h1 style="margin:0; font-size:22px;">Lesson Completed</h1>
+        </div>
+        <div style="padding:28px; color:#1f2937;">
+          <p><strong>${learner.display_name}</strong> completed <strong>${lesson.title}</strong>.</p>
+          <table style="width:100%; border-collapse:collapse; background:#f8fafc; margin:20px 0;">
+            <tr><td style="padding:10px; color:#64748b;">Total Score</td><td style="padding:10px; font-weight:bold;">${progress.total_score}%</td></tr>
+            <tr><td style="padding:10px; color:#64748b;">Quiz</td><td style="padding:10px;">${progress.quiz_score}%</td></tr>
+            <tr><td style="padding:10px; color:#64748b;">Coding Task</td><td style="padding:10px;">${progress.code_score}%</td></tr>
+            <tr><td style="padding:10px; color:#64748b;">Points</td><td style="padding:10px;">${progress.points_awarded}</td></tr>
+          </table>
+          <p><strong>Strengths:</strong> ${progress.strengths || "Good effort and steady progress."}</p>
+          <p><strong>Areas to improve:</strong> ${progress.improvements || "Keep practicing and retry the task for a higher score."}</p>
+          <p><a href="${workUrl}">Open learner dashboard</a></p>
+        </div>
+      </div>
+    `,
+  });
+
+  if (error) throw error;
+  return data;
+};
+
+export const sendTeacherWelcomeEmail = async ({
+  teacher,
+  plainPassword,
+  verificationUrl,
+}) => {
+  const { data, error } = await resend.emails.send({
+    from: EMAIL_SENDERS.ADMIN,
+    to: teacher.email,
+    subject: "Bright Coders Teacher Account",
+    html: `
+      <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+        <div style="background:#0f172a;color:#fff;padding:24px;">
+          <h1 style="margin:0;font-size:22px;">Teacher Portal Access</h1>
+        </div>
+        <div style="padding:28px;color:#1f2937;">
+          <p>Hello <strong>${teacher.full_name}</strong>,</p>
+          <p>Your Bright Coders teacher account has been created.</p>
+          <table style="width:100%;border-collapse:collapse;background:#f8fafc;margin:20px 0;">
+            <tr><td style="padding:10px;color:#64748b;">Email</td><td style="padding:10px;font-weight:bold;">${teacher.email}</td></tr>
+            <tr><td style="padding:10px;color:#64748b;">Temporary Password</td><td style="padding:10px;font-weight:bold;">${plainPassword}</td></tr>
+          </table>
+          <div style="text-align:center;margin:24px 0;">
+            <a href="${verificationUrl}" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">Verify Email</a>
+          </div>
+          <p style="font-size:13px;color:#64748b;">After verifying, login at ${process.env.SITE_URL || ""}/teacher/login.</p>
+        </div>
+      </div>
+    `,
+  });
+
+  if (error) throw error;
+  return data;
+};
+
 export const sendOTPEmail = async (email, otp) => {
   try {
     const { data, error } = await resend.emails.send({

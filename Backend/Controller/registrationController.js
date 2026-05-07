@@ -3,12 +3,17 @@ import * as Queries from "../Database/Config/registrationQueries.js";
 import {
   sendAdminNotification,
   sendGraduationInvoiceEmail,
+  sendLearnerWelcomeEmail,
   sendPaymentConfirmation,
 } from "../Utils/mailer.js";
 import { generateAndSaveReceipt } from "../Utils/receiptsGenerator.js";
 import { generateAdminEmailHtml } from "../Utils/mailhelper.js";
 import cloudinary from "../Utils/cloudinary.js";
 import fs from "fs";
+import {
+  generateLearnerPassword,
+  provisionLearnerForRegistration,
+} from "../Database/Config/lmsQueries.js";
 
 const processReceiptUpload = async (registration) => {
   let fileInfo = null; // 1. Declare outside try so catch can see it
@@ -97,6 +102,25 @@ export const handleAddRegistration = async (req, res) => {
 
     // Insert into DB
     const newRegistration = await Queries.createRegistration(registrationData);
+
+    try {
+      const plainPassword = generateLearnerPassword();
+      const learnerAccess = await provisionLearnerForRegistration(
+        newRegistration,
+        plainPassword,
+      );
+
+      if (learnerAccess) {
+        await sendLearnerWelcomeEmail({
+          registration: newRegistration,
+          learner: learnerAccess.learner,
+          course: learnerAccess.course,
+          plainPassword,
+        });
+      }
+    } catch (learnerErr) {
+      console.error("LEARNER_PROVISIONING_ERROR:", learnerErr.message);
+    }
 
     // ==========================================
     // 🔔 TRIGGER ADMIN NOTIFICATION HERE

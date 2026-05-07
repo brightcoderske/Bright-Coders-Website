@@ -47,6 +47,7 @@ export default function Register() {
     parentName: "",
     parentPhone: "",
     parentEmail: "",
+    childEmail: "",
     childName: "",
     ageGroup: "",
     gradeGroup: "",
@@ -360,6 +361,16 @@ export default function Register() {
                 {error.field === "parentEmail" && (
                   <p className="error-message">{error.message}</p>
                 )}
+
+                <div className="input-container">
+                  <input
+                    name="childEmail"
+                    type="email"
+                    value={formData.childEmail || ""}
+                    onChange={handleChange}
+                  />
+                  <div className="labelline">Learner Email (optional)</div>
+                </div>
               </div>
             )}
 

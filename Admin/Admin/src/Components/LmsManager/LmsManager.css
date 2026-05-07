@@ -1,0 +1,89 @@
+.lms-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 20px;
+}
+
+.lms-panel {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.lms-panel h2 {
+  margin: 0 0 14px;
+  color: #0f172a;
+  font-size: 1.1rem;
+}
+
+.difficulty-row,
+.content-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+  background: transparent;
+  text-align: left;
+}
+
+.difficulty-row div,
+.content-row {
+  color: #0f172a;
+}
+
+.difficulty-row span,
+.content-row span,
+.content-row em {
+  display: block;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-style: normal;
+}
+
+.difficulty-row b {
+  color: #dc2626;
+}
+
+.content-row {
+  cursor: pointer;
+}
+
+.lms-content-panel {
+  grid-column: 1 / -1;
+}
+
+.lms-edit-modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: #334155;
+  font-weight: 700;
+}
+
+.teacher-form {
+  display: grid;
+  gap: 12px;
+}
+
+.teacher-form input {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 11px 12px;
+  font: inherit;
+}
+
+.class-list {
+  margin-top: 14px;
+}
+
+@media (max-width: 980px) {
+  .lms-grid {
+    grid-template-columns: 1fr;
+  }
+}

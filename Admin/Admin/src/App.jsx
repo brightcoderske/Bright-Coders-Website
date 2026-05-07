@@ -26,6 +26,7 @@ import { useEffect } from "react";
 import { fetchCsrfToken } from "./utils/csrf";
 import AdminContactManager from "./Components/AdminContact/AdminContact";
 import StudentWorkManager from "./Components/StudentWorkManager/StudentWorkManager";
+import LmsManager from "./Components/LmsManager/LmsManager";
 
 // =====================
 // ROOT COMPONENT
@@ -67,6 +68,7 @@ function AppRoutes() {
           <Route path="/programs" element={<ProgramManagement />} />
           <Route path="/blogs" element={<AdminBlogManager />} />
           <Route path="/student-work" element={<StudentWorkManager />} />
+          <Route path="/learning" element={<LmsManager />} />
           <Route path="/testimonials" element={<AdminTestimonialManager />} />
           <Route path="/account-settings" element={<AccountSettings />} />
           <Route

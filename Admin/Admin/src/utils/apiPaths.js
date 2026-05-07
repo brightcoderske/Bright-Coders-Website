@@ -79,6 +79,16 @@ ADMIN_ACCOUNT: {
     CREATE: "/api/student-work",
     UPDATE: (id) => `/api/student-work/${id}`,
     DELETE: (id) => `/api/student-work/${id}`,
+  },
+  LMS: {
+    OVERVIEW: "/api/lms-admin/overview",
+    COURSES: "/api/lms-admin/courses",
+    UPDATE_LESSON: (id) => `/api/lms-admin/lessons/${id}`,
+  },
+  TEACHERS: {
+    OVERVIEW: "/api/teachers/admin/overview",
+    CREATE: "/api/teachers/admin",
+    AUTO_ALLOCATE: "/api/teachers/admin/auto-allocate",
   }
 
 };
