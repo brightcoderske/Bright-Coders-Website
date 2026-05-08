@@ -2,6 +2,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import * as Lms from "../Database/Config/lmsQueries.js";
 import { sendTeacherWelcomeEmail } from "../Utils/mailer.js";
+import { sendPortalResetEmail } from "../Utils/mailer.js";
 import {
   teacherCookieOptions,
 } from "../Middleware/teacherAuthMiddleware.js";
@@ -106,6 +107,40 @@ export const teacherLogin = async (req, res) => {
 export const teacherLogout = async (req, res) => {
   res.clearCookie("teacher_token", teacherCookieOptions);
   return res.status(200).json({ message: "Logged out." });
+};
+
+export const requestTeacherPasswordReset = async (req, res) => {
+  const { email } = req.body;
+  if (email) {
+    const token = crypto.randomBytes(32).toString("hex");
+    const teacher = await Lms.setTeacherResetToken(
+      email,
+      token,
+      new Date(Date.now() + 1000 * 60 * 30),
+    );
+    if (teacher) {
+      const siteUrl = process.env.SITE_URL || process.env.FRONTEND_URL || "";
+      const resetUrl = `${siteUrl}/teacher/reset-password/${token}`;
+      await sendPortalResetEmail({
+        to: teacher.email,
+        name: teacher.full_name,
+        resetUrl,
+        portalName: "Teacher Portal",
+      }).catch((error) => console.error("TEACHER_RESET_EMAIL:", error.message));
+    }
+  }
+  return res.status(200).json({ message: "If the account exists, a reset link has been sent." });
+};
+
+export const confirmTeacherPasswordReset = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+  if (!password || password.length < 8) {
+    return res.status(400).json({ message: "Password must be at least 8 characters." });
+  }
+  const teacher = await Lms.resetTeacherPassword(token, password);
+  if (!teacher) return res.status(400).json({ message: "Invalid or expired reset link." });
+  return res.status(200).json({ message: "Password reset successfully." });
 };
 
 export const teacherMe = async (req, res) => {

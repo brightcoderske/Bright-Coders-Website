@@ -66,6 +66,30 @@
   font-weight: 700;
 }
 
+.lms-edit-modal {
+  max-width: 920px;
+}
+
+.lms-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.lms-edit-modal textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.lms-edit-modal .lms-long-field {
+  min-height: 180px;
+}
+
+.lms-edit-modal .lms-code-field {
+  font-family: Consolas, monospace;
+  font-size: 0.88rem;
+}
+
 .teacher-form {
   display: grid;
   gap: 12px;
@@ -84,6 +108,10 @@
 
 @media (max-width: 980px) {
   .lms-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lms-editor-grid {
     grid-template-columns: 1fr;
   }
 }

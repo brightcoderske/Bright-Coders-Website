@@ -251,9 +251,86 @@
   padding: 18px;
 }
 
+.lesson-notes {
+  max-height: calc(100vh - 150px);
+  overflow: auto;
+}
+
 .lesson-notes p {
   color: #475569;
   line-height: 1.6;
+}
+
+.lesson-code-example {
+  white-space: pre-wrap;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 14px;
+  font-family: Consolas, monospace;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.example-preview,
+.preview-panel {
+  margin-top: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.example-preview iframe {
+  width: 100%;
+  min-height: 180px;
+  border: 0;
+  background: #fff;
+}
+
+.task-steps {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.task-steps button {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #0f172a;
+  padding: 10px;
+  text-align: left;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.task-steps button.active-task {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.task-steps button:disabled,
+.submit-lesson-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.active-task-prompt,
+.study-warning,
+.workspace-note {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 12px;
+  color: #9a3412;
+}
+
+.workspace-note {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 .quiz-box {
@@ -295,13 +372,6 @@
   resize: vertical;
 }
 
-.preview-panel {
-  margin-top: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
 .preview-panel iframe {
   width: 100%;
   min-height: 280px;
@@ -323,6 +393,29 @@
 
 .result-panel svg {
   color: #16a34a;
+}
+
+.lesson-nav-actions,
+.lesson-bottom-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.lesson-nav-actions a,
+.lesson-bottom-nav a {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.lesson-bottom-nav {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px;
 }
 
 @media (max-width: 900px) {

@@ -1,23 +1,32 @@
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import * as Lms from "../Database/Config/lmsQueries.js";
 import {
   learnerCookieOptions,
 } from "../Middleware/learnerAuthMiddleware.js";
 import { sendLessonCompletionEmail } from "../Utils/mailer.js";
+import { sendPortalResetEmail } from "../Utils/mailer.js";
 
-const scoreCode = (lesson, html = "", css = "", js = "") => {
+const scoreCode = (lesson, html = "", css = "", js = "", taskIndex = null) => {
+  const task =
+    Array.isArray(lesson.tasks) && taskIndex !== null
+      ? lesson.tasks[Number(taskIndex)]
+      : null;
+  const requiredHtml = task?.requiredHtml || lesson.required_html || [];
+  const requiredCss = task?.requiredCss || lesson.required_css || [];
+  const requiredJs = task?.requiredJs || lesson.required_js || [];
   const checks = [
-    ...(lesson.required_html || []).map((item) => ({
+    ...requiredHtml.map((item) => ({
       area: "HTML",
       item,
       ok: html.toLowerCase().includes(String(item).toLowerCase()),
     })),
-    ...(lesson.required_css || []).map((item) => ({
+    ...requiredCss.map((item) => ({
       area: "CSS",
       item,
       ok: css.toLowerCase().includes(String(item).toLowerCase()),
     })),
-    ...(lesson.required_js || []).map((item) => ({
+    ...requiredJs.map((item) => ({
       area: "JavaScript",
       item,
       ok: js.toLowerCase().includes(String(item).toLowerCase()),
@@ -30,6 +39,17 @@ const scoreCode = (lesson, html = "", css = "", js = "") => {
     score: Math.round((passed / checks.length) * 100),
     missing: checks.filter((check) => !check.ok),
   };
+};
+
+const normalizeTasks = (tasks) => {
+  if (Array.isArray(tasks)) return tasks;
+  if (!tasks) return [];
+  try {
+    const parsed = JSON.parse(tasks);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 };
 
 const generateLearnerToken = (id) => {
@@ -69,6 +89,40 @@ export const learnerLogin = async (req, res) => {
 export const learnerLogout = async (req, res) => {
   res.clearCookie("learner_token", learnerCookieOptions);
   return res.status(200).json({ message: "Logged out." });
+};
+
+export const requestLearnerPasswordReset = async (req, res) => {
+  const { email } = req.body;
+  if (email) {
+    const token = crypto.randomBytes(32).toString("hex");
+    const learner = await Lms.setLearnerResetToken(
+      email,
+      token,
+      new Date(Date.now() + 1000 * 60 * 30),
+    );
+    if (learner) {
+      const siteUrl = process.env.SITE_URL || process.env.FRONTEND_URL || "";
+      const resetUrl = `${siteUrl}/learn/reset-password/${token}`;
+      await sendPortalResetEmail({
+        to: learner.learner_email,
+        name: learner.display_name,
+        resetUrl,
+        portalName: "Learner Portal",
+      }).catch((error) => console.error("LEARNER_RESET_EMAIL:", error.message));
+    }
+  }
+  return res.status(200).json({ message: "If the account exists, a reset link has been sent." });
+};
+
+export const confirmLearnerPasswordReset = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+  if (!password || password.length < 8) {
+    return res.status(400).json({ message: "Password must be at least 8 characters." });
+  }
+  const learner = await Lms.resetLearnerPassword(token, password);
+  if (!learner) return res.status(400).json({ message: "Invalid or expired reset link." });
+  return res.status(200).json({ message: "Password reset successfully." });
 };
 
 export const learnerMe = async (req, res) => {
@@ -112,9 +166,11 @@ export const saveCode = async (req, res) => {
 
 export const submitLesson = async (req, res) => {
   try {
-    const { html = "", css = "", js = "", answers = {} } = req.body;
+    const { html = "", css = "", js = "", answers = {}, taskIndex = 0, studySeconds = 0 } = req.body;
     const lesson = await Lms.getLessonForLearner(req.learner.id, req.params.id);
     if (!lesson) return res.status(404).json({ message: "Lesson not found." });
+    const tasks = normalizeTasks(lesson.tasks);
+    const currentTaskIndex = Math.max(0, Math.min(Number(taskIndex) || 0, Math.max(tasks.length - 1, 0)));
 
     const correctAnswers = await Lms.getQuizAnswers(req.params.id);
     const correctCount = correctAnswers.filter((answer) => {
@@ -127,8 +183,38 @@ export const submitLesson = async (req, res) => {
       ? Math.round((correctCount / correctAnswers.length) * 100)
       : 100;
 
-    const codeResult = scoreCode(lesson, html, css, js);
+    if (Number(studySeconds) < Number(lesson.min_study_seconds || 0)) {
+      return res.status(400).json({
+        message: `Spend at least ${lesson.min_study_seconds} seconds reading and practicing before submitting.`,
+      });
+    }
+
+    const codeResult = scoreCode(lesson, html, css, js, currentTaskIndex);
     const completionScore = html.trim() || css.trim() || js.trim() ? 100 : 0;
+    const isFinalTask = !tasks.length || currentTaskIndex >= tasks.length - 1;
+
+    await Lms.saveLearnerCode({
+      learnerId: req.learner.id,
+      lessonId: req.params.id,
+      html,
+      css,
+      js,
+    });
+
+    if (!isFinalTask) {
+      return res.status(200).json({
+        task: {
+          index: currentTaskIndex,
+          passed: codeResult.score >= 70,
+          codeScore: codeResult.score,
+          nextTaskIndex: codeResult.score >= 70 ? currentTaskIndex + 1 : currentTaskIndex,
+        },
+        checks: {
+          missing: codeResult.missing,
+        },
+      });
+    }
+
     const totalScore = Math.round(
       quizScore * 0.4 + codeResult.score * 0.5 + completionScore * 0.1,
     );

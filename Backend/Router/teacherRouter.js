@@ -12,6 +12,8 @@ import {
   teacherLogin,
   teacherLogout,
   teacherMe,
+  requestTeacherPasswordReset,
+  confirmTeacherPasswordReset,
   verifyTeacherEmail,
 } from "../Controller/teacherController.js";
 
@@ -27,6 +29,8 @@ const loginLimiter = rateLimit({
 router.get("/verify/:token", verifyTeacherEmail);
 router.post("/auth/login", loginLimiter, teacherLogin);
 router.post("/auth/logout", teacherLogout);
+router.post("/auth/forgot-password", requestTeacherPasswordReset);
+router.post("/auth/reset-password/:token", confirmTeacherPasswordReset);
 router.get("/auth/me", protectTeacher, teacherMe);
 router.get("/dashboard", protectTeacher, teacherDashboard);
 router.patch("/work/:progressId/comment", protectTeacher, teacherComment);

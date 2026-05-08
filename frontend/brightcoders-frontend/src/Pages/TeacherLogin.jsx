@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Mail, ShieldCheck } from "lucide-react";
 import teacherApi from "../Utils/teacherApi";
 import "../Css/TeacherPortal.css";
@@ -46,6 +47,7 @@ const TeacherLogin = () => {
           </label>
           {error && <p className="teacher-error">{error}</p>}
           <button disabled={loading}>{loading ? "Checking..." : "Login"}</button>
+          <Link to="/teacher/forgot-password">Forgot password?</Link>
         </form>
       </main>
     </>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Lock, Mail, Sparkles } from "lucide-react";
 import learnerApi from "../Utils/learnerApi";
 import "../Css/LearnerPortal.css";
@@ -65,6 +66,7 @@ const LearnerLogin = () => {
               {loading ? "Checking..." : "Login"}
             </button>
           </form>
+          <Link to="/learn/forgot-password">Forgot password?</Link>
         </section>
       </main>
     </>

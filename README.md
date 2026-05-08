@@ -177,3 +177,12 @@ For production, set `MPESA_ENV=production` and use live Daraja credentials from 
 
 ### Student work showcase
 Admins can publish student projects under Scratch, Web Development, AI, and Graphics Design. Scratch, Web, and AI projects use project links; Graphics Design projects can use uploaded images. Published work appears on `/student-work`.
+
+### Learner and teacher portals
+Registered Web Development learners can sign in at `/learn/login`. Teachers can sign in at `/teacher/login`. Both portals include forgot-password reset links that send time-limited reset URLs by email.
+
+Learner lessons include notes, example code, a live preview, a blank coding workspace, quizzes, auto-marking, saved scores, parent completion emails, previous/next lesson navigation, and study-time gating before submission.
+
+Admins manage LMS content from the admin Learning System page. They can edit lesson title, notes, task prompt, example HTML/CSS/JS, task requirements, study time, publish state, lock state, and scheduled open time. Admin-edited lesson content is protected from being overwritten by the LMS seed on later server starts.
+
+Teachers are registered by admins and assigned to classes of up to 15 learners. The teacher dashboard shows assigned learners, submitted work, scores, grading bands, and teacher comments.

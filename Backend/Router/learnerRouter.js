@@ -9,6 +9,8 @@ import {
   learnerLogin,
   learnerLogout,
   learnerMe,
+  requestLearnerPasswordReset,
+  confirmLearnerPasswordReset,
   saveCode,
   submitLesson,
 } from "../Controller/learnerController.js";
@@ -23,6 +25,8 @@ const loginLimiter = rateLimit({
 
 router.post("/auth/login", loginLimiter, learnerLogin);
 router.post("/auth/logout", learnerLogout);
+router.post("/auth/forgot-password", requestLearnerPasswordReset);
+router.post("/auth/reset-password/:token", confirmLearnerPasswordReset);
 router.get("/auth/me", protectLearner, learnerMe);
 
 router.get("/dashboard", protectLearner, learnerDashboard);

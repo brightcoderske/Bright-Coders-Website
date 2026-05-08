@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS learner_accounts (
   is_active BOOLEAN DEFAULT TRUE,
   points INTEGER DEFAULT 0,
   streak_count INTEGER DEFAULT 0,
+  reset_token VARCHAR(255),
+  reset_expires TIMESTAMP,
   last_activity_at TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -51,6 +53,11 @@ CREATE TABLE IF NOT EXISTS lms_lessons (
   required_html TEXT[] DEFAULT '{}',
   required_css TEXT[] DEFAULT '{}',
   required_js TEXT[] DEFAULT '{}',
+  tasks JSONB DEFAULT '[]'::jsonb,
+  min_study_seconds INTEGER DEFAULT 60,
+  unlock_at TIMESTAMP,
+  is_locked BOOLEAN DEFAULT FALSE,
+  content_locked_by_admin BOOLEAN DEFAULT FALSE,
   lesson_order INTEGER NOT NULL,
   points_available INTEGER DEFAULT 100,
   is_published BOOLEAN DEFAULT TRUE,
@@ -124,6 +131,8 @@ CREATE TABLE IF NOT EXISTS teacher_accounts (
   email_verified BOOLEAN DEFAULT FALSE,
   verification_token VARCHAR(255),
   verification_expires TIMESTAMP,
+  reset_token VARCHAR(255),
+  reset_expires TIMESTAMP,
   last_login TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -145,6 +154,16 @@ CREATE TABLE IF NOT EXISTS lms_class_learners (
   assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(class_id, learner_id)
 );
+
+ALTER TABLE learner_accounts ADD COLUMN IF NOT EXISTS reset_token VARCHAR(255);
+ALTER TABLE learner_accounts ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMP;
+ALTER TABLE teacher_accounts ADD COLUMN IF NOT EXISTS reset_token VARCHAR(255);
+ALTER TABLE teacher_accounts ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMP;
+ALTER TABLE lms_lessons ADD COLUMN IF NOT EXISTS tasks JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE lms_lessons ADD COLUMN IF NOT EXISTS min_study_seconds INTEGER DEFAULT 60;
+ALTER TABLE lms_lessons ADD COLUMN IF NOT EXISTS unlock_at TIMESTAMP;
+ALTER TABLE lms_lessons ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT FALSE;
+ALTER TABLE lms_lessons ADD COLUMN IF NOT EXISTS content_locked_by_admin BOOLEAN DEFAULT FALSE;
 `;
 
 const modules = [
@@ -159,6 +178,54 @@ const modules = [
   ["Publishing Websites", "Hosting, links, folders, and basic security."],
   ["Final Web Project", "A complete learner website."],
 ];
+
+const buildLessonTasks = (lesson) => [
+  {
+    title: "Build the basic structure",
+    prompt: `${lesson.taskPrompt} Start with the correct HTML structure. Do not copy the example exactly; use your own topic and text.`,
+    requiredHtml: lesson.requiredHtml,
+    requiredCss: [],
+    requiredJs: [],
+  },
+  {
+    title: "Style the work",
+    prompt:
+      "Improve your page with the CSS skills from this lesson. Add your own colors, spacing, and layout choices.",
+    requiredHtml: [],
+    requiredCss: lesson.requiredCss,
+    requiredJs: [],
+  },
+  {
+    title: "Finish and test",
+    prompt:
+      "Complete the final version. If this lesson has JavaScript, make it interactive. If not, polish the design and content.",
+    requiredHtml: lesson.requiredHtml.slice(0, 2),
+    requiredCss: lesson.requiredCss.slice(0, 2),
+    requiredJs: lesson.requiredJs,
+  },
+];
+
+const buildEnhancedNotes = (lesson, moduleTitle) => {
+  const htmlTargets = lesson.requiredHtml.length
+    ? `HTML focus: ${lesson.requiredHtml.join(", ")}.`
+    : "HTML focus: keep the structure meaningful and easy to read.";
+  const cssTargets = lesson.requiredCss.length
+    ? `CSS focus: ${lesson.requiredCss.join(", ")}.`
+    : "CSS focus: keep spacing, readability, and consistency in mind.";
+  const jsTargets = lesson.requiredJs.length
+    ? `JavaScript focus: ${lesson.requiredJs.join(", ")}.`
+    : "JavaScript focus: no script is required for this lesson unless you want to extend it.";
+
+  return `${lesson.notes}
+
+In this ${moduleTitle} lesson, read the example carefully and notice what each part is doing before you write your own version. Do not copy the example word-for-word. Change the topic, text, names, colors, and layout choices so your work shows that you understand the idea.
+
+${htmlTargets}
+${cssTargets}
+${jsTargets}
+
+Good practice steps: first build the structure, then add style, then test the page in the preview. If something does not appear, check spelling, closing tags, selectors, and whether your JavaScript is selecting the right element.`;
+};
 
 const moduleLessons = [
   [
@@ -612,25 +679,28 @@ export const seedWebDevelopmentCourse = async () => {
         `
         INSERT INTO lms_lessons (
           module_id, title, notes, example_html, example_css, example_js,
-          task_prompt, required_html, required_css, required_js, lesson_order
+          task_prompt, required_html, required_css, required_js, tasks,
+          min_study_seconds, lesson_order
         )
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
         ON CONFLICT (module_id, lesson_order) DO UPDATE
-          SET title = EXCLUDED.title,
-              notes = EXCLUDED.notes,
-              example_html = EXCLUDED.example_html,
-              example_css = EXCLUDED.example_css,
-              example_js = EXCLUDED.example_js,
-              task_prompt = EXCLUDED.task_prompt,
-              required_html = EXCLUDED.required_html,
-              required_css = EXCLUDED.required_css,
-              required_js = EXCLUDED.required_js
+          SET title = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.title ELSE EXCLUDED.title END,
+              notes = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.notes ELSE EXCLUDED.notes END,
+              example_html = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.example_html ELSE EXCLUDED.example_html END,
+              example_css = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.example_css ELSE EXCLUDED.example_css END,
+              example_js = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.example_js ELSE EXCLUDED.example_js END,
+              task_prompt = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.task_prompt ELSE EXCLUDED.task_prompt END,
+              required_html = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.required_html ELSE EXCLUDED.required_html END,
+              required_css = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.required_css ELSE EXCLUDED.required_css END,
+              required_js = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.required_js ELSE EXCLUDED.required_js END,
+              tasks = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.tasks ELSE EXCLUDED.tasks END,
+              min_study_seconds = CASE WHEN lms_lessons.content_locked_by_admin THEN lms_lessons.min_study_seconds ELSE EXCLUDED.min_study_seconds END
         RETURNING *
         `,
         [
           module.id,
           lesson.title,
-          lesson.notes,
+          buildEnhancedNotes(lesson, title),
           lesson.exampleHtml,
           lesson.exampleCss,
           lesson.exampleJs,
@@ -638,6 +708,8 @@ export const seedWebDevelopmentCourse = async () => {
           lesson.requiredHtml,
           lesson.requiredCss,
           lesson.requiredJs,
+          JSON.stringify(buildLessonTasks(lesson)),
+          90,
           lessonIndex + 1,
         ],
       );
@@ -744,9 +816,42 @@ export const provisionLearnerForRegistration = async (registration, plainPasswor
 };
 
 export const findLearnerByEmail = async (email) => {
-  const rows = await query(`SELECT * FROM learner_accounts WHERE learner_email = $1`, [
-    email,
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const rows = await query(`SELECT * FROM learner_accounts WHERE LOWER(learner_email) = $1`, [
+    normalizedEmail,
   ]);
+  return rows[0] || null;
+};
+
+export const setLearnerResetToken = async (email, token, expires) => {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const rows = await query(
+    `
+    UPDATE learner_accounts
+    SET reset_token = $1,
+        reset_expires = $2
+    WHERE LOWER(learner_email) = $3
+    RETURNING id, display_name, learner_email, parent_email, child_email
+    `,
+    [token, expires, normalizedEmail],
+  );
+  return rows[0] || null;
+};
+
+export const resetLearnerPassword = async (token, password) => {
+  const passwordHash = await bcrypt.hash(password, 10);
+  const rows = await query(
+    `
+    UPDATE learner_accounts
+    SET password_hash = $1,
+        reset_token = NULL,
+        reset_expires = NULL
+    WHERE reset_token = $2
+      AND reset_expires > CURRENT_TIMESTAMP
+    RETURNING id, learner_email, display_name
+    `,
+    [passwordHash, token],
+  );
   return rows[0] || null;
 };
 
@@ -810,7 +915,10 @@ export const getCourseTreeForLearner = async (learnerId, slug) => {
     JOIN lms_modules m ON m.id = l.module_id
     LEFT JOIN learner_lesson_progress p
       ON p.lesson_id = l.id AND p.learner_id = $2
-    WHERE m.course_id = $1 AND l.is_published = true
+    WHERE m.course_id = $1
+      AND l.is_published = true
+      AND l.is_locked = false
+      AND (l.unlock_at IS NULL OR l.unlock_at <= CURRENT_TIMESTAMP)
     ORDER BY m.module_order ASC, l.lesson_order ASC
     `,
     [course.id, learnerId],
@@ -838,6 +946,9 @@ export const getLessonForLearner = async (learnerId, lessonId) => {
     LEFT JOIN learner_lesson_progress p
       ON p.lesson_id = l.id AND p.learner_id = e.learner_id
     WHERE l.id = $1 AND e.learner_id = $2 AND e.status = 'active'
+      AND l.is_published = true
+      AND l.is_locked = false
+      AND (l.unlock_at IS NULL OR l.unlock_at <= CURRENT_TIMESTAMP)
     `,
     [lessonId, learnerId],
   );
@@ -854,7 +965,32 @@ export const getLessonForLearner = async (learnerId, lessonId) => {
     [lessonId],
   );
 
-  return { ...lesson, questions };
+  const siblingRows = await query(
+    `
+    SELECT l.id
+    FROM lms_lessons l
+    JOIN lms_modules m ON m.id = l.module_id
+    WHERE m.course_id = (
+      SELECT m2.course_id
+      FROM lms_lessons l2
+      JOIN lms_modules m2 ON m2.id = l2.module_id
+      WHERE l2.id = $1
+    )
+      AND l.is_published = true
+      AND l.is_locked = false
+      AND (l.unlock_at IS NULL OR l.unlock_at <= CURRENT_TIMESTAMP)
+    ORDER BY m.module_order ASC, l.lesson_order ASC
+    `,
+    [lessonId],
+  );
+  const index = siblingRows.findIndex((row) => Number(row.id) === Number(lessonId));
+
+  return {
+    ...lesson,
+    questions,
+    previousLessonId: index > 0 ? siblingRows[index - 1].id : null,
+    nextLessonId: index >= 0 && index < siblingRows.length - 1 ? siblingRows[index + 1].id : null,
+  };
 };
 
 export const saveLearnerCode = async ({ learnerId, lessonId, html, css, js }) => {
@@ -1056,6 +1192,7 @@ export const createTeacherAccount = async ({
   verificationExpires,
 }) => {
   const passwordHash = await bcrypt.hash(plainPassword, 10);
+  const normalizedEmail = String(email || "").trim().toLowerCase();
   const rows = await query(
     `
     INSERT INTO teacher_accounts (
@@ -1064,15 +1201,49 @@ export const createTeacherAccount = async ({
     VALUES ($1,$2,$3,$4,$5,$6)
     RETURNING id, full_name, email, phone, is_active, email_verified, created_at
     `,
-    [fullName, email, phone || null, passwordHash, verificationToken, verificationExpires],
+    [fullName, normalizedEmail, phone || null, passwordHash, verificationToken, verificationExpires],
   );
   return rows[0];
 };
 
 export const findTeacherByEmail = async (email) => {
-  const rows = await query(`SELECT * FROM teacher_accounts WHERE email = $1`, [
-    email,
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const rows = await query(`SELECT * FROM teacher_accounts WHERE LOWER(email) = $1`, [
+    normalizedEmail,
   ]);
+  return rows[0] || null;
+};
+
+export const setTeacherResetToken = async (email, token, expires) => {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const rows = await query(
+    `
+    UPDATE teacher_accounts
+    SET reset_token = $1,
+        reset_expires = $2
+    WHERE LOWER(email) = $3
+    RETURNING id, full_name, email
+    `,
+    [token, expires, normalizedEmail],
+  );
+  return rows[0] || null;
+};
+
+export const resetTeacherPassword = async (token, password) => {
+  const passwordHash = await bcrypt.hash(password, 10);
+  const rows = await query(
+    `
+    UPDATE teacher_accounts
+    SET password_hash = $1,
+        reset_token = NULL,
+        reset_expires = NULL,
+        email_verified = true
+    WHERE reset_token = $2
+      AND reset_expires > CURRENT_TIMESTAMP
+    RETURNING id, email, full_name
+    `,
+    [passwordHash, token],
+  );
   return rows[0] || null;
 };
 

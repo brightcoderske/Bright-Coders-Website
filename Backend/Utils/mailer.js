@@ -228,6 +228,36 @@ export const sendTeacherWelcomeEmail = async ({
   return data;
 };
 
+export const sendPortalResetEmail = async ({
+  to,
+  name,
+  resetUrl,
+  portalName,
+}) => {
+  const { data, error } = await resend.emails.send({
+    from: EMAIL_SENDERS.SECURITY,
+    to,
+    subject: `Reset your ${portalName} password`,
+    html: `
+      <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+        <div style="background:#0f172a;color:#fff;padding:24px;">
+          <h1 style="margin:0;font-size:22px;">Password Reset</h1>
+        </div>
+        <div style="padding:28px;color:#1f2937;">
+          <p>Hello <strong>${name}</strong>,</p>
+          <p>Use the button below to set a new ${portalName} password. This link expires in 30 minutes.</p>
+          <div style="text-align:center;margin:24px 0;">
+            <a href="${resetUrl}" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">Reset Password</a>
+          </div>
+          <p style="font-size:12px;color:#64748b;word-break:break-all;">${resetUrl}</p>
+        </div>
+      </div>
+    `,
+  });
+  if (error) throw error;
+  return data;
+};
+
 export const sendOTPEmail = async (email, otp) => {
   try {
     const { data, error } = await resend.emails.send({

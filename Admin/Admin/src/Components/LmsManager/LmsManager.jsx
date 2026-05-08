@@ -40,6 +40,15 @@ const LmsManager = () => {
     setSelectedLesson(row);
     setLessonForm({
       title: row.lesson_title,
+      notes: row.notes || "",
+      taskPrompt: row.task_prompt || "",
+      exampleHtml: row.example_html || "",
+      exampleCss: row.example_css || "",
+      exampleJs: row.example_js || "",
+      tasksText: JSON.stringify(row.tasks || [], null, 2),
+      minStudySeconds: row.min_study_seconds || 90,
+      unlockAt: row.unlock_at ? new Date(row.unlock_at).toISOString().slice(0, 16) : "",
+      isLocked: Boolean(row.is_locked),
       isPublished: row.is_published,
     });
   };
@@ -48,9 +57,29 @@ const LmsManager = () => {
     if (!selectedLesson) return;
     setSaving(true);
     try {
+      let tasks = [];
+      try {
+        tasks = JSON.parse(lessonForm.tasksText || "[]");
+      } catch {
+        alert("Tasks must be valid JSON before saving.");
+        setSaving(false);
+        return;
+      }
       await axiosInstance.patch(
         API_PATHS.LMS.UPDATE_LESSON(selectedLesson.lesson_id),
-        lessonForm,
+        {
+          title: lessonForm.title,
+          notes: lessonForm.notes,
+          taskPrompt: lessonForm.taskPrompt,
+          exampleHtml: lessonForm.exampleHtml,
+          exampleCss: lessonForm.exampleCss,
+          exampleJs: lessonForm.exampleJs,
+          tasks,
+          minStudySeconds: Number(lessonForm.minStudySeconds) || 60,
+          unlockAt: lessonForm.unlockAt || null,
+          isLocked: Boolean(lessonForm.isLocked),
+          isPublished: Boolean(lessonForm.isPublished),
+        },
       );
       await load();
       setSelectedLesson(null);
@@ -174,7 +203,15 @@ const LmsManager = () => {
                 >
                   <span>{row.module_title}</span>
                   <strong>{row.lesson_title}</strong>
-                  <em>{row.is_published ? "Published" : "Hidden"}</em>
+                  <em>
+                    {row.is_locked
+                      ? "Locked"
+                      : row.unlock_at
+                        ? `Opens ${new Date(row.unlock_at).toLocaleDateString()}`
+                        : row.is_published
+                          ? "Published"
+                          : "Hidden"}
+                  </em>
                 </button>
               ))}
           </section>
@@ -279,6 +316,109 @@ const LmsManager = () => {
                     setLessonForm((prev) => ({ ...prev, title: event.target.value }))
                   }
                 />
+              </label>
+              <label>
+                Lesson Notes
+                <textarea
+                  className="admin-input lms-long-field"
+                  value={lessonForm.notes || ""}
+                  onChange={(event) =>
+                    setLessonForm((prev) => ({ ...prev, notes: event.target.value }))
+                  }
+                />
+              </label>
+              <label>
+                Task Prompt
+                <textarea
+                  className="admin-input"
+                  value={lessonForm.taskPrompt || ""}
+                  onChange={(event) =>
+                    setLessonForm((prev) => ({ ...prev, taskPrompt: event.target.value }))
+                  }
+                />
+              </label>
+              <div className="lms-editor-grid">
+                <label>
+                  Example HTML
+                  <textarea
+                    className="admin-input"
+                    value={lessonForm.exampleHtml || ""}
+                    onChange={(event) =>
+                      setLessonForm((prev) => ({ ...prev, exampleHtml: event.target.value }))
+                    }
+                  />
+                </label>
+                <label>
+                  Example CSS
+                  <textarea
+                    className="admin-input"
+                    value={lessonForm.exampleCss || ""}
+                    onChange={(event) =>
+                      setLessonForm((prev) => ({ ...prev, exampleCss: event.target.value }))
+                    }
+                  />
+                </label>
+                <label>
+                  Example JS
+                  <textarea
+                    className="admin-input"
+                    value={lessonForm.exampleJs || ""}
+                    onChange={(event) =>
+                      setLessonForm((prev) => ({ ...prev, exampleJs: event.target.value }))
+                    }
+                  />
+                </label>
+              </div>
+              <label>
+                Lesson Tasks JSON
+                <textarea
+                  className="admin-input lms-long-field lms-code-field"
+                  value={lessonForm.tasksText || ""}
+                  onChange={(event) =>
+                    setLessonForm((prev) => ({ ...prev, tasksText: event.target.value }))
+                  }
+                />
+              </label>
+              <div className="lms-editor-grid">
+                <label>
+                  Study Time (seconds)
+                  <input
+                    className="admin-input"
+                    type="number"
+                    min="30"
+                    value={lessonForm.minStudySeconds || 60}
+                    onChange={(event) =>
+                      setLessonForm((prev) => ({
+                        ...prev,
+                        minStudySeconds: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  Opens At
+                  <input
+                    className="admin-input"
+                    type="datetime-local"
+                    value={lessonForm.unlockAt || ""}
+                    onChange={(event) =>
+                      setLessonForm((prev) => ({ ...prev, unlockAt: event.target.value }))
+                    }
+                  />
+                </label>
+              </div>
+              <label className="publish-toggle">
+                <input
+                  type="checkbox"
+                  checked={Boolean(lessonForm.isLocked)}
+                  onChange={(event) =>
+                    setLessonForm((prev) => ({
+                      ...prev,
+                      isLocked: event.target.checked,
+                    }))
+                  }
+                />
+                Locked
               </label>
               <label className="publish-toggle">
                 <input
