@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BookOpenCheck, Save, TrendingDown, Trophy, Users } from "lucide-react";
+import { BookOpenCheck, Mail, Save, ShieldCheck, Trash2, TrendingDown, Trophy, Users } from "lucide-react";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import { getGradeBand } from "../../utils/grading";
@@ -15,6 +15,7 @@ const LmsManager = () => {
   const [saving, setSaving] = useState(false);
   const [teacherData, setTeacherData] = useState({ teachers: [], classes: [] });
   const [teacherForm, setTeacherForm] = useState({ fullName: "", email: "", phone: "" });
+  const [selectedCourseId, setSelectedCourseId] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -25,6 +26,7 @@ const LmsManager = () => {
       ]);
       setOverview(overviewRes.data);
       setContentRows(contentRes.data);
+      setSelectedCourseId((current) => current || String(contentRes.data.find((row) => row.course_id)?.course_id || ""));
       const teacherRes = await axiosInstance.get(API_PATHS.TEACHERS.OVERVIEW);
       setTeacherData(teacherRes.data);
     } finally {
@@ -97,23 +99,65 @@ const LmsManager = () => {
   };
 
   const autoAllocate = async () => {
+    const selectedCourse = contentRows.find(
+      (row) => String(row.course_id) === String(selectedCourseId),
+    );
     await axiosInstance.post(API_PATHS.TEACHERS.AUTO_ALLOCATE, {
-      courseSlug: "web-development",
+      courseSlug: selectedCourse?.slug || "web-development",
     });
+    await load();
+  };
+
+  const sendTeacherReset = async (teacherId) => {
+    await axiosInstance.post(API_PATHS.TEACHERS.RESET(teacherId));
+    await load();
+  };
+
+  const verifyTeacher = async (teacherId) => {
+    await axiosInstance.patch(API_PATHS.TEACHERS.VERIFY(teacherId));
+    await load();
+  };
+
+  const deleteTeacher = async (teacherId) => {
+    if (!window.confirm("Delete this teacher account? Their classes will remain but become unassigned.")) return;
+    await axiosInstance.delete(API_PATHS.TEACHERS.DELETE(teacherId));
     await load();
   };
 
   const inactiveLearners = overview.learners.filter((learner) => !learner.last_activity_at).length;
   const difficultLessons = overview.lessons.slice(0, 5);
+  const courses = Array.from(
+    new Map(contentRows.filter((row) => row.course_id).map((row) => [row.course_id, row])).values(),
+  );
+  const visibleContentRows = contentRows.filter(
+    (row) => !selectedCourseId || String(row.course_id) === String(selectedCourseId),
+  );
 
   return (
     <div className="admin-container lms-admin">
       <div className="admin-header">
         <div>
           <h1>Learning System</h1>
-          <p className="subtitle">Learner progress, leaderboard, and course content controls.</p>
+          <p className="subtitle">Choose a course, manage learners, teachers, content, locks, and lesson timing.</p>
         </div>
       </div>
+
+      <section className="lms-panel lms-course-picker">
+        <label>
+          Course
+          <select
+            className="admin-input"
+            value={selectedCourseId}
+            onChange={(event) => setSelectedCourseId(event.target.value)}
+          >
+            {courses.map((course) => (
+              <option key={course.course_id} value={course.course_id}>
+                {course.course_title}
+              </option>
+            ))}
+          </select>
+        </label>
+      </section>
 
       <div className="stats-grid">
         <div className="stat-card">
@@ -193,7 +237,7 @@ const LmsManager = () => {
 
           <section className="lms-panel lms-content-panel">
             <h2>Course Content</h2>
-            {contentRows
+            {visibleContentRows
               .filter((row) => row.lesson_id)
               .map((row) => (
                 <button
@@ -253,7 +297,7 @@ const LmsManager = () => {
         <section className="lms-panel">
           <h2>Class Allocation</h2>
           <button className="confirm-btn" onClick={autoAllocate}>
-            Auto-allocate Web Development learners
+            Auto-allocate selected course learners
           </button>
           <div className="class-list">
             {teacherData.classes.map((item) => (
@@ -279,6 +323,7 @@ const LmsManager = () => {
                   <th>Verified</th>
                   <th>Classes</th>
                   <th>Learners</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -289,6 +334,21 @@ const LmsManager = () => {
                     <td>{teacher.email_verified ? "Yes" : "Pending"}</td>
                     <td>{teacher.classes_count}</td>
                     <td>{teacher.learners_count}</td>
+                    <td>
+                      <div className="teacher-actions">
+                        {!teacher.email_verified && (
+                          <button title="Mark verified" onClick={() => verifyTeacher(teacher.id)}>
+                            <ShieldCheck size={14} />
+                          </button>
+                        )}
+                        <button title="Send reset link" onClick={() => sendTeacherReset(teacher.id)}>
+                          <Mail size={14} />
+                        </button>
+                        <button title="Delete teacher" onClick={() => deleteTeacher(teacher.id)}>
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

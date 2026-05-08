@@ -6,7 +6,10 @@ import { protectTeacher } from "../Middleware/teacherAuthMiddleware.js";
 import {
   adminAutoAllocate,
   adminCreateTeacher,
+  adminDeleteTeacher,
+  adminSendTeacherReset,
   adminTeacherOverview,
+  adminVerifyTeacher,
   teacherComment,
   teacherDashboard,
   teacherLogin,
@@ -38,5 +41,8 @@ router.patch("/work/:progressId/comment", protectTeacher, teacherComment);
 router.get("/admin/overview", protect, csrfProtection, adminTeacherOverview);
 router.post("/admin", protect, csrfProtection, adminCreateTeacher);
 router.post("/admin/auto-allocate", protect, csrfProtection, adminAutoAllocate);
+router.post("/admin/:id/reset", protect, csrfProtection, adminSendTeacherReset);
+router.patch("/admin/:id/verify", protect, csrfProtection, adminVerifyTeacher);
+router.delete("/admin/:id", protect, csrfProtection, adminDeleteTeacher);
 
 export default router;

@@ -364,11 +364,55 @@ export const markInvoiceSent = async (id) => {
    DELETE REGISTRATION
 ========================= */
 export const deleteRegistrationById = async (id) => {
-  const rows = await query(
-    `DELETE FROM registrations WHERE id = $1 RETURNING id`,
-    [id],
+  const targetRows = await query(`SELECT * FROM registrations WHERE id = $1`, [id]);
+  const target = targetRows[0];
+  if (!target) return null;
+
+  const registrationRows = target.student_key
+    ? await query(`SELECT id FROM registrations WHERE student_key = $1`, [
+        target.student_key,
+      ])
+    : [{ id: target.id }];
+  const registrationIds = registrationRows.map((row) => row.id);
+
+  const learnerRows = await query(
+    `
+    SELECT id
+    FROM learner_accounts
+    WHERE registration_id = ANY($1::int[])
+       OR id IN (
+         SELECT learner_id
+         FROM learner_course_enrollments
+         WHERE registration_id = ANY($1::int[])
+       )
+    `,
+    [registrationIds],
   );
-  return rows[0];
+  const learnerIds = learnerRows.map((row) => row.id);
+
+  await query(
+    `
+    UPDATE registrations
+    SET previous_registration_id = NULL,
+        graduated_to_registration_id = NULL
+    WHERE id = ANY($1::int[])
+       OR previous_registration_id = ANY($1::int[])
+       OR graduated_to_registration_id = ANY($1::int[])
+    `,
+    [registrationIds],
+  );
+
+  if (learnerIds.length) {
+    await query(`DELETE FROM learner_accounts WHERE id = ANY($1::int[])`, [
+      learnerIds,
+    ]);
+  }
+
+  const rows = await query(
+    `DELETE FROM registrations WHERE id = ANY($1::int[]) RETURNING id`,
+    [registrationIds],
+  );
+  return { id: target.id, deletedCount: rows.length };
 };
 
 /* =========================

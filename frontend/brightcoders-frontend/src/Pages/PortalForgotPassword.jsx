@@ -13,8 +13,14 @@ const PortalForgotPassword = ({ portal }) => {
 
   const submit = async (event) => {
     event.preventDefault();
-    const res = await api.post(`${base}/auth/forgot-password`, { email });
-    setMessage(res.data.message);
+    try {
+      const res = await api.post(`${base}/auth/forgot-password`, {
+        email: email.trim(),
+      });
+      setMessage(res.data.message);
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Reset request failed. Please try again.");
+    }
   };
 
   return (
@@ -46,8 +52,12 @@ export const PortalResetPassword = ({ portal }) => {
 
   const submit = async (event) => {
     event.preventDefault();
-    const res = await api.post(`${base}/auth/reset-password/${token}`, { password });
-    setMessage(res.data.message);
+    try {
+      const res = await api.post(`${base}/auth/reset-password/${token}`, { password });
+      setMessage(res.data.message);
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Password reset failed. Please request a new link.");
+    }
   };
 
   return (

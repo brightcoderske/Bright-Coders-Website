@@ -227,6 +227,13 @@ ${jsTargets}
 Good practice steps: first build the structure, then add style, then test the page in the preview. If something does not appear, check spelling, closing tags, selectors, and whether your JavaScript is selecting the right element.`;
 };
 
+const slugifyCourse = (title = "") =>
+  String(title)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+
 const moduleLessons = [
   [
     {
@@ -746,6 +753,29 @@ export const seedWebDevelopmentCourse = async () => {
       }
     }
   }
+
+  const publicCourses = await query(
+    `SELECT title, description FROM courses WHERE is_public = true ORDER BY created_at ASC`,
+  );
+  for (const publicCourse of publicCourses) {
+    const slug = slugifyCourse(publicCourse.title);
+    if (!slug || slug === WEB_COURSE_SLUG) continue;
+    const description =
+      typeof publicCourse.description === "object"
+        ? publicCourse.description?.intro || publicCourse.description?.summary || publicCourse.title
+        : publicCourse.title;
+    await query(
+      `
+      INSERT INTO lms_courses (slug, title, description, is_public)
+      VALUES ($1, $2, $3, true)
+      ON CONFLICT (slug) DO UPDATE
+        SET title = EXCLUDED.title,
+            description = EXCLUDED.description,
+            is_public = true
+      `,
+      [slug, publicCourse.title, description],
+    );
+  }
 };
 
 export const isWebDevelopmentCourseName = (courseName = "") => {
@@ -760,11 +790,16 @@ export const generateLearnerPassword = () => {
 };
 
 export const provisionLearnerForRegistration = async (registration, plainPassword) => {
-  if (!isWebDevelopmentCourseName(registration.course_name)) return null;
-
-  const courseRows = await query(`SELECT * FROM lms_courses WHERE slug = $1`, [
-    WEB_COURSE_SLUG,
-  ]);
+  const courseRows = await query(
+    `
+    SELECT *
+    FROM lms_courses
+    WHERE LOWER(title) = LOWER($1)
+       OR ($2 = true AND slug = $3)
+    LIMIT 1
+    `,
+    [registration.course_name, isWebDevelopmentCourseName(registration.course_name), WEB_COURSE_SLUG],
+  );
   const course = courseRows[0];
   if (!course) return null;
 
@@ -784,6 +819,8 @@ export const provisionLearnerForRegistration = async (registration, plainPasswor
       SET registration_id = EXCLUDED.registration_id,
           parent_email = EXCLUDED.parent_email,
           child_email = EXCLUDED.child_email,
+          password_hash = EXCLUDED.password_hash,
+          display_name = EXCLUDED.display_name,
           full_name = EXCLUDED.full_name,
           is_active = true
     RETURNING *
@@ -1243,6 +1280,34 @@ export const resetTeacherPassword = async (token, password) => {
     RETURNING id, email, full_name
     `,
     [passwordHash, token],
+  );
+  return rows[0] || null;
+};
+
+export const verifyTeacherAccount = async (teacherId) => {
+  const rows = await query(
+    `
+    UPDATE teacher_accounts
+    SET email_verified = true,
+        verification_token = NULL,
+        verification_expires = NULL,
+        is_active = true
+    WHERE id = $1
+    RETURNING id, full_name, email, is_active, email_verified
+    `,
+    [teacherId],
+  );
+  return rows[0] || null;
+};
+
+export const deleteTeacherAccount = async (teacherId) => {
+  const rows = await query(
+    `
+    DELETE FROM teacher_accounts
+    WHERE id = $1
+    RETURNING id, full_name, email
+    `,
+    [teacherId],
   );
   return rows[0] || null;
 };

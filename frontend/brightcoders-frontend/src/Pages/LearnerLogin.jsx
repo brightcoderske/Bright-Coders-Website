@@ -19,7 +19,7 @@ const LearnerLogin = () => {
     setError("");
 
     try {
-      await learnerApi.post("/learn/auth/login", { email, password });
+      await learnerApi.post("/learn/auth/login", { email: email.trim(), password });
       navigate("/learn/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed.");

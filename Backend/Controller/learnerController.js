@@ -101,7 +101,7 @@ export const requestLearnerPasswordReset = async (req, res) => {
       new Date(Date.now() + 1000 * 60 * 30),
     );
     if (learner) {
-      const siteUrl = process.env.SITE_URL || process.env.FRONTEND_URL || "";
+      const siteUrl = process.env.SITE_URL || process.env.FRONTEND_URL || req.get("origin") || "";
       const resetUrl = `${siteUrl}/learn/reset-password/${token}`;
       await sendPortalResetEmail({
         to: learner.learner_email,

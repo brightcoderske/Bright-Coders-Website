@@ -35,6 +35,7 @@ const AdminRegistrationManager = () => {
   const [paymentModalData, setPaymentModalData] = useState(null);
   const [graduateModalData, setGraduateModalData] = useState(null);
   const [courses, setCourses] = useState([]);
+  const [courseFilter, setCourseFilter] = useState("all");
   const [nextCourseId, setNextCourseId] = useState("");
   const [highlightId, setHighlightId] = useState(null);
   const location = useLocation();
@@ -151,6 +152,10 @@ const AdminRegistrationManager = () => {
           .includes(searchTerm.toLowerCase()),
     );
 
+    if (courseFilter !== "all") {
+      result = result.filter((r) => r.course_name === courseFilter);
+    }
+
     if (filterMode === "paid")
       return result.filter((r) => r.payment_status === "paid");
     if (filterMode === "partial")
@@ -159,7 +164,7 @@ const AdminRegistrationManager = () => {
       return result.filter((r) => r.payment_status !== "paid");
 
     return result;
-  }, [registrations, searchTerm, filterMode]);
+  }, [registrations, searchTerm, filterMode, courseFilter]);
 
   // --- CORE PAYMENT VERIFICATION LOGIC ---
   const handleVerifyPayment = (reg) => {
@@ -226,11 +231,11 @@ const AdminRegistrationManager = () => {
       onConfirm: async () => {
         setAlertConfig((prev) => ({ ...prev, isOpen: false }));
         try {
-          await axiosInstance.delete(API_PATHS.REGISTRATIONS.DELETE(id));
-          setRegistrations((prev) => prev.filter((r) => r.id !== id));
-          triggerToast("Deleted successfully!");
+          const res = await axiosInstance.delete(API_PATHS.REGISTRATIONS.DELETE(id));
+          await fetchRegistrations();
+          triggerToast(res.data?.message || "Deleted successfully!");
         } catch (err) {
-          triggerToast("Delete failed", "error");
+          triggerToast(err.response?.data?.message || "Delete failed", "error");
         }
       },
     });
@@ -353,6 +358,18 @@ const AdminRegistrationManager = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+            <select
+              className="admin-input"
+              value={courseFilter}
+              onChange={(event) => setCourseFilter(event.target.value)}
+            >
+              <option value="all">All courses</option>
+              {courses.map((course) => (
+                <option key={course.id} value={course.title}>
+                  {course.title}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

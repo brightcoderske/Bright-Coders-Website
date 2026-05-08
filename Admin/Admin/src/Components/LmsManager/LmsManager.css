@@ -68,6 +68,19 @@
 
 .lms-edit-modal {
   max-width: 920px;
+  max-height: 86vh;
+  overflow-y: auto;
+}
+
+.lms-course-picker {
+  margin-bottom: 18px;
+}
+
+.lms-course-picker label {
+  display: grid;
+  gap: 8px;
+  color: #334155;
+  font-weight: 800;
 }
 
 .lms-editor-grid {
@@ -104,6 +117,21 @@
 
 .class-list {
   margin-top: 14px;
+}
+
+.teacher-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.teacher-actions button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #0f172a;
+  cursor: pointer;
 }
 
 @media (max-width: 980px) {

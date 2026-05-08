@@ -119,7 +119,7 @@ export const requestTeacherPasswordReset = async (req, res) => {
       new Date(Date.now() + 1000 * 60 * 30),
     );
     if (teacher) {
-      const siteUrl = process.env.SITE_URL || process.env.FRONTEND_URL || "";
+      const siteUrl = process.env.SITE_URL || process.env.FRONTEND_URL || req.get("origin") || "";
       const resetUrl = `${siteUrl}/teacher/reset-password/${token}`;
       await sendPortalResetEmail({
         to: teacher.email,
@@ -169,6 +169,54 @@ export const adminTeacherOverview = async (req, res) => {
     Lms.getClasses(),
   ]);
   return res.status(200).json({ teachers, classes });
+};
+
+export const adminSendTeacherReset = async (req, res) => {
+  try {
+    const teacher = await Lms.findTeacherById(req.params.id);
+    if (!teacher) return res.status(404).json({ message: "Teacher not found." });
+
+    const token = crypto.randomBytes(32).toString("hex");
+    await Lms.setTeacherResetToken(
+      teacher.email,
+      token,
+      new Date(Date.now() + 1000 * 60 * 30),
+    );
+
+    const siteUrl = process.env.SITE_URL || process.env.FRONTEND_URL || req.get("origin") || "";
+    await sendPortalResetEmail({
+      to: teacher.email,
+      name: teacher.full_name,
+      resetUrl: `${siteUrl}/teacher/reset-password/${token}`,
+      portalName: "Teacher Portal",
+    });
+
+    return res.status(200).json({ message: "Teacher reset link sent." });
+  } catch (error) {
+    console.error("ADMIN_TEACHER_RESET_ERROR:", error);
+    return res.status(500).json({ message: "Failed to send reset link." });
+  }
+};
+
+export const adminVerifyTeacher = async (req, res) => {
+  try {
+    const teacher = await Lms.verifyTeacherAccount(req.params.id);
+    if (!teacher) return res.status(404).json({ message: "Teacher not found." });
+    return res.status(200).json(teacher);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to verify teacher." });
+  }
+};
+
+export const adminDeleteTeacher = async (req, res) => {
+  try {
+    const teacher = await Lms.deleteTeacherAccount(req.params.id);
+    if (!teacher) return res.status(404).json({ message: "Teacher not found." });
+    return res.status(200).json({ message: "Teacher deleted.", teacher });
+  } catch (error) {
+    console.error("ADMIN_DELETE_TEACHER_ERROR:", error);
+    return res.status(500).json({ message: "Failed to delete teacher." });
+  }
 };
 
 export const adminAutoAllocate = async (req, res) => {

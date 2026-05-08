@@ -18,7 +18,7 @@ const TeacherLogin = () => {
     setLoading(true);
     setError("");
     try {
-      await teacherApi.post("/teachers/auth/login", { email, password });
+      await teacherApi.post("/teachers/auth/login", { email: email.trim(), password });
       navigate("/teacher/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed.");

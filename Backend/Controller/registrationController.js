@@ -310,9 +310,9 @@ export const handleDeleteRegistration = async (req, res) => {
         .status(404)
         .json({ message: "Registration does not exist or already deleted." });
 
-    return res
-      .status(200)
-      .json({ message: "Registration successfully deleted." });
+    return res.status(200).json({
+      message: `Student record deleted with ${deleted.deletedCount || 1} linked module record(s).`,
+    });
   } catch (err) {
     console.error("DELETE_REGISTRATION_ERROR:", err);
     return res.status(500).json({ message: "Could not delete registration." });

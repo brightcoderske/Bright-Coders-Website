@@ -123,7 +123,7 @@ export const sendLearnerWelcomeEmail = async ({
   course,
   plainPassword,
 }) => {
-  const loginUrl = `${process.env.SITE_URL || ""}/learn/login`;
+  const loginUrl = `${process.env.SITE_URL || process.env.FRONTEND_URL || ""}/learn/login`;
   const recipients = [
     registration.parent_email,
     registration.child_email || learner.learner_email,
@@ -218,7 +218,7 @@ export const sendTeacherWelcomeEmail = async ({
           <div style="text-align:center;margin:24px 0;">
             <a href="${verificationUrl}" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">Verify Email</a>
           </div>
-          <p style="font-size:13px;color:#64748b;">After verifying, login at ${process.env.SITE_URL || ""}/teacher/login.</p>
+          <p style="font-size:13px;color:#64748b;">After verifying, login at ${process.env.SITE_URL || process.env.FRONTEND_URL || ""}/teacher/login.</p>
         </div>
       </div>
     `,

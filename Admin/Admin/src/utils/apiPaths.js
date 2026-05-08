@@ -89,6 +89,9 @@ ADMIN_ACCOUNT: {
     OVERVIEW: "/api/teachers/admin/overview",
     CREATE: "/api/teachers/admin",
     AUTO_ALLOCATE: "/api/teachers/admin/auto-allocate",
+    RESET: (id) => `/api/teachers/admin/${id}/reset`,
+    VERIFY: (id) => `/api/teachers/admin/${id}/verify`,
+    DELETE: (id) => `/api/teachers/admin/${id}`,
   }
 
 };
