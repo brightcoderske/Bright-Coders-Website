@@ -65,16 +65,39 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((origin) => origin.trim()) // .trim() removes accidental spaces
   : [];
 
+[
+  process.env.SITE_URL,
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_URL,
+].forEach((origin) => {
+  if (origin && !allowedOrigins.includes(origin)) allowedOrigins.push(origin);
+});
+
+const wildcardToRegex = (pattern) =>
+  new RegExp(`^${pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*")}$`);
+
+const allowedOriginPatterns = [
+  ...allowedOrigins.filter((origin) => origin.includes("*")).map(wildcardToRegex),
+  /^https:\/\/bright-coders-admin-website-[a-z0-9-]+\.vercel\.app$/,
+  /^https:\/\/bright-coders-website-[a-z0-9-]+\.vercel\.app$/,
+];
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  return allowedOriginPatterns.some((pattern) => pattern.test(origin));
+};
+
 /* ============================
    4️⃣ INITIALIZE SOCKETS
 ============================ */
-initSocket(httpServer, allowedOrigins);
+initSocket(httpServer, isAllowedOrigin);
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow if no origin (Postman) or if it's in the list
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (isAllowedOrigin(origin)) {
         return callback(null, true);
       }
 

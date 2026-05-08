@@ -35,6 +35,20 @@ const generateTempToken = (id) => {
   });
 };
 
+const sanitizeAdminUser = (user = {}) => {
+  const {
+    password_hash,
+    reset_token,
+    reset_expires,
+    two_factor_code,
+    two_factor_expires,
+    otp_code,
+    otp_expires,
+    ...safeUser
+  } = user;
+  return safeUser;
+};
+
 // ========================================
 // 🔹 Register User
 // ========================================
@@ -67,7 +81,7 @@ export const registerUser = async (request, response) => {
     );
 
     // SECURITY: Remove password from the user object before sending to frontend
-    const { password_hash, ...userWithoutPassword } = newUser;
+    const userWithoutPassword = sanitizeAdminUser(newUser);
 
     await sendAdminWelcomeEmail(userWithoutPassword);
     return response.status(201).json({
@@ -103,12 +117,6 @@ export const loginUser = async (request, response) => {
         .status(401)
         .json({ message: "Invalid email or password." });
     }
-
-    console.log(
-      "2FA enabled:",
-      user.two_factor_enabled,
-      typeof user.two_factor_enabled,
-    );
 
     const isMatch = await comparePassword(password, user.password_hash);
     if (!isMatch) {
@@ -148,7 +156,7 @@ export const loginUser = async (request, response) => {
     await updateLastLogin(user.id);
 
     // SECURITY: Strip sensitive data
-    const { password_hash, ...userWithoutPassword } = user;
+    const userWithoutPassword = sanitizeAdminUser(user);
 
     const token = generateToken(user.id);
 
@@ -174,7 +182,7 @@ export const getUserInfo = async (request, response) => {
       return response.status(404).json({ message: "User not found." });
     }
 
-    const { password_hash, ...userWithoutPassword } = user;
+    const userWithoutPassword = sanitizeAdminUser(user);
     return response.status(200).json({ user: userWithoutPassword });
   } catch (error) {
     console.error("[GetUserInfo Error]:", error);
@@ -284,7 +292,7 @@ export const verifyOTP = async (req, res) => {
     await resetOtpAttempts(user.id);
     await updateLastLogin(user.id);
 
-    const { password_hash, ...userWithoutPassword } = user;
+    const userWithoutPassword = sanitizeAdminUser(user);
 
     const finalToken = generateToken(user.id);
 

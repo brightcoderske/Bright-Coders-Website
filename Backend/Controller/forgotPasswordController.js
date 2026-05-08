@@ -56,12 +56,14 @@ export const resetPassword = async (req, res) => {
 
   const users = await findUserByResetToken();
 
-  const matchedUser = await Promise.any(
-    users.map(async (u) => {
-      const isMatch = await bcrypt.compare(token, u.reset_token);
-      return isMatch ? u : null;
-    })
-  ).catch(() => null);
+  let matchedUser = null;
+  for (const user of users) {
+    const isMatch = await bcrypt.compare(token, user.reset_token);
+    if (isMatch) {
+      matchedUser = user;
+      break;
+    }
+  }
 
   if (!matchedUser) {
     return res.status(400).json({

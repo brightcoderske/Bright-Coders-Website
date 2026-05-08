@@ -20,6 +20,18 @@ const generateTeacherToken = (id) => {
   });
 };
 
+const sanitizeTeacher = (teacher = {}) => {
+  const {
+    password_hash,
+    verification_token,
+    verification_expires,
+    reset_token,
+    reset_expires,
+    ...safeTeacher
+  } = teacher;
+  return safeTeacher;
+};
+
 export const adminCreateTeacher = async (req, res) => {
   try {
     const { fullName, email, phone } = req.body;
@@ -97,8 +109,7 @@ export const teacherLogin = async (req, res) => {
     await Lms.updateTeacherLastLogin(teacher.id);
     res.cookie("teacher_token", generateTeacherToken(teacher.id), teacherCookieOptions);
 
-    const { password_hash, verification_token, ...safeTeacher } = teacher;
-    return res.status(200).json({ teacher: safeTeacher });
+    return res.status(200).json({ teacher: sanitizeTeacher(teacher) });
   } catch (error) {
     return res.status(500).json({ message: "Login failed." });
   }

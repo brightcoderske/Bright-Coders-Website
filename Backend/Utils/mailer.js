@@ -162,7 +162,7 @@ export const sendLessonCompletionEmail = async ({
   progress,
   workUrl,
 }) => {
-  const recipients = [learner.parent_email, learner.child_email].filter(Boolean);
+  const recipients = [learner.child_email || learner.learner_email].filter(Boolean);
   const subject = `${learner.display_name} completed: ${lesson.title}`;
 
   const { data, error } = await resend.emails.send({
@@ -190,6 +190,132 @@ export const sendLessonCompletionEmail = async ({
     `,
   });
 
+  if (error) throw error;
+  return data;
+};
+
+const getGradeBand = (score = 0) => {
+  const value = Number(score) || 0;
+  if (value <= 40) return "Approaching expectation";
+  if (value <= 60) return "Meets expectation";
+  if (value <= 80) return "Above expectation";
+  return "Exceeding expectation";
+};
+
+const lessonRowsHtml = (lessons = []) =>
+  lessons
+    .map(
+      (lesson) => `
+        <tr>
+          <td style="padding:8px;border:1px solid #e5e7eb;">${lesson.title || lesson.lesson_title}</td>
+          <td style="padding:8px;border:1px solid #e5e7eb;text-align:center;">${lesson.total_score ?? 0}%</td>
+          <td style="padding:8px;border:1px solid #e5e7eb;">${getGradeBand(lesson.total_score)}</td>
+          <td style="padding:8px;border:1px solid #e5e7eb;">${lesson.strengths || "Good effort shown."}</td>
+          <td style="padding:8px;border:1px solid #e5e7eb;">${lesson.improvements || "Keep practicing for stronger fluency."}</td>
+        </tr>
+      `,
+    )
+    .join("");
+
+export const sendModuleCompletionEmail = async ({
+  learner,
+  module,
+  course,
+  lessons,
+  workUrl,
+}) => {
+  const average = lessons.length
+    ? Math.round(
+        lessons.reduce((sum, lesson) => sum + Number(lesson.total_score || 0), 0) /
+          lessons.length,
+      )
+    : 0;
+
+  const { data, error } = await resend.emails.send({
+    from: EMAIL_SENDERS.INFO,
+    to: learner.parent_email,
+    subject: `${learner.display_name} completed module: ${module.module_title}`,
+    html: `
+      <div style="max-width:680px;margin:0 auto;font-family:Arial,sans-serif;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+        <div style="background:#0f172a;color:#fff;padding:24px;">
+          <h1 style="margin:0;font-size:22px;">Module Completed</h1>
+        </div>
+        <div style="padding:28px;color:#1f2937;">
+          <p>Hello, <strong>${learner.display_name}</strong> has completed <strong>${module.module_title}</strong> in ${course.course_title}.</p>
+          <p><strong>Module average:</strong> ${average}% - ${getGradeBand(average)}</p>
+          <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:13px;">
+            <thead>
+              <tr style="background:#f8fafc;">
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Lesson</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;">Score</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Band</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Strength</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Next Step</th>
+              </tr>
+            </thead>
+            <tbody>${lessonRowsHtml(lessons)}</tbody>
+          </table>
+          <p><a href="${workUrl}">Open learner dashboard</a></p>
+        </div>
+      </div>
+    `,
+  });
+  if (error) throw error;
+  return data;
+};
+
+export const sendCourseReportEmail = async ({
+  learner,
+  course,
+  modules,
+  workUrl,
+}) => {
+  const allLessons = modules.flatMap((module) => module.lessons || []);
+  const average = allLessons.length
+    ? Math.round(
+        allLessons.reduce((sum, lesson) => sum + Number(lesson.total_score || 0), 0) /
+          allLessons.length,
+      )
+    : 0;
+  const moduleSections = modules
+    .map(
+      (module) => `
+        <h3 style="margin:24px 0 10px;color:#0f172a;">${module.title}</h3>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="background:#f8fafc;">
+              <th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Lesson</th>
+              <th style="padding:8px;border:1px solid #e5e7eb;">Score</th>
+              <th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Band</th>
+              <th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Teacher-style comment</th>
+              <th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Improvement</th>
+            </tr>
+          </thead>
+          <tbody>${lessonRowsHtml(module.lessons)}</tbody>
+        </table>
+      `,
+    )
+    .join("");
+
+  const { data, error } = await resend.emails.send({
+    from: EMAIL_SENDERS.INFO,
+    to: [...new Set([learner.parent_email, learner.child_email || learner.learner_email].filter(Boolean))],
+    subject: `${learner.display_name} course report card: ${course.course_title}`,
+    html: `
+      <div style="max-width:760px;margin:0 auto;font-family:Arial,sans-serif;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+        <div style="background:#2563eb;color:#fff;padding:24px;">
+          <h1 style="margin:0;font-size:24px;">Course Report Card</h1>
+        </div>
+        <div style="padding:28px;color:#1f2937;">
+          <p><strong>${learner.display_name}</strong> has completed <strong>${course.course_title}</strong>.</p>
+          <p><strong>Overall average:</strong> ${average}% - ${getGradeBand(average)}</p>
+          <p>${learner.display_name} should keep building projects, reading instructions carefully, and improving code polish through consistent practice.</p>
+          ${moduleSections}
+          <p style="margin-top:24px;"><a href="${workUrl}">Open learner dashboard</a></p>
+        </div>
+      </div>
+    `,
+  });
   if (error) throw error;
   return data;
 };

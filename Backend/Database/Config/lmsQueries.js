@@ -1,7 +1,11 @@
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { query } from "./config.db.js";
 
 const WEB_COURSE_SLUG = "web-development";
+
+const hashResetToken = (token) =>
+  crypto.createHash("sha256").update(String(token)).digest("hex");
 
 export const lmsTableSchema = `
 CREATE TABLE IF NOT EXISTS learner_accounts (
@@ -225,6 +229,38 @@ ${cssTargets}
 ${jsTargets}
 
 Good practice steps: first build the structure, then add style, then test the page in the preview. If something does not appear, check spelling, closing tags, selectors, and whether your JavaScript is selecting the right element.`;
+};
+
+const buildQuizSet = (lesson) => {
+  const firstQuestion = lesson.quiz?.[0] || [
+    `What is the main idea in ${lesson.title}?`,
+    ["Structure", "Random typing", "Deleting files", "Guessing"],
+    "Structure",
+  ];
+
+  return [
+    firstQuestion,
+    [
+      `Which code area is most important to start this ${lesson.title} task?`,
+      ["HTML structure", "Browser history", "File size only", "Keyboard color"],
+      "HTML structure",
+    ],
+    [
+      "What should you do before submitting your work?",
+      ["Test it in the preview", "Close the browser", "Remove all headings", "Copy the example exactly"],
+      "Test it in the preview",
+    ],
+    [
+      `Type one HTML item required in this lesson.`,
+      [],
+      String(lesson.requiredHtml?.[0] || "html").replace(/[<>=]/g, ""),
+    ],
+    [
+      `Type one CSS or JavaScript keyword used in this lesson.`,
+      [],
+      String(lesson.requiredCss?.[0] || lesson.requiredJs?.[0] || "style").replace(/[<>=]/g, ""),
+    ],
+  ];
 };
 
 const slugifyCourse = (title = "") =>
@@ -722,8 +758,9 @@ export const seedWebDevelopmentCourse = async () => {
       );
 
       const savedLesson = lessonRows[0];
-      for (let quizIndex = 0; quizIndex < lesson.quiz.length; quizIndex += 1) {
-        const [question, options, answer] = lesson.quiz[quizIndex];
+      const quizSet = buildQuizSet(lesson);
+      for (let quizIndex = 0; quizIndex < quizSet.length; quizIndex += 1) {
+        const [question, options, answer] = quizSet[quizIndex];
         await query(
           `
           INSERT INTO lms_quiz_questions (
@@ -741,9 +778,7 @@ export const seedWebDevelopmentCourse = async () => {
           [
             savedLesson.id,
             question,
-            options.length === 2 && options.includes("true")
-              ? "true_false"
-              : "multiple_choice",
+            options.length ? "multiple_choice" : "fill_blank",
             JSON.stringify(options),
             answer,
             "Review the lesson notes and try the task again if this felt tricky.",
@@ -862,6 +897,7 @@ export const findLearnerByEmail = async (email) => {
 
 export const setLearnerResetToken = async (email, token, expires) => {
   const normalizedEmail = String(email || "").trim().toLowerCase();
+  const tokenHash = hashResetToken(token);
   const rows = await query(
     `
     UPDATE learner_accounts
@@ -870,13 +906,14 @@ export const setLearnerResetToken = async (email, token, expires) => {
     WHERE LOWER(learner_email) = $3
     RETURNING id, display_name, learner_email, parent_email, child_email
     `,
-    [token, expires, normalizedEmail],
+    [tokenHash, expires, normalizedEmail],
   );
   return rows[0] || null;
 };
 
 export const resetLearnerPassword = async (token, password) => {
   const passwordHash = await bcrypt.hash(password, 10);
+  const tokenHash = hashResetToken(token);
   const rows = await query(
     `
     UPDATE learner_accounts
@@ -887,7 +924,7 @@ export const resetLearnerPassword = async (token, password) => {
       AND reset_expires > CURRENT_TIMESTAMP
     RETURNING id, learner_email, display_name
     `,
-    [passwordHash, token],
+    [passwordHash, tokenHash],
   );
   return rows[0] || null;
 };
@@ -1148,6 +1185,91 @@ export const getLearnerDashboard = async (learnerId) => {
   return { courses, progress };
 };
 
+export const getModuleCompletionForLesson = async (learnerId, lessonId) => {
+  const moduleRows = await query(
+    `
+    SELECT m.id AS module_id, m.title AS module_title, c.id AS course_id,
+           c.title AS course_title, c.slug AS course_slug
+    FROM lms_lessons l
+    JOIN lms_modules m ON m.id = l.module_id
+    JOIN lms_courses c ON c.id = m.course_id
+    WHERE l.id = $1
+    `,
+    [lessonId],
+  );
+  const moduleInfo = moduleRows[0];
+  if (!moduleInfo) return null;
+
+  const lessons = await query(
+    `
+    SELECT l.id, l.title, l.lesson_order, p.total_score, p.quiz_score,
+           p.code_score, p.status, p.strengths, p.improvements, p.completed_at
+    FROM lms_lessons l
+    LEFT JOIN learner_lesson_progress p
+      ON p.lesson_id = l.id AND p.learner_id = $2
+    WHERE l.module_id = $1 AND l.is_published = true
+    ORDER BY l.lesson_order ASC
+    `,
+    [moduleInfo.module_id, learnerId],
+  );
+
+  return {
+    ...moduleInfo,
+    lessons,
+    isComplete: lessons.length > 0 && lessons.every((lesson) => lesson.status === "completed"),
+  };
+};
+
+export const getCourseReportForLesson = async (learnerId, lessonId) => {
+  const courseRows = await query(
+    `
+    SELECT c.id AS course_id, c.title AS course_title, c.slug AS course_slug
+    FROM lms_lessons l
+    JOIN lms_modules m ON m.id = l.module_id
+    JOIN lms_courses c ON c.id = m.course_id
+    WHERE l.id = $1
+    `,
+    [lessonId],
+  );
+  const course = courseRows[0];
+  if (!course) return null;
+
+  const rows = await query(
+    `
+    SELECT m.id AS module_id, m.title AS module_title, m.module_order,
+           l.id AS lesson_id, l.title AS lesson_title, l.lesson_order,
+           p.total_score, p.quiz_score, p.code_score, p.status,
+           p.strengths, p.improvements, p.completed_at
+    FROM lms_modules m
+    JOIN lms_lessons l ON l.module_id = m.id AND l.is_published = true
+    LEFT JOIN learner_lesson_progress p
+      ON p.lesson_id = l.id AND p.learner_id = $2
+    WHERE m.course_id = $1
+    ORDER BY m.module_order ASC, l.lesson_order ASC
+    `,
+    [course.course_id, learnerId],
+  );
+
+  const modulesMap = new Map();
+  rows.forEach((row) => {
+    if (!modulesMap.has(row.module_id)) {
+      modulesMap.set(row.module_id, {
+        id: row.module_id,
+        title: row.module_title,
+        moduleOrder: row.module_order,
+        lessons: [],
+      });
+    }
+    modulesMap.get(row.module_id).lessons.push(row);
+  });
+
+  return {
+    ...course,
+    modules: Array.from(modulesMap.values()),
+    isComplete: rows.length > 0 && rows.every((row) => row.status === "completed"),
+  };
+};
+
 export const getLeaderboard = async (courseSlug = WEB_COURSE_SLUG) => {
   return await query(
     `
@@ -1220,6 +1342,19 @@ export const logParentEmail = async ({
   );
 };
 
+export const hasParentEmailSubject = async ({ learnerId, subject }) => {
+  const rows = await query(
+    `
+    SELECT id
+    FROM lms_parent_email_log
+    WHERE learner_id = $1 AND subject = $2 AND status = 'sent'
+    LIMIT 1
+    `,
+    [learnerId, subject],
+  );
+  return Boolean(rows[0]);
+};
+
 export const createTeacherAccount = async ({
   fullName,
   email,
@@ -1253,6 +1388,7 @@ export const findTeacherByEmail = async (email) => {
 
 export const setTeacherResetToken = async (email, token, expires) => {
   const normalizedEmail = String(email || "").trim().toLowerCase();
+  const tokenHash = hashResetToken(token);
   const rows = await query(
     `
     UPDATE teacher_accounts
@@ -1261,13 +1397,14 @@ export const setTeacherResetToken = async (email, token, expires) => {
     WHERE LOWER(email) = $3
     RETURNING id, full_name, email
     `,
-    [token, expires, normalizedEmail],
+    [tokenHash, expires, normalizedEmail],
   );
   return rows[0] || null;
 };
 
 export const resetTeacherPassword = async (token, password) => {
   const passwordHash = await bcrypt.hash(password, 10);
+  const tokenHash = hashResetToken(token);
   const rows = await query(
     `
     UPDATE teacher_accounts
@@ -1279,7 +1416,7 @@ export const resetTeacherPassword = async (token, password) => {
       AND reset_expires > CURRENT_TIMESTAMP
     RETURNING id, email, full_name
     `,
-    [passwordHash, token],
+    [passwordHash, tokenHash],
   );
   return rows[0] || null;
 };

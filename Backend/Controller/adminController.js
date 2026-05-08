@@ -75,9 +75,6 @@ export const handleDeleteAdminAccount = async (request, response) => {
   }
 
 
-  console.log("Input Password:", password);
-    console.log("Stored Hash:", admin.password_hash);
-
   // 2️⃣ Enforce step-up verification
   if (!admin.last_verified) {
     return response.status(403).json({

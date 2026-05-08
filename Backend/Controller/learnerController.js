@@ -4,8 +4,12 @@ import * as Lms from "../Database/Config/lmsQueries.js";
 import {
   learnerCookieOptions,
 } from "../Middleware/learnerAuthMiddleware.js";
-import { sendLessonCompletionEmail } from "../Utils/mailer.js";
-import { sendPortalResetEmail } from "../Utils/mailer.js";
+import {
+  sendCourseReportEmail,
+  sendLessonCompletionEmail,
+  sendModuleCompletionEmail,
+  sendPortalResetEmail,
+} from "../Utils/mailer.js";
 
 const scoreCode = (lesson, html = "", css = "", js = "", taskIndex = null) => {
   const task =
@@ -58,6 +62,11 @@ const generateLearnerToken = (id) => {
   });
 };
 
+const sanitizeLearner = (learner = {}) => {
+  const { password_hash, reset_token, reset_expires, ...safeLearner } = learner;
+  return safeLearner;
+};
+
 export const learnerLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -78,8 +87,7 @@ export const learnerLogin = async (req, res) => {
     const token = generateLearnerToken(learner.id);
     res.cookie("learner_token", token, learnerCookieOptions);
 
-    const { password_hash, ...safeLearner } = learner;
-    return res.status(200).json({ learner: safeLearner });
+    return res.status(200).json({ learner: sanitizeLearner(learner) });
   } catch (error) {
     console.error("LEARNER_LOGIN_ERROR:", error);
     return res.status(500).json({ message: "Login failed." });
@@ -242,34 +250,95 @@ export const submitLesson = async (req, res) => {
         : "Try improving design polish and readability.",
     });
 
-    const workUrl = `${process.env.SITE_URL || ""}/learn/dashboard`;
+    const siteUrl = process.env.SITE_URL || process.env.FRONTEND_URL || req.get("origin") || "";
+    const workUrl = `${siteUrl}/learn/dashboard`;
     sendLessonCompletionEmail({
       learner: req.learner,
       lesson,
       progress,
       workUrl,
     })
-      .then(() =>
-        Lms.logParentEmail({
-          learnerId: req.learner.id,
-          lessonId: lesson.id,
-          parentEmail: req.learner.parent_email,
-          childEmail: req.learner.child_email,
-          subject: `${req.learner.display_name} completed: ${lesson.title}`,
-          status: "sent",
-        }),
-      )
-      .catch((error) =>
-        Lms.logParentEmail({
-          learnerId: req.learner.id,
-          lessonId: lesson.id,
-          parentEmail: req.learner.parent_email,
-          childEmail: req.learner.child_email,
-          subject: `${req.learner.display_name} completed: ${lesson.title}`,
-          status: "failed",
-          errorMessage: error.message,
-        }),
-      );
+      .catch((error) => console.error("LEARNER_LESSON_EMAIL:", error.message));
+
+    const moduleSummary = await Lms.getModuleCompletionForLesson(
+      req.learner.id,
+      lesson.id,
+    );
+    if (moduleSummary?.isComplete) {
+      const subject = `${req.learner.display_name} completed module: ${moduleSummary.module_title}`;
+      const alreadySent = await Lms.hasParentEmailSubject({
+        learnerId: req.learner.id,
+        subject,
+      });
+      if (!alreadySent) {
+        sendModuleCompletionEmail({
+          learner: req.learner,
+          module: moduleSummary,
+          course: moduleSummary,
+          lessons: moduleSummary.lessons,
+          workUrl,
+        })
+          .then(() =>
+            Lms.logParentEmail({
+              learnerId: req.learner.id,
+              lessonId: null,
+              parentEmail: req.learner.parent_email,
+              childEmail: req.learner.child_email,
+              subject,
+              status: "sent",
+            }),
+          )
+          .catch((error) =>
+            Lms.logParentEmail({
+              learnerId: req.learner.id,
+              lessonId: null,
+              parentEmail: req.learner.parent_email,
+              childEmail: req.learner.child_email,
+              subject,
+              status: "failed",
+              errorMessage: error.message,
+            }),
+          );
+      }
+    }
+
+    const courseReport = await Lms.getCourseReportForLesson(req.learner.id, lesson.id);
+    if (courseReport?.isComplete) {
+      const subject = `${req.learner.display_name} course report card: ${courseReport.course_title}`;
+      const alreadySent = await Lms.hasParentEmailSubject({
+        learnerId: req.learner.id,
+        subject,
+      });
+      if (!alreadySent) {
+        sendCourseReportEmail({
+          learner: req.learner,
+          course: courseReport,
+          modules: courseReport.modules,
+          workUrl,
+        })
+          .then(() =>
+            Lms.logParentEmail({
+              learnerId: req.learner.id,
+              lessonId: null,
+              parentEmail: req.learner.parent_email,
+              childEmail: req.learner.child_email,
+              subject,
+              status: "sent",
+            }),
+          )
+          .catch((error) =>
+            Lms.logParentEmail({
+              learnerId: req.learner.id,
+              lessonId: null,
+              parentEmail: req.learner.parent_email,
+              childEmail: req.learner.child_email,
+              subject,
+              status: "failed",
+              errorMessage: error.message,
+            }),
+          );
+      }
+    }
 
     return res.status(200).json({
       progress,
