@@ -26,7 +26,7 @@ const Contact = () => {
   // Function for Hovering (Visual Only)
   const handleMouseEnter = (type) => {
     if (type === "email") {
-      setPopupText("developerisaac92@gmail.com");
+      setPopupText("brightcoderske@gmail.com");
       setActiveContact("email");
     } else {
       setPopupText("+254 740 073 575");
@@ -207,7 +207,7 @@ const Contact = () => {
                 <p>First Name</p>
                 <input
                   type="text"
-                  placeholder="e.g Isaac"
+                  placeholder="e.g Bright"
                   name="Name"
                   required
                 />
@@ -224,7 +224,7 @@ const Contact = () => {
                 <p>Email</p>
                 <input
                   type="email"
-                  placeholder="e.g isaac@gmail.com"
+                  placeholder="e.g brightcoderske@gmail.com"
                   name="Email"
                   required
                 />
