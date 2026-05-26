@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import Navbar from "./Layout/Navbar";
 import Footer from "./Components/Footer";
+import SiteSEO from "./Components/SiteSEO";
 import ScrollToTop from "./helper/ScrollToTop";
 import DashboardLayout from "./Layout/DashboardLayout";
 import About from "./Pages/About";
@@ -76,6 +77,7 @@ function AppShell() {
 
   return (
     <>
+      <SiteSEO pathname={location.pathname} />
       <ScrollToTop />
       {!isPortal && <Navbar />}
       <div className="main-content">

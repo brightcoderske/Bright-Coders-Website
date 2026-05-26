@@ -126,7 +126,7 @@ const Footer = () => {
           <div className="social-icons flex gap-4">
             {/* Facebook */}
             <a
-              href={`https://www.facebook.com/sharer/sharer.php?u=https://brightcoders.com&quote=${encodeURIComponent(
+              href={`https://www.facebook.com/sharer/sharer.php?u=https://www.brightcoderske.co.ke/&quote=${encodeURIComponent(
                 "Hello! I am interested in learning more about Bright Coders programs."
               )}`}
               target="_blank"
@@ -159,7 +159,7 @@ const Footer = () => {
 
             {/* WhatsApp */}
             <a
-              href={`https://wa.me/254757810818?text=${encodeURIComponent(
+              href={`https://wa.me/254740073575?text=${encodeURIComponent(
                 "Hello! I am interested in learning more about Bright Coders programs."
               )}`}
               target="_blank"

@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { loadCachedList } from "../Utils/cachedApi";
 import "../Css/StudentWork.css";
+import { SITE_URL } from "../Utils/seoData";
 
 const categories = [
   { key: "scratch", label: "Scratch" },
@@ -15,7 +16,7 @@ const StudentWork = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const rowRefs = useRef({});
-  const siteUrl = import.meta.env.VITE_SITE_URL;
+  const siteUrl = SITE_URL;
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {

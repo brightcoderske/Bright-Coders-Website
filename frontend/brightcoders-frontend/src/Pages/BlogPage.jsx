@@ -12,6 +12,7 @@ import {
 import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router-dom";
 import { loadCachedList } from "../Utils/cachedApi";
+import { DEFAULT_IMAGE, SITE_URL } from "../Utils/seoData";
 
 const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
@@ -19,7 +20,7 @@ const BlogPage = () => {
   const [selectedBlog, setSelectedBlog] = useState(null);
 
   const { id } = useParams();
-  const siteUrl = import.meta.env.VITE_SITE_URL;
+  const siteUrl = SITE_URL;
   const API_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
@@ -54,7 +55,7 @@ const BlogPage = () => {
   }, [id, blogs]);
 
   const handleShare = async (blog) => {
-    const shareUrl = `${siteUrl}/blog/${blog.id}/meta`;
+    const shareUrl = `${siteUrl}/blog/${blog.id}`;
 
     const shareData = {
       title: blog.title,
@@ -81,7 +82,7 @@ const BlogPage = () => {
     "@context": "https://schema.org",
     "@type": "Blog",
     name: "Bright Coders Blog",
-    url: `${siteUrl}/blog`,
+    url: `${siteUrl}/blogs`,
     description:
       "Tips, insights, and stories about coding and tech for kids & teens.",
     blogPost: blogs.map((blog) => ({
@@ -119,7 +120,7 @@ const BlogPage = () => {
           href={
             selectedBlog
               ? `${siteUrl}/blog/${selectedBlog.id}`
-              : `${siteUrl}/blog`
+            : `${siteUrl}/blogs`
           }
         />
 
@@ -138,7 +139,7 @@ const BlogPage = () => {
         />
         <meta
           property="og:image"
-          content={selectedBlog?.image_url || `${siteUrl}/og-blog.jpg`}
+          content={selectedBlog?.image_url || DEFAULT_IMAGE}
         />
         <meta property="og:type" content="article" />
         <meta
@@ -146,7 +147,7 @@ const BlogPage = () => {
           content={
             selectedBlog
               ? `${siteUrl}/blog/${selectedBlog.id}`
-              : `${siteUrl}/blog`
+              : `${siteUrl}/blogs`
           }
         />
 
@@ -158,7 +159,7 @@ const BlogPage = () => {
         />
         <meta
           name="twitter:image"
-          content={selectedBlog?.image_url || `${siteUrl}/og-blog.jpg`}
+          content={selectedBlog?.image_url || DEFAULT_IMAGE}
         />
 
         {/* --- Structured Data --- */}

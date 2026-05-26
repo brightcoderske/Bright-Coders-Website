@@ -2,9 +2,10 @@ import React from "react";
 import "../Css/Founder.css";
 import founderImg from "../assets/AirBrush_20250725153208.jpg"; // replace with your real image
 import { Helmet } from "react-helmet-async";
+import { DEFAULT_IMAGE, SITE_URL } from "../Utils/seoData";
 
 const Founder = () => {
-  const siteUrl = import.meta.env.VITE_SITE_URL;
+  const siteUrl = SITE_URL;
 
   return (
     <>
@@ -29,7 +30,7 @@ const Founder = () => {
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/founder`} />
-        <meta property="og:image" content={`${siteUrl}/og-founder.jpg`} />
+        <meta property="og:image" content={DEFAULT_IMAGE} />
 
         {/* Structured Data */}
         <script type="application/ld+json">

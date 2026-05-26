@@ -11,6 +11,23 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { loadCachedList } from "../Utils/cachedApi";
+import { DEFAULT_IMAGE, SITE_URL } from "../Utils/seoData";
+import programData from "../Utils/programData";
+
+const fallbackCourses = programData.flatMap((group, groupIndex) =>
+  group.items.map((course, courseIndex) => ({
+    ...course,
+    id: `fallback-${groupIndex}-${courseIndex}`,
+    category: group.category,
+    image_url: course.image,
+    price: course.price.replace(/^KSh\s*/i, ""),
+  })),
+);
+
+const normalizeCourses = (data) => {
+  const rawCourses = Array.isArray(data) ? data : data?.data;
+  return Array.isArray(rawCourses) ? rawCourses : fallbackCourses;
+};
 
 const Programs = () => {
   const navigate = useNavigate();
@@ -19,29 +36,36 @@ const Programs = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_BASE_URL;
-  const siteUrl = import.meta.env.VITE_SITE_URL;
+  const siteUrl = SITE_URL;
 
   // 1. Fetch only LIVE courses from the database
   useEffect(() => {
     const fetchLiveCourses = async () => {
       try {
         setLoading(true);
+        if (!API_URL) {
+          setCourses(fallbackCourses);
+          return;
+        }
+
         await loadCachedList({
           cacheKey: "brightcoders:live-courses",
           url: `${API_URL}/courses/live`,
+          mapData: normalizeCourses,
           onData: setCourses,
         });
       } catch (err) {
         console.error("Error fetching programs:", err);
+        setCourses(fallbackCourses);
       } finally {
         setLoading(false);
       }
     };
     fetchLiveCourses();
-  }, []);
+  }, [API_URL]);
 
   // 2. Group the database results by category
-  const groupedCourses = courses.reduce((acc, course) => {
+  const groupedCourses = normalizeCourses(courses).reduce((acc, course) => {
     const category = course.category || "General";
     if (!acc[category]) acc[category] = [];
     acc[category].push(course);
@@ -125,7 +149,7 @@ const Programs = () => {
     <>
       {/* ================= SEO ================= */}
       <Helmet>
-        <title>Programs | Kids Coding Courses in Kenya | Bright Coders</title>
+        <title>Kids Coding Programs in Kenya | Scratch, Python & Web Design</title>
 
         <meta
           name="description"
@@ -134,7 +158,7 @@ const Programs = () => {
 
         <meta
           name="keywords"
-          content="kids coding programs, coding courses for children, programming for kids Kenya, Bright Coders courses"
+          content="kids coding programs Kenya, Scratch coding classes Nairobi, Python for kids Kenya, web design for kids, online coding classes Kenya"
         />
 
         <link rel="canonical" href={`${siteUrl}/programs`} />
@@ -150,7 +174,7 @@ const Programs = () => {
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/programs`} />
-        <meta property="og:image" content={`${siteUrl}/og-programs.jpg`} />
+        <meta property="og:image" content={DEFAULT_IMAGE} />
 
         {/* Structured Data */}
         {courses.length > 0 && (

@@ -11,6 +11,7 @@ import { Helmet } from "react-helmet-async";
 import "../Css/Contact.css";
 import { validateContact } from "../helper/validateContact";
 import axios from "axios";
+import { DEFAULT_IMAGE, SITE_URL } from "../Utils/seoData";
 
 const Contact = () => {
   const API_URL = import.meta.env.VITE_API_BASE_URL;
@@ -21,12 +22,12 @@ const Contact = () => {
   const [activeContact, setActiveContact] = useState("");
   const [errors, setErrors] = useState({});
   const [showModal, setShowModal] = useState(false);
-  const siteUrl = import.meta.env.VITE_SITE_URL; // Use env for canonical & og URLs
+  const siteUrl = SITE_URL;
 
   // Function for Hovering (Visual Only)
   const handleMouseEnter = (type) => {
     if (type === "email") {
-      setPopupText("developerisaac92@gmail.com");
+      setPopupText("brightcoderske@gmail.com");
       setActiveContact("email");
     } else {
       setPopupText("+254 740 073 575");
@@ -126,7 +127,7 @@ const Contact = () => {
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/contact`} />
-        <meta property="og:image" content={`${siteUrl}/og-contact.jpg`} />
+        <meta property="og:image" content={DEFAULT_IMAGE} />
 
         {/* Structured Data */}
         <script type="application/ld+json">
@@ -207,7 +208,7 @@ const Contact = () => {
                 <p>First Name</p>
                 <input
                   type="text"
-                  placeholder="e.g Isaac"
+                  placeholder="e.g Bright"
                   name="Name"
                   required
                 />
@@ -224,7 +225,7 @@ const Contact = () => {
                 <p>Email</p>
                 <input
                   type="email"
-                  placeholder="e.g isaac@gmail.com"
+                  placeholder="e.g brightcoderske@gmail.com"
                   name="Email"
                   required
                 />

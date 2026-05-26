@@ -3,13 +3,14 @@ import "../Css/FAQs.css";
 import { FaChevronDown } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
 import faqs from "../Utils/faqsData";
+import { DEFAULT_IMAGE, SITE_URL } from "../Utils/seoData";
 
 const FAQs = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [visibleFaqs, setVisibleFaqs] = useState([]);
   const [remainingFaqs, setRemainingFaqs] = useState([...faqs]);
 
-  const siteUrl = import.meta.env.VITE_SITE_URL;
+  const siteUrl = SITE_URL;
 
   // Load initial 5 FAQs on component mount
   useEffect(() => {
@@ -70,7 +71,7 @@ const FAQs = () => {
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/faqs`} />
-        <meta property="og:image" content={`${siteUrl}/og-faqs.jpg`} />
+        <meta property="og:image" content={DEFAULT_IMAGE} />
 
         {/* Structured Data */}
         <script type="application/ld+json">

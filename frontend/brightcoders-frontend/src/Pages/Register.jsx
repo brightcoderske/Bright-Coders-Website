@@ -19,6 +19,21 @@ import { validateStep } from "../helper/validateStep";
 import axios from "axios";
 import SuccessScreen from "../Components/SuccessScreen/SuccessScreen";
 import { loadCachedList } from "../Utils/cachedApi";
+import programData from "../Utils/programData";
+
+const fallbackCourses = programData.flatMap((group, groupIndex) =>
+  group.items.map((course, courseIndex) => ({
+    ...course,
+    id: `fallback-register-${groupIndex}-${courseIndex}`,
+    category: group.category,
+    price: course.price.replace(/^KSh\s*/i, ""),
+  })),
+);
+
+const normalizeCourses = (data) => {
+  const rawCourses = Array.isArray(data) ? data : data?.data;
+  return Array.isArray(rawCourses) ? rawCourses : fallbackCourses;
+};
 
 export default function Register() {
   const location = useLocation();
@@ -67,11 +82,19 @@ export default function Register() {
   useEffect(() => {
     const fetchAndInitialize = async () => {
       try {
-        const courses = await loadCachedList({
-          cacheKey: "brightcoders:live-courses",
-          url: `${import.meta.env.VITE_API_BASE_URL}/courses/live`,
-          onData: setDbCourses,
-        });
+        const apiUrl = import.meta.env.VITE_API_BASE_URL;
+        const courses = apiUrl
+          ? await loadCachedList({
+              cacheKey: "brightcoders:live-courses",
+              url: `${apiUrl}/courses/live`,
+              mapData: normalizeCourses,
+              onData: setDbCourses,
+            })
+          : fallbackCourses;
+
+        if (!apiUrl) {
+          setDbCourses(fallbackCourses);
+        }
 
         // Handle pre-selected course from navigation state
         if (location.state?.selectedCourse) {
@@ -92,6 +115,7 @@ export default function Register() {
         }
       } catch (error) {
         console.error("Error while fetching data from the Database: ", error);
+        setDbCourses(fallbackCourses);
       }
     };
     fetchAndInitialize();

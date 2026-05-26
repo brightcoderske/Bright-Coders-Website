@@ -167,7 +167,7 @@ const Navbar = () => {
                    */}
                   <HashLink
                     smooth
-                    to="/home#why-choose-us"
+                    to="/#why-choose-us"
                     onClick={closeAllMenus}
                   >
                     <FaStarHalfAlt className="nav-icon" />

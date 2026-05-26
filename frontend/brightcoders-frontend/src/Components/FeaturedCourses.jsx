@@ -5,26 +5,52 @@ import { MdReadMore } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { loadCachedList } from "../Utils/cachedApi";
+import { SITE_URL } from "../Utils/seoData";
+import featuredCourseData from "../Utils/featuredCourseData";
+
+const fallbackFeaturedCourses = featuredCourseData.map((course, index) => ({
+  id: `fallback-featured-${index}`,
+  title: course.title,
+  level: course.header1,
+  image_url: course.image,
+  focus: course.focus.split(",").map((item) => item.trim()),
+  duration: course.duration,
+  price: course.fee.replace(/^KSh\.\s*/i, ""),
+  is_featured: true,
+}));
+
+const normalizeFeaturedCourses = (data) => {
+  const rawCourses = Array.isArray(data) ? data : data?.data;
+  return Array.isArray(rawCourses) ? rawCourses : fallbackFeaturedCourses;
+};
 
 const FeaturedCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const SITE_URL = import.meta.env.VITE_SITE_URL;
 
   useEffect(() => {
     const fetchLiveCourses = async () => {
       try {
         setLoading(true);
         const API_URL = import.meta.env.VITE_API_BASE_URL;
+        if (!API_URL) {
+          setCourses(fallbackFeaturedCourses);
+          return;
+        }
+
         await loadCachedList({
           cacheKey: "brightcoders:featured-courses",
           url: `${API_URL}/courses/live`,
-          mapData: (data) => data.filter((course) => course.is_featured === true),
+          mapData: (data) =>
+            normalizeFeaturedCourses(data).filter(
+              (course) => course.is_featured === true || course.is_featured === 1,
+            ),
           onData: setCourses,
         });
       } catch (err) {
         console.error("Failed to fetch featured courses", err);
+        setCourses(fallbackFeaturedCourses);
       } finally {
         setLoading(false);
       }

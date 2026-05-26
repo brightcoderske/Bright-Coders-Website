@@ -32,10 +32,20 @@ const TestimonialsCard = () => {
   useEffect(() => {
     const fetchLiveReviews = async () => {
       try {
+        if (!API_URL) {
+          setLiveTestimonials([]);
+          return;
+        }
+
         await loadCachedList({
           cacheKey: "brightcoders:live-testimonials",
           url: `${API_URL.replace(/\/$/, "")}/testimonials/live`,
-          mapData: (data) => data.slice(0, 15),
+          mapData: (data) => {
+            const rawTestimonials = Array.isArray(data) ? data : data?.data;
+            return Array.isArray(rawTestimonials)
+              ? rawTestimonials.slice(0, 15)
+              : [];
+          },
           onData: setLiveTestimonials,
         });
       } catch (error) {

@@ -4,6 +4,7 @@ import axios from "axios";
 import { ShieldCheck, ShieldX, Loader2, Search } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import "./CertificateVerify.css";
+import { DEFAULT_IMAGE, SITE_URL } from "../../Utils/seoData";
 
 const CertificateVerify = () => {
   const { regNumber } = useParams(); // Grabs the ID from the URL
@@ -61,7 +62,7 @@ const CertificateVerify = () => {
     }
   };
 
-  const siteUrl = import.meta.env.VITE_SITE_URL;
+  const siteUrl = SITE_URL;
 
   return (
     <>
@@ -86,7 +87,7 @@ const CertificateVerify = () => {
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/verify`} />
-        <meta property="og:image" content={`${siteUrl}/og-verify.jpg`} />
+        <meta property="og:image" content={DEFAULT_IMAGE} />
       </Helmet>
 
       {/* ================= PAGE ================= */}

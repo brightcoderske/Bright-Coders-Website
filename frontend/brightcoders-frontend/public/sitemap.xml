@@ -1,40 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
   <url>
     <loc>https://www.brightcoderske.co.ke/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
   </url>
-
   <url>
     <loc>https://www.brightcoderske.co.ke/about</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://www.brightcoderske.co.ke/programs</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
   </url>
-
+  <url>
+    <loc>https://www.brightcoderske.co.ke/register</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
   <url>
     <loc>https://www.brightcoderske.co.ke/contact</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
   </url>
-
+  <url>
+    <loc>https://www.brightcoderske.co.ke/student-work</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
   <url>
     <loc>https://www.brightcoderske.co.ke/blogs</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
   </url>
-
   <url>
     <loc>https://www.brightcoderske.co.ke/faqs</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://www.brightcoderske.co.ke/founder</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
   </url>
-
   <url>
     <loc>https://www.brightcoderske.co.ke/testimonials</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://www.brightcoderske.co.ke/verify</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
-
 </urlset>

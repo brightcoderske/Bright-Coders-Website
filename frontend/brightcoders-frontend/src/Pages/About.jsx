@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import "../Css/AboutUs.css";
 import about_image_1 from "../assets/about-image-1.webp";
 import founder from "../assets/AirBrush_20250725153208.jpg";
+import { DEFAULT_IMAGE, SITE_URL } from "../Utils/seoData";
 
 const AboutUs = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const AboutUs = () => {
     navigate("/register");
   };
 
-  const siteUrl = import.meta.env.VITE_SITE_URL;
+  const siteUrl = SITE_URL;
 
   return (
     <>
@@ -51,7 +52,7 @@ const AboutUs = () => {
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteUrl}/about`} />
-        <meta property="og:image" content={`${siteUrl}/og-about.jpg`} />
+        <meta property="og:image" content={DEFAULT_IMAGE} />
 
         {/* Structured Data */}
         <script type="application/ld+json">

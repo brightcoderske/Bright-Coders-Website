@@ -5,23 +5,24 @@ import WhyChoseUs from "../Components/WhyChoseUs";
 import HowItWorks from "../Components/HowItWorks";
 import AboutHomepage from "../Components/AboutHomepage";
 import Testimonials from "../Components/Testimonials";
+import { DEFAULT_IMAGE, SITE_URL } from "../Utils/seoData";
 
 const DashboardLayout = () => {
-  const baseUrl = import.meta.env.VITE_SITE_URL || "http://localhost:5173";
-  const fullImageUrl = `${baseUrl}/logo2.png`;
+  const baseUrl = SITE_URL;
+  const fullImageUrl = DEFAULT_IMAGE;
 
   return (
     <>
       <Helmet>
         {/* Standard SEO */}
-        <title>Bright Coders | Learn Programming & Tech Skills in Kenya</title>
+        <title>Coding Classes for Kids & Teens in Kenya | Bright Coders</title>
         <meta
           name="description"
-          content="Bright Coders is a leading tech training institute in Kenya offering programming, web development, and software engineering courses."
+          content="Fun coding, robotics, Scratch, Python and web design classes for kids and teens in Kenya. Small groups, certificates and parent updates."
         />
         <meta
           name="keywords"
-          content="coding school Kenya, programming courses Nairobi, Bright Coders, learn javascript kenya"
+          content="coding classes for kids Kenya, coding for kids Nairobi, programming for kids Kenya, robotics classes for kids Kenya, Scratch coding Kenya, Python for kids Kenya"
         />
         <link rel="canonical" href={baseUrl} />
 
@@ -31,11 +32,11 @@ const DashboardLayout = () => {
         <meta property="og:url" content={baseUrl} />
         <meta
           property="og:title"
-          content="Bright Coders | Tech Training Institute"
+          content="Coding Classes for Kids & Teens in Kenya | Bright Coders"
         />
         <meta
           property="og:description"
-          content="Master coding and software engineering in Kenya. Join Bright Coders today."
+          content="Small-group coding classes for Kenyan kids and teens: Scratch, Python, JavaScript, web design, robotics and AI basics."
         />
         <meta property="og:image" content={fullImageUrl} />
 
@@ -43,11 +44,11 @@ const DashboardLayout = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:title"
-          content="Bright Coders | Learn Programming"
+          content="Coding Classes for Kids & Teens in Kenya | Bright Coders"
         />
         <meta
           name="twitter:description"
-          content="Expert tech training in the heart of Kenya."
+          content="Fun project-based coding classes for kids and teens in Kenya."
         />
         <meta name="twitter:image" content={fullImageUrl} />
 
