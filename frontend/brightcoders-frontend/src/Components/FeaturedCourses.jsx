@@ -21,7 +21,9 @@ const fallbackFeaturedCourses = featuredCourseData.map((course, index) => ({
 
 const normalizeFeaturedCourses = (data) => {
   const rawCourses = Array.isArray(data) ? data : data?.data;
-  return Array.isArray(rawCourses) ? rawCourses : fallbackFeaturedCourses;
+  return Array.isArray(rawCourses) && rawCourses.length > 0
+    ? rawCourses
+    : fallbackFeaturedCourses;
 };
 
 const FeaturedCourses = () => {

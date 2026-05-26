@@ -26,7 +26,9 @@ const fallbackCourses = programData.flatMap((group, groupIndex) =>
 
 const normalizeCourses = (data) => {
   const rawCourses = Array.isArray(data) ? data : data?.data;
-  return Array.isArray(rawCourses) ? rawCourses : fallbackCourses;
+  return Array.isArray(rawCourses) && rawCourses.length > 0
+    ? rawCourses
+    : fallbackCourses;
 };
 
 const Programs = () => {

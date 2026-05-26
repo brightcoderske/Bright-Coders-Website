@@ -12,7 +12,7 @@ const featuredCourseData = [
     focus: "Animations, games, logic building.",
     duration: "3 weeks",
     DurationIcon: FiClock,
-    fee: "KSh. 3,000",
+    fee: "KSh. 4,000",
   },
   {
     title: "HTML & CSS",
@@ -21,7 +21,7 @@ const featuredCourseData = [
     focus: "Web pages,  layouts, creativity.",
     duration: "3 weeks",
     DurationIcon: FiClock,
-    fee: "KSh. 3,000",
+    fee: "KSh. 4,000",
   },
   {
     title: "Junior JavaScript",
@@ -30,7 +30,7 @@ const featuredCourseData = [
     focus: "websites, variables, problem solving.",
     duration: "3 weeks",
     DurationIcon: FiClock,
-    fee: "KSh. 3,000",
+    fee: "KSh. 4,000",
   },
   {
     title: "Python for Kids",
@@ -39,7 +39,7 @@ const featuredCourseData = [
     focus: "Games, basic algorithms, problem solving.",
     duration: "3 weeks",
     DurationIcon: FiClock,
-    fee: "KSh. 3,000",
+    fee: "KSh. 4,000",
   },
   // {
   //   title: "Python for Kids",
@@ -48,7 +48,7 @@ const featuredCourseData = [
   //   focus: "Games, basic algorithms, problem solving.",
   //   duration: "3 weeks",
   //   DurationIcon: FiClock,
-  //   fee: "KSh. 3,000",
+  //   fee: "KSh. 4,000",
   // },
 ];
 

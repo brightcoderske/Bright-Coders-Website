@@ -22,7 +22,7 @@ const faqs = [
   {
     question: "How much do the programs cost?",
     answer:
-      "Most courses start at KSh 3,000. Prices vary depending on the level and focus.",
+      "Most courses start at KSh 4,000. Prices vary depending on the level and focus.",
   },
   {
     question: "What programming languages will my child learn?",

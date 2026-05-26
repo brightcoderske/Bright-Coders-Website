@@ -139,7 +139,7 @@ export const buildOrganizationSchema = () => ({
     "Bright Coders provides coding, robotics, Scratch, Python, web design and digital skills classes for kids and teens in Kenya.",
   telephone: CONTACT_PHONE,
   email: CONTACT_EMAIL,
-  priceRange: "KSh 3,000+",
+  priceRange: "KSh 4,000+",
   areaServed: [
     { "@type": "Country", name: "Kenya" },
     { "@type": "City", name: "Nairobi" },
@@ -183,4 +183,3 @@ export const buildWebsiteSchema = () => ({
     "query-input": "required name=search_term_string",
   },
 });
-

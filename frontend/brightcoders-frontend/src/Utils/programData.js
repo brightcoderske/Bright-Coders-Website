@@ -11,7 +11,7 @@ const programData = [
       {
         title: "Scratch Coding Introduction",
         duration: "3 weeks",
-        price: "KSh 3,000",
+        price: "KSh 4,000",
         focus: ["Animations", "Games", "Logic"],
         level: "Beginner",
         image: scratchImage,
@@ -37,7 +37,7 @@ const programData = [
       {
         title: "Scratch Game Development",
         duration: "4 weeks",
-        price: "KSh 3,500",
+        price: "KSh 4,000",
         focus: ["Game logic", "Sprites", "Storytelling"],
         level: "Beginner",
         image: scratchImage,
@@ -62,7 +62,7 @@ const programData = [
       {
         title: "Scratch Game Development 2",
         duration: "4 weeks",
-        price: "KSh 3,500",
+        price: "KSh 4,000",
         focus: ["Game logic", "Sprites", "Storytelling"],
         level: "Intermediate",
         image: scratchImage,
@@ -92,7 +92,7 @@ const programData = [
       {
         title: "HTML & CSS",
         duration: "3 weeks",
-        price: "KSh 3,000",
+        price: "KSh 4,000",
         focus: ["Web Pages", "Layouts", "Creativity"],
         level: "Intermediate",
         image: htmlIcon,
@@ -114,7 +114,7 @@ const programData = [
       {
         title: "Junior JavaScript",
         duration: "3 weeks",
-        price: "KSh 3,000",
+        price: "KSh 4,000",
         focus: ["Variables", "Websites", "Logic"],
         level: "Advanced",
         image: jsIcon,
@@ -141,7 +141,7 @@ const programData = [
       {
         title: "Python for Kids",
         duration: "3 weeks",
-        price: "KSh 3,000",
+        price: "KSh 4,000",
         focus: ["Games", "Basics", "Problem Solving"],
         level: "Beginner",
         image: pythonIcon,
@@ -163,7 +163,7 @@ const programData = [
       {
         title: "Machine Learning for Kids",
         duration: "3 weeks",
-        price: "KSh 3,500",
+        price: "KSh 4,000",
         focus: ["Games", "Basics", "Problem Solving"],
         level: "Beginner",
         image: ml,
@@ -188,7 +188,7 @@ const programData = [
       {
         title: "Python for Kids 2",
         duration: "3 weeks",
-        price: "KSh 3,000",
+        price: "KSh 4,000",
         focus: ["Games", "Basics", "Problem Solving"],
         level: "Beginner",
         image: pythonIcon,
